@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Box — Système de caisse</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0d0d0d;--bg2:#141414;--bg3:#1a1a1a;--bg4:#222;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);--text:#f0ede8;--text2:#888;--text3:#555;--accent:#c8a96e;--accent2:#a07840;--green:#4caf7d;--red:#e05c5c;--orange:#e0935c;--blue:#5c9fe0;--radius:10px;--radius-lg:16px}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;display:flex}
+
+/* ── LOGIN ── */
+.login-screen{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:0}
+.login-screen.hidden{display:none}
+.login-box{background:var(--bg2);border:1px solid var(--border2);border-radius:24px;padding:40px 44px;width:380px;text-align:center}
+.login-logo{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:4px;color:var(--accent);margin-bottom:4px}
+.login-sub{font-size:11px;color:var(--text3);letter-spacing:3px;text-transform:uppercase;margin-bottom:32px}
+.role-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:24px}
+.role-btn{padding:16px 12px;border-radius:12px;border:1.5px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;transition:.2s;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500}
+.role-btn:hover{border-color:var(--accent);color:var(--accent);background:rgba(200,169,110,.05)}
+.role-btn.selected{border-color:var(--accent);color:var(--accent);background:rgba(200,169,110,.1)}
+.role-icon{font-size:22px;display:block;margin-bottom:6px}
+.pin-label{font-size:12px;color:var(--text3);margin-bottom:10px;text-align:left}
+.pin-input{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:12px 16px;color:var(--text);font-size:20px;font-family:'DM Mono',monospace;letter-spacing:8px;text-align:center;outline:none;transition:.15s;margin-bottom:16px}
+.pin-input:focus{border-color:var(--accent)}
+.login-btn{width:100%;padding:13px;background:var(--accent);color:#0d0d0d;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:.15s}
+.login-btn:hover{background:var(--accent2)}
+.login-error{color:var(--red);font-size:12px;margin-top:10px;min-height:18px}
+.login-hint{font-size:11px;color:var(--text3);margin-top:16px;line-height:1.6}
+
+/* ── SIDEBAR ── */
+.sidebar{flex-shrink:0;width:220px;height:100vh;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;z-index:100}
+.logo{padding:24px 24px 18px;border-bottom:1px solid var(--border)}
+.logo-name{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:var(--accent);line-height:1}
+.logo-sub{font-size:10px;color:var(--text3);letter-spacing:3px;text-transform:uppercase;margin-top:3px}
+.nav{padding:16px 12px;flex:1;overflow-y:auto}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;cursor:pointer;color:var(--text2);font-size:13px;font-weight:500;transition:.15s;margin-bottom:4px;border:none;background:none;width:100%;text-align:left}
+.nav-item:hover{background:var(--bg3);color:var(--text)}
+.nav-item.active{background:var(--bg4);color:var(--accent);border:1px solid rgba(200,169,110,.15)}
+.nav-item.locked{opacity:.3;cursor:not-allowed;pointer-events:none}
+.nav-icon{width:18px;height:18px;opacity:.7}
+.nav-item.active .nav-icon{opacity:1}
+.sidebar-bottom{padding:16px 12px;border-top:1px solid var(--border);flex-shrink:0}
+.user-badge{display:flex;align-items:center;gap:8px;padding:8px 10px;background:var(--bg3);border-radius:8px;margin-bottom:10px}
+.user-avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0}
+.avatar-admin{background:rgba(200,169,110,.2);color:var(--accent)}
+.avatar-serveur{background:rgba(92,159,224,.2);color:var(--blue)}
+.user-name{font-size:12px;font-weight:500;color:var(--text)}
+.user-role{font-size:10px;color:var(--text3)}
+.logout-btn{width:100%;padding:8px;background:transparent;border:1px solid var(--border);border-radius:8px;color:var(--text3);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:.15s}
+.logout-btn:hover{border-color:var(--red);color:var(--red)}
+.status-dot{width:7px;height:7px;border-radius:50%;background:var(--green);display:inline-block;margin-right:6px}
+.status-text{font-size:11px;color:var(--text2)}
+
+/* ── MAIN ── */
+.main{flex:1;min-width:0;height:100vh;overflow-y:auto;overflow-x:hidden}
+.page{display:none;padding:28px 32px}
+.page.active{display:block}
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+.page-title{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:1.5px;color:var(--text)}
+.page-subtitle{font-size:12px;color:var(--text3);margin-top:2px}
+.header-right{display:flex;align-items:center;gap:10px}
+
+/* ── ACCESS DENIED ── */
+.access-denied{display:flex;flex-direction:column;align-items:center;justify-content:center;height:60vh;gap:12px;color:var(--text3)}
+.access-denied-icon{font-size:48px;opacity:.3}
+.access-denied-title{font-size:18px;font-weight:600;color:var(--text2)}
+.access-denied-sub{font-size:13px}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:none;transition:.15s;font-family:'DM Sans',sans-serif}
+.btn-primary{background:var(--accent);color:#0d0d0d}.btn-primary:hover{background:var(--accent2)}
+.btn-ghost{background:transparent;color:var(--text2);border:1px solid var(--border2)}.btn-ghost:hover{background:var(--bg3);color:var(--text)}
+.btn-danger{background:transparent;color:var(--red);border:1px solid rgba(224,92,92,.3)}.btn-danger:hover{background:rgba(224,92,92,.1)}
+.btn-sm{padding:6px 12px;font-size:12px}
+
+/* ── CARDS / GRID ── */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px 24px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.grid-4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:20px 22px}
+.stat-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.stat-value{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:1px;line-height:1;color:var(--text)}
+.stat-unit{font-size:14px;color:var(--text2);margin-left:4px;font-family:'DM Sans',sans-serif}
+.stat-delta{font-size:11px;margin-top:6px;color:var(--text3)}
+.delta-up{color:var(--green)}
+
+/* ── BADGE ── */
+.badge{display:inline-block;font-size:11px;font-weight:500;padding:3px 9px;border-radius:20px}
+.badge-green{background:rgba(76,175,125,.15);color:var(--green)}
+.badge-red{background:rgba(224,92,92,.15);color:var(--red)}
+.badge-orange{background:rgba(224,147,92,.15);color:var(--orange)}
+.badge-blue{background:rgba(92,159,224,.15);color:var(--blue)}
+.badge-accent{background:rgba(200,169,110,.15);color:var(--accent)}
+
+/* ── FORMS ── */
+.form-group{margin-bottom:14px}
+.form-label{font-size:12px;color:var(--text2);margin-bottom:6px;display:block;font-weight:500}
+.form-input{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:9px 13px;color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;transition:.15s}
+.form-input:focus{border-color:var(--accent);background:var(--bg4)}
+.form-input::placeholder{color:var(--text3)}
+select.form-input option{background:var(--bg3)}
+
+/* ── TABLE ── */
+.table-wrap{overflow-x:auto;width:100%}
+table{width:100%;border-collapse:collapse}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--text3);font-weight:500;padding:10px 14px;text-align:left;border-bottom:1px solid var(--border)}
+td{padding:12px 14px;border-bottom:1px solid var(--border);font-size:13px;color:var(--text2)}
+td.primary{color:var(--text);font-weight:500}
+tr:hover td{background:rgba(255,255,255,.02)}
+tr:last-child td{border-bottom:none}
+.divider{height:1px;background:var(--border);margin:20px 0}
+
+/* ── CAISSE ── */
+.pos-layout{display:grid;grid-template-columns:1fr 360px;gap:16px;height:calc(100vh - 130px);min-height:500px}
+.products-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;align-content:start;overflow-y:auto;padding-right:4px}
+.products-grid::-webkit-scrollbar{width:4px}
+.products-grid::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+.product-btn{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px 12px;cursor:pointer;text-align:left;transition:.2s;position:relative;overflow:hidden}
+.product-btn:hover{border-color:var(--accent);background:var(--bg3);transform:translateY(-1px)}
+.product-btn.out-of-stock{opacity:.35;cursor:not-allowed;pointer-events:none}
+.product-btn::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent);opacity:0;transition:.2s}
+.product-btn:hover::before{opacity:1}
+.product-cat-dot{width:6px;height:6px;border-radius:50%;margin-bottom:8px}
+.product-name{font-size:13px;font-weight:600;color:var(--text);margin-bottom:3px;line-height:1.3}
+.product-price{font-family:'DM Mono',monospace;font-size:13px;color:var(--accent);font-weight:500}
+.product-stock-info{font-size:10px;color:var(--text3);margin-top:3px}
+.cat-filter{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.cat-btn{padding:5px 13px;border-radius:20px;border:1px solid var(--border2);background:transparent;color:var(--text2);font-size:12px;cursor:pointer;transition:.15s;font-family:'DM Sans',sans-serif}
+.cat-btn:hover{background:var(--bg3)}
+.cat-btn.active{background:var(--accent);color:#0d0d0d;border-color:var(--accent);font-weight:600}
+.order-panel{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius-lg);display:flex;flex-direction:column;overflow:hidden}
+.order-header{padding:16px 18px;border-bottom:1px solid var(--border)}
+.order-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;color:var(--text)}
+.order-num{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;margin-top:2px}
+.order-items{flex:1;overflow-y:auto;padding:10px 18px}
+.order-items::-webkit-scrollbar{width:3px}
+.order-items::-webkit-scrollbar-thumb{background:var(--border2)}
+.order-empty{text-align:center;padding:30px 20px;color:var(--text3)}
+.order-empty-icon{font-size:28px;margin-bottom:8px;opacity:.3}
+.order-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--border)}
+.order-item:last-child{border-bottom:none}
+.order-item-name{flex:1;font-size:13px;font-weight:500;color:var(--text)}
+.order-item-cat{font-size:10px;color:var(--text3)}
+.qty-ctrl{display:flex;align-items:center;gap:5px}
+.qty-btn{width:24px;height:24px;border-radius:6px;border:1px solid var(--border2);background:var(--bg3);color:var(--text);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.1s}
+.qty-btn:hover{background:var(--accent);color:#0d0d0d;border-color:var(--accent)}
+.qty-num{font-family:'DM Mono',monospace;font-size:13px;font-weight:500;width:22px;text-align:center}
+.order-item-price{font-family:'DM Mono',monospace;font-size:13px;color:var(--accent);min-width:56px;text-align:right}
+.order-footer{padding:14px 18px;border-top:1px solid var(--border);background:var(--bg3)}
+.order-line{display:flex;justify-content:space-between;margin-bottom:7px;font-size:13px}
+.order-line .lbl{color:var(--text2)}
+.order-line .val{font-family:'DM Mono',monospace;color:var(--text)}
+.order-total-line{display:flex;justify-content:space-between;align-items:center;margin:12px 0;padding:12px 0;border-top:1px solid var(--border2);border-bottom:1px solid var(--border2)}
+.order-total-lbl{font-size:13px;font-weight:600;color:var(--text2)}
+.order-total-val{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:1px;color:var(--accent)}
+.validate-btn{width:100%;padding:13px;background:var(--accent);color:#0d0d0d;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:.15s;margin-bottom:7px}
+.validate-btn:hover{background:var(--accent2)}
+.validate-btn:disabled{opacity:.4;cursor:not-allowed}
+.clear-btn{width:100%;padding:8px;background:transparent;color:var(--text3);border:1px solid var(--border);border-radius:10px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:.15s}
+.clear-btn:hover{border-color:var(--red);color:var(--red)}
+
+/* ── DASHBOARD CHARTS ── */
+.chart-bar-wrap{margin-top:12px}
+.chart-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:7px}
+.chart-bar-label{font-size:12px;color:var(--text2);width:110px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chart-bar-track{flex:1;height:8px;background:var(--bg4);border-radius:4px;overflow:hidden}
+.chart-bar-fill{height:100%;border-radius:4px;transition:width .6s}
+.chart-bar-val{font-size:11px;font-family:'DM Mono',monospace;color:var(--text3);min-width:50px;text-align:right}
+.stock-gauge-wrap{display:flex;flex-direction:column;gap:9px;margin-top:8px}
+.gauge-row{display:flex;align-items:center;gap:10px}
+.gauge-label{font-size:12px;color:var(--text2);width:100px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gauge-track{flex:1;height:9px;background:var(--bg4);border-radius:5px;overflow:hidden}
+.gauge-fill{height:100%;border-radius:5px;transition:width .5s}
+.gauge-fill.ok{background:var(--green)}.gauge-fill.warn{background:var(--orange)}.gauge-fill.danger{background:var(--red)}
+.gauge-pct{font-size:11px;font-family:'DM Mono',monospace;color:var(--text3);min-width:40px;text-align:right}
+
+/* ── ADMIN ── */
+.recette-row{display:grid;grid-template-columns:1fr 90px 80px 36px;gap:8px;align-items:end;margin-bottom:8px}
+.btn-del-ing{width:36px;height:36px;background:transparent;border:1px solid var(--border2);border-radius:8px;color:var(--text3);cursor:pointer;font-size:16px;transition:.15s;display:flex;align-items:center;justify-content:center}
+.btn-del-ing:hover{background:rgba(224,92,92,.1);border-color:var(--red);color:var(--red)}
+.add-ing-btn{width:100%;padding:9px;background:transparent;border:1px dashed var(--border2);border-radius:8px;color:var(--text3);cursor:pointer;font-size:12px;transition:.15s;font-family:'DM Sans',sans-serif;margin-bottom:16px}
+.add-ing-btn:hover{border-color:var(--accent);color:var(--accent)}
+.product-list-item{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--bg3);border-radius:10px;margin-bottom:8px;border:1px solid var(--border)}
+.product-list-item:hover{border-color:var(--border2)}
+.pli-name{font-size:13px;font-weight:600;color:var(--text)}
+.pli-recette{font-size:11px;color:var(--text3);margin-top:3px}
+.pli-price{font-family:'DM Mono',monospace;font-size:14px;color:var(--accent);margin-right:12px}
+
+/* ── TOAST ── */
+.toast-container{position:fixed;top:16px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:8px}
+.toast{background:var(--bg3);border:1px solid var(--border2);border-radius:10px;padding:11px 16px;font-size:13px;color:var(--text);display:flex;align-items:center;gap:10px;transform:translateX(120%);transition:transform .3s cubic-bezier(.4,0,.2,1);min-width:240px;box-shadow:0 8px 32px rgba(0,0,0,.4)}
+.toast.show{transform:translateX(0)}
+.toast-icon{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;flex-shrink:0}
+.toast-success .toast-icon{background:rgba(76,175,125,.2);color:var(--green)}
+.toast-error .toast-icon{background:rgba(224,92,92,.2);color:var(--red)}
+.toast-warn .toast-icon{background:rgba(224,147,92,.2);color:var(--orange)}
+
+/* ── MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;display:none;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:20px;padding:28px 32px;width:520px;max-height:85vh;overflow-y:auto}
+.modal-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;margin-bottom:18px;color:var(--text)}
+.modal-actions{display:flex;gap:10px;margin-top:18px;justify-content:flex-end}
+
+/* ── RECEIPT ── */
+.receipt-modal{background:var(--bg2);border:1px solid var(--border2);border-radius:20px;padding:28px 32px;width:340px}
+.receipt-header{text-align:center;margin-bottom:18px;padding-bottom:14px;border-bottom:1px dashed var(--border2)}
+.receipt-logo{font-family:'Bebas Neue',sans-serif;font-size:34px;letter-spacing:3px;color:var(--accent)}
+.receipt-date{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;margin-top:4px}
+.receipt-items{margin-bottom:14px}
+.receipt-item{display:flex;justify-content:space-between;font-size:12px;color:var(--text2);padding:5px 0;border-bottom:1px solid var(--border)}
+.receipt-item:last-child{border-bottom:none}
+.receipt-total{display:flex;justify-content:space-between;padding-top:12px;border-top:1px solid var(--border2);margin-top:4px}
+.receipt-total span:first-child{font-weight:600;color:var(--text)}
+.receipt-total span:last-child{font-family:'DM Mono',monospace;font-weight:600;color:var(--accent);font-size:16px}
+.receipt-footer{text-align:center;margin-top:14px;font-size:10px;color:var(--text3);font-family:'DM Mono',monospace}
+
+/* ── LOADING ── */
+.loading{display:flex;align-items:center;justify-content:center;padding:40px;color:var(--text3);font-size:13px;gap:10px}
+.spinner{width:18px;height:18px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+</style>
+</head>
+<body>
+
+<!-- ══════════════ LOGIN SCREEN ══════════════ -->
+<div class="login-screen" id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">THE BOX</div>
+    <div class="login-sub">Système de caisse</div>
+    <div class="role-btns">
+      <button class="role-btn" id="role-admin" onclick="selectRole('admin')">
+        <span class="role-icon">👑</span>Administrateur
+      </button>
+      <button class="role-btn" id="role-serveur" onclick="selectRole('serveur')">
+        <span class="role-icon">☕</span>Serveur
+      </button>
+    </div>
+    <div class="pin-label">Code PIN</div>
+    <input class="pin-input" type="password" id="pin-input" maxlength="4" placeholder="••••" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">Se connecter</button>
+    <div class="login-error" id="login-error"></div>
+    <div class="login-hint">Admin : <b>1234</b> &nbsp;|&nbsp; Serveur : <b>0000</b></div>
+  </div>
+</div>
+
+<!-- ══════════════ TOAST ══════════════ -->
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ══════════════ SIDEBAR ══════════════ -->
+<div class="sidebar" id="sidebar" style="display:none">
+  <div class="logo">
+    <div class="logo-name">THE BOX</div>
+    <div class="logo-sub">Système de caisse</div>
+  </div>
+  <nav class="nav" id="nav">
+    <button class="nav-item active" id="nav-caisse" onclick="showPage('caisse')">
+      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>Caisse
+    </button>
+    <button class="nav-item" id="nav-dashboard" onclick="showPage('dashboard')">
+      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path d="M3 3v18h18"/><path d="M7 16l4-4 4 4 4-8"/></svg>Dashboard
+    </button>
+    <button class="nav-item" id="nav-stock" onclick="showPage('stock')">
+      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path d="M20 7l-8-4-8 4m16 0v10l-8 4m-8-4V7m8 4l8-4M4 7l8 4"/></svg>Stock
+    </button>
+    <button class="nav-item" id="nav-commandes" onclick="showPage('commandes')">
+      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>Commandes
+    </button>
+    <button class="nav-item" id="nav-admin" onclick="showPage('admin')">
+      <svg class="nav-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><circle cx="12" cy="12" r="3"/></svg>Administration
+    </button>
+  </nav>
+  <div class="sidebar-bottom">
+    <div class="user-badge">
+      <div class="user-avatar" id="user-avatar"></div>
+      <div><div class="user-name" id="user-name"></div><div class="user-role" id="user-role"></div></div>
+    </div>
+    <button class="logout-btn" onclick="logout()">Se déconnecter</button>
+    <div style="margin-top:10px;display:flex;align-items:center">
+      <span class="status-dot" id="api-dot"></span>
+      <span class="status-text" id="api-status">Connexion...</span>
+    </div>
+    <div style="margin-top:4px;font-size:11px;color:var(--text3);font-family:'DM Mono',monospace" id="clock"></div>
+  </div>
+</div>
+
+<!-- ══════════════ MAIN ══════════════ -->
+<div class="main" id="main-area" style="display:none">
+
+<!-- PAGE: CAISSE -->
+<div class="page active" id="page-caisse">
+  <div class="page-header">
+    <div>
+      <div class="page-title">Caisse</div>
+      <div class="page-subtitle" id="caisse-date"></div>
+    </div>
+    <div class="header-right">
+      <span id="commande-count" style="font-size:12px;color:var(--text3);font-family:'DM Mono',monospace"></span>
+    </div>
+  </div>
+  <div class="pos-layout">
+    <div>
+      <div class="cat-filter" id="cat-filter"></div>
+      <div class="products-grid" id="products-grid"><div class="loading"><div class="spinner"></div>Chargement...</div></div>
+    </div>
+    <div class="order-panel">
+      <div class="order-header">
+        <div class="order-title">Commande en cours</div>
+        <div class="order-num" id="order-num">N° —</div>
+      </div>
+      <div class="order-items" id="order-items">
+        <div class="order-empty"><div class="order-empty-icon">☕</div><div style="font-size:13px;color:var(--text3)">Sélectionnez des produits</div></div>
+      </div>
+      <div class="order-footer">
+        <div class="order-line"><span class="lbl">Sous-total</span><span class="val" id="subtotal">0.000 DT</span></div>
+        <div class="order-total-line">
+          <span class="order-total-lbl">TOTAL</span>
+          <span class="order-total-val" id="order-total">0.000 DT</span>
+        </div>
+        <button class="validate-btn" id="validate-btn" onclick="validerCommande()" disabled>Valider la commande</button>
+        <button class="clear-btn" onclick="clearOrder()">Vider la commande</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: DASHBOARD -->
+<div class="page" id="page-dashboard">
+  <div class="page-header">
+    <div><div class="page-title">Dashboard</div><div class="page-subtitle">Vue d'ensemble</div></div>
+  </div>
+  <div class="grid-4" style="margin-bottom:18px">
+    <div class="stat-card"><div class="stat-label">Ventes du jour</div><div><span class="stat-value" id="stat-ventes">—</span><span class="stat-unit">DT</span></div><div class="stat-delta delta-up" id="stat-delta-ventes"></div></div>
+    <div class="stat-card"><div class="stat-label">Commandes</div><div><span class="stat-value" id="stat-cmds">—</span></div><div class="stat-delta" id="stat-delta-cmds">aujourd'hui</div></div>
+    <div class="stat-card"><div class="stat-label">Produit phare</div><div class="stat-value" style="font-size:18px;margin-top:4px" id="stat-top">—</div><div class="stat-delta" id="stat-top-count"></div></div>
+    <div class="stat-card"><div class="stat-label">Alertes stock</div><div><span class="stat-value" id="stat-alerts" style="color:var(--orange)">—</span></div><div class="stat-delta" id="stat-alerts-lbl"></div></div>
+  </div>
+  <div class="grid-2" style="margin-bottom:16px">
+    <div class="card"><div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px">Ventes par produit</div><div style="font-size:11px;color:var(--text3)">Unités vendues aujourd'hui</div><div class="chart-bar-wrap" id="chart-produits"></div></div>
+    <div class="card"><div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:4px">Stock ingrédients</div><div style="font-size:11px;color:var(--text3)">Niveau actuel vs seuil</div><div class="stock-gauge-wrap" id="stock-gauges"></div></div>
+  </div>
+  <div class="card"><div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:14px">Dernières commandes</div><div class="table-wrap"><table><thead><tr><th>N°</th><th>Heure</th><th>Produits</th><th>Total</th><th>Statut</th></tr></thead><tbody id="dash-commandes"></tbody></table></div></div>
+</div>
+
+<!-- PAGE: STOCK -->
+<div class="page" id="page-stock">
+  <div class="page-header">
+    <div><div class="page-title">Stock</div><div class="page-subtitle">Ingrédients & niveaux</div></div>
+    <div class="header-right" id="stock-header-actions"></div>
+  </div>
+  <div class="grid-3" style="margin-bottom:18px" id="stock-cards"></div>
+  <div class="card"><div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:14px">Tous les ingrédients</div><div class="table-wrap"><table><thead><tr><th>Ingrédient</th><th>Stock actuel</th><th>Seuil min</th><th>Unité</th><th>Statut</th><th>Actions</th></tr></thead><tbody id="stock-table"></tbody></table></div></div>
+</div>
+
+<!-- PAGE: COMMANDES -->
+<div class="page" id="page-commandes">
+  <div class="page-header"><div><div class="page-title">Commandes</div><div class="page-subtitle">Historique complet</div></div></div>
+  <div class="card"><div class="table-wrap"><table><thead><tr><th>N°</th><th>Date / Heure</th><th>Produits</th><th>Total</th><th>Statut</th></tr></thead><tbody id="commandes-table"></tbody></table></div></div>
+</div>
+
+<!-- PAGE: ADMIN -->
+<div class="page" id="page-admin">
+  <div class="page-header">
+    <div><div class="page-title">Administration</div><div class="page-subtitle">Gestion du menu et des recettes</div></div>
+    <div class="header-right" id="admin-header-actions"></div>
+  </div>
+  <div id="admin-content"></div>
+</div>
+
+</div><!-- /.main -->
+
+<!-- MODAL: PRODUIT -->
+<div class="modal-overlay" id="modal-product">
+  <div class="modal">
+    <div class="modal-title">Nouveau produit</div>
+    <div class="grid-2">
+      <div class="form-group"><label class="form-label">Nom du produit</label><input class="form-input" id="new-product-name" placeholder="Ex: Frappuccino caramel"></div>
+      <div class="form-group"><label class="form-label">Prix (DT)</label><input class="form-input" type="number" id="new-product-price" placeholder="4.500" step="0.5"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Catégorie</label><select class="form-input" id="new-product-cat"><option>Boisson chaude</option><option>Boisson froide</option><option>Pâtisserie</option><option>Snack</option></select></div>
+    <div class="divider"></div>
+    <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">Recette — ingrédients consommés</div>
+    <div id="new-recette-rows"></div>
+    <button class="add-ing-btn" onclick="addRecetteRow()">+ Ajouter un ingrédient</button>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-product')">Annuler</button>
+      <button class="btn btn-primary" onclick="saveNewProduct()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: INGRÉDIENT -->
+<div class="modal-overlay" id="modal-ingredient">
+  <div class="modal" style="width:420px">
+    <div class="modal-title">Nouvel ingrédient</div>
+    <div class="form-group"><label class="form-label">Nom</label><input class="form-input" id="new-ing-name" placeholder="Ex: Sirop vanille"></div>
+    <div class="grid-2">
+      <div class="form-group"><label class="form-label">Stock initial</label><input class="form-input" type="number" id="new-ing-stock" placeholder="500"></div>
+      <div class="form-group"><label class="form-label">Unité</label><select class="form-input" id="new-ing-unite"><option>g</option><option>ml</option><option>unité</option><option>cl</option><option>L</option><option>kg</option></select></div>
+    </div>
+    <div class="form-group"><label class="form-label">Seuil minimum d'alerte</label><input class="form-input" type="number" id="new-ing-seuil" placeholder="100"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-ingredient')">Annuler</button>
+      <button class="btn btn-primary" onclick="saveNewIngredient()">Ajouter</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: REÇU -->
+<div class="modal-overlay" id="modal-receipt">
+  <div class="receipt-modal">
+    <div class="receipt-header"><div class="receipt-logo">THE BOX</div><div class="receipt-date" id="receipt-date"></div></div>
+    <div class="receipt-items" id="receipt-items"></div>
+    <div class="receipt-total"><span>TOTAL</span><span id="receipt-total"></span></div>
+    <div class="receipt-footer">Merci pour votre visite !<br>The Box Café</div>
+    <div style="display:flex;gap:8px;margin-top:14px">
+      <button class="btn btn-ghost btn-sm" style="flex:1" onclick="closeModal('modal-receipt')">Fermer</button>
+      <button class="btn btn-primary btn-sm" style="flex:1" onclick="closeModal('modal-receipt')">OK</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = 'http://localhost:3001/api';
+const CAT_COLORS = {'Boisson chaude':'#c8a96e','Boisson froide':'#5c9fe0','Pâtisserie':'#e0935c','Snack':'#4caf7d','Tous':'#888'};
+
+// ══════════════════════════════════════════════
+// AUTH — rôles et PIN
+// ══════════════════════════════════════════════
+const PINS = { admin: '1234', serveur: '0000' };
+// Permissions par rôle
+const PERMS = {
+  admin:   { stock:true, admin:true, reappro:true, toggleProduit:true, addProduit:true, addIngredient:true },
+  serveur: { stock:false, admin:false, reappro:false, toggleProduit:false, addProduit:false, addIngredient:false }
+};
+
+let currentUser = null; // { role, nom }
+let selectedRole = null;
+let currentOrder = [];
+let currentFilter = 'Tous';
+let db = { produits:[], ingredients:[], commandeCounter:1 };
+
+function selectRole(role){
+  selectedRole = role;
+  document.querySelectorAll('.role-btn').forEach(b=>b.classList.remove('selected'));
+  document.getElementById('role-'+role).classList.add('selected');
+  document.getElementById('pin-input').focus();
+  document.getElementById('login-error').textContent='';
+}
+
+function doLogin(){
+  const pin = document.getElementById('pin-input').value;
+  if(!selectedRole){ document.getElementById('login-error').textContent='Choisissez un rôle'; return; }
+  if(pin !== PINS[selectedRole]){ document.getElementById('login-error').textContent='Code PIN incorrect'; document.getElementById('pin-input').value=''; return; }
+  currentUser = { role: selectedRole, nom: selectedRole==='admin' ? 'Administrateur' : 'Serveur' };
+  document.getElementById('login-screen').classList.add('hidden');
+  document.getElementById('sidebar').style.display='flex';
+  document.getElementById('main-area').style.display='flex';
+  applyRoleUI();
+  initApp();
+}
+
+function logout(){
+  currentUser = null; selectedRole = null;
+  document.getElementById('login-screen').classList.remove('hidden');
+  document.getElementById('sidebar').style.display='none';
+  document.getElementById('main-area').style.display='none';
+  document.getElementById('pin-input').value='';
+  document.getElementById('login-error').textContent='';
+  document.querySelectorAll('.role-btn').forEach(b=>b.classList.remove('selected'));
+  currentOrder = [];
+}
+
+function can(perm){ return currentUser && PERMS[currentUser.role][perm]; }
+
+function applyRoleUI(){
+  const isAdmin = currentUser.role === 'admin';
+  // Sidebar user badge
+  const av = document.getElementById('user-avatar');
+  av.className = 'user-avatar ' + (isAdmin?'avatar-admin':'avatar-serveur');
+  av.textContent = isAdmin ? '👑' : '☕';
+  document.getElementById('user-name').textContent = isAdmin ? 'Admin' : 'Serveur';
+  document.getElementById('user-role').textContent = isAdmin ? 'Accès complet' : 'Caisse uniquement';
+  // Lock nav items for serveur
+  if(!isAdmin){
+    document.getElementById('nav-stock').classList.add('locked');
+    document.getElementById('nav-admin').classList.add('locked');
+  } else {
+    document.getElementById('nav-stock').classList.remove('locked');
+    document.getElementById('nav-admin').classList.remove('locked');
+  }
+}
+
+// ══════════════════════════════════════════════
+// CLOCK
+// ══════════════════════════════════════════════
+function updateClock(){
+  const now = new Date();
+  const cl = document.getElementById('clock');
+  if(cl) cl.textContent = now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  const cd = document.getElementById('caisse-date');
+  if(cd) cd.textContent = now.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+}
+setInterval(updateClock,1000); updateClock();
+
+// ══════════════════════════════════════════════
+// API helpers
+// ══════════════════════════════════════════════
+async function apiFetch(path, opts={}){
+  try{
+    const r = await fetch(API+path, {headers:{'Content-Type':'application/json'}, ...opts});
+    return await r.json();
+  } catch(e){
+    return null;
+  }
+}
+
+async function checkApiStatus(){
+  const dot = document.getElementById('api-dot');
+  const lbl = document.getElementById('api-status');
+  const r = await apiFetch('/status');
+  if(r && r.server){
+    dot.style.background='var(--green)';
+    lbl.textContent = r.whatsapp ? 'WA connecté' : 'WA hors ligne';
+  } else {
+    dot.style.background='var(--red)';
+    lbl.textContent = 'Serveur hors ligne';
+  }
+}
+
+// ══════════════════════════════════════════════
+// INIT — charge les données depuis l'API
+// ══════════════════════════════════════════════
+async function initApp(){
+  checkApiStatus();
+  setInterval(checkApiStatus, 30000);
+  await loadProduits();
+  await loadIngredients();
+  renderCaisse();
+}
+
+async function loadProduits(){
+  const data = await apiFetch('/produits');
+  if(data && Array.isArray(data)){
+    // Normaliser le format API → format local
+    db.produits = data.map(p=>({
+      id: p.id,
+      nom: p.nom,
+      prix: parseFloat(p.prix),
+      cat: p.categorie || p.cat || 'Boisson chaude',
+      actif: p.actif,
+      recette: (p.recettes || []).map(r=>({
+        ing: r.ingredient_id,
+        qty: parseFloat(r.quantite)
+      }))
+    }));
+  }
+  // Fallback si API hors ligne
+  if(!db.produits.length) db.produits = FALLBACK_PRODUITS;
+}
+
+async function loadIngredients(){
+  const data = await apiFetch('/stock');
+  if(data && Array.isArray(data)){
+    db.ingredients = data.map(i=>({
+      id: i.id,
+      nom: i.nom,
+      stock: parseFloat(i.stock_actuel),
+      unite: i.unite,
+      seuil: parseFloat(i.seuil_minimum)
+    }));
+  }
+  if(!db.ingredients.length) db.ingredients = FALLBACK_INGREDIENTS;
+}
+
+// ══════════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════════
+function showPage(name){
+  if(name==='stock' && !can('stock')){ showToast('Accès réservé à l\'admin','warn'); return; }
+  if(name==='admin' && !can('admin')){ showToast('Accès réservé à l\'admin','warn'); return; }
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.getElementById('nav-'+name).classList.add('active');
+  if(name==='dashboard') renderDashboard();
+  if(name==='stock') renderStock();
+  if(name==='commandes') renderCommandes();
+  if(name==='admin') renderAdmin();
+}
+
+// ══════════════════════════════════════════════
+// CAISSE
+// ══════════════════════════════════════════════
+function renderCaisse(){
+  const cats = ['Tous',...new Set(db.produits.filter(p=>p.actif).map(p=>p.cat))];
+  const cf = document.getElementById('cat-filter');
+  cf.innerHTML = cats.map(c=>`<button class="cat-btn ${c===currentFilter?'active':''}"
+    onclick="filterCat('${c}')" style="${c!=='Tous'?'border-color:'+CAT_COLORS[c]+'40':''}">${c}</button>`).join('');
+  const filtered = (currentFilter==='Tous' ? db.produits : db.produits.filter(p=>p.cat===currentFilter)).filter(p=>p.actif);
+  const pg = document.getElementById('products-grid');
+  if(!filtered.length){ pg.innerHTML='<div class="loading">Aucun produit</div>'; return; }
+  pg.innerHTML = filtered.map(p=>{
+    const canMake = canMakeProduct(p);
+    return `<button class="product-btn ${!canMake?'out-of-stock':''}" onclick="addToOrder(${p.id})">
+      <div class="product-cat-dot" style="background:${CAT_COLORS[p.cat]||'#888'}"></div>
+      <div class="product-name">${p.nom}</div>
+      <div class="product-price">${p.prix.toFixed(3)} DT</div>
+      <div class="product-stock-info">${canMake?getCantMake(p)+' portions dispo':'Stock insuffisant'}</div>
+    </button>`;
+  }).join('');
+}
+
+function getCantMake(p){
+  if(!p.recette||!p.recette.length) return 99;
+  let min=Infinity;
+  for(const r of p.recette){
+    const ing=db.ingredients.find(i=>i.id===r.ing);
+    if(ing) min=Math.min(min,Math.floor(ing.stock/r.qty));
+  }
+  return min===Infinity?99:min;
+}
+function canMakeProduct(p){ return getCantMake(p)>0; }
+function filterCat(cat){ currentFilter=cat; renderCaisse(); }
+
+function addToOrder(produitId){
+  const p=db.produits.find(x=>x.id===produitId);
+  if(!p) return;
+  const existing=currentOrder.find(x=>x.id===produitId);
+  if(existing) existing.qty++;
+  else currentOrder.push({id:p.id,nom:p.nom,prix:p.prix,cat:p.cat,qty:1,recette:p.recette});
+  renderOrder();
+}
+
+function renderOrder(){
+  const oi=document.getElementById('order-items');
+  if(!currentOrder.length){
+    oi.innerHTML=`<div class="order-empty"><div class="order-empty-icon">☕</div><div style="font-size:13px;color:var(--text3)">Sélectionnez des produits</div></div>`;
+    document.getElementById('validate-btn').disabled=true;
+    document.getElementById('subtotal').textContent='0.000 DT';
+    document.getElementById('order-total').textContent='0.000 DT';
+    document.getElementById('order-num').textContent='N° —';
+    return;
+  }
+  oi.innerHTML=currentOrder.map(item=>`
+    <div class="order-item">
+      <div style="flex:1"><div class="order-item-name">${item.nom}</div><div class="order-item-cat">${item.cat}</div></div>
+      <div class="qty-ctrl">
+        <button class="qty-btn" onclick="changeQty(${item.id},-1)">−</button>
+        <span class="qty-num">${item.qty}</span>
+        <button class="qty-btn" onclick="changeQty(${item.id},1)">+</button>
+      </div>
+      <div class="order-item-price">${(item.prix*item.qty).toFixed(3)} DT</div>
+    </div>`).join('');
+  const total=currentOrder.reduce((s,i)=>s+i.prix*i.qty,0);
+  document.getElementById('subtotal').textContent=total.toFixed(3)+' DT';
+  document.getElementById('order-total').textContent=total.toFixed(3)+' DT';
+  document.getElementById('validate-btn').disabled=false;
+  document.getElementById('order-num').textContent='N° '+db.commandeCounter;
+}
+
+function changeQty(id,delta){
+  const item=currentOrder.find(x=>x.id===id);
+  if(!item) return;
+  item.qty+=delta;
+  if(item.qty<=0) currentOrder=currentOrder.filter(x=>x.id!==id);
+  renderOrder();
+}
+function clearOrder(){ currentOrder=[]; renderOrder(); }
+
+async function validerCommande(){
+  if(!currentOrder.length) return;
+  const total=currentOrder.reduce((s,i)=>s+i.prix*i.qty,0);
+  const btn=document.getElementById('validate-btn');
+  btn.disabled=true; btn.textContent='Validation...';
+
+  const payload={
+    items: currentOrder.map(i=>({
+      produit_id: i.id,
+      nom: i.nom,
+      prix: i.prix,
+      quantite: i.qty,
+      recette: i.recette.map(r=>({ingredient_id:r.ing, quantite:r.qty}))
+    }))
+  };
+
+  const res = await apiFetch('/orders',{method:'POST',body:JSON.stringify(payload)});
+  btn.textContent='Valider la commande';
+
+  if(res && res.success){
+    showReceipt(currentOrder, total, res.commande_id);
+    db.commandeCounter++;
+    currentOrder=[];
+    renderOrder();
+    // Recharger le stock DEPUIS L'API pour avoir les vraies valeurs
+    await loadIngredients();
+    renderCaisse();
+    showToast(`Commande #${res.commande_id} validée — ${total.toFixed(3)} DT`,'success');
+  } else {
+    showToast('Serveur hors ligne — déduction locale','warn');
+    // Mode hors ligne : déduire localement
+    for(const item of currentOrder){
+      for(const r of item.recette){
+        const ing=db.ingredients.find(i=>i.id===r.ing);
+        if(ing) ing.stock=Math.max(0, ing.stock - r.qty*item.qty);
+      }
+    }
+    showReceipt(currentOrder, total, db.commandeCounter);
+    db.commandeCounter++;
+    currentOrder=[];
+    renderOrder();
+    renderCaisse();
+  }
+}
+
+function showReceipt(items, total, id){
+  document.getElementById('receipt-date').textContent=new Date().toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'})+' — N°'+id;
+  document.getElementById('receipt-items').innerHTML=items.map(i=>`<div class="receipt-item"><span>${i.qty}x ${i.nom}</span><span>${(i.prix*i.qty).toFixed(3)} DT</span></div>`).join('');
+  document.getElementById('receipt-total').textContent=total.toFixed(3)+' DT';
+  document.getElementById('modal-receipt').classList.add('open');
+}
+
+// ══════════════════════════════════════════════
+// DASHBOARD
+// ══════════════════════════════════════════════
+  <section class="page" id="page-dashboard">
+    <header class="page-header">
+      <div><h1 class="page-title">Dashboard</h1><p class="page-subtitle" id="dash-subtitle">Vue d'ensemble</p></div>
+      <div class="header-right" id="dash-header-right"></div>
+    </header>
+    <div class="stats-grid" id="stats-grid">
+      <div class="stat-card"><div class="stat-label">Ventes du jour</div><div class="stat-value" id="s-ventes">—</div><div class="stat-delta" id="s-cmds-delta"></div></div>
+      <div class="stat-card"><div class="stat-label">Commandes</div><div class="stat-value" id="s-cmds">—</div><div class="stat-delta">aujourd'hui</div></div>
+      <div class="stat-card"><div class="stat-label">Produit phare</div><div class="stat-value sm" id="s-top">—</div><div class="stat-delta" id="s-top-delta"></div></div>
+      <div class="stat-card"><div class="stat-label">Alertes stock</div><div class="stat-value orange" id="s-alerts">—</div><div class="stat-delta" id="s-alerts-lbl"></div></div>
+    </div>
+    <div class="dash-grid-2">
+      <div class="card">
+        <div class="card-title">Ventes par produit</div>
+        <div class="card-sub">Unités vendues aujourd'hui</div>
+        <div id="chart-produits"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Niveaux de stock</div>
+        <div class="card-sub">Stock actuel vs seuil minimum</div>
+        <div id="stock-gauges"></div>
+      </div>
+    </div>
+    <div class="dash-grid-2">
+      <div class="card">
+        <div class="card-title">Ventes par heure</div>
+        <div class="card-sub">CA par tranche horaire</div>
+        <div id="chart-heures"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Évolution CA — 7 jours</div>
+        <div class="card-sub">Cliquer sur une barre pour naviguer</div>
+        <div id="chart-evolution"></div>
+      </div>
+    </div>
+    <div class="card mt-16">
+      <div class="card-title">Dernières commandes</div>
+      <div class="table-wrap">
+        <table><thead><tr><th>N°</th><th>Heure</th><th>Produits</th><th>Total</th><th>Statut</th></tr></thead>
+        <tbody id="dash-commandes"></tbody></table>
+      </div>
+    </div>
+  </section>
+
+// ══════════════════════════════════════════════
+// STOCK
+// ══════════════════════════════════════════════
+function renderStock(){
+  // Header bouton selon rôle
+  const ha = document.getElementById('stock-header-actions');
+  ha.innerHTML = can('addIngredient') ? '<button class="btn btn-primary btn-sm" onclick="openAddIngredient()">+ Ajouter ingrédient</button>' : '';
+
+  const bas=db.ingredients.filter(i=>i.stock<i.seuil);
+  const ok=db.ingredients.filter(i=>i.stock>=i.seuil);
+  document.getElementById('stock-cards').innerHTML=`
+    <div class="stat-card"><div class="stat-label">Total ingrédients</div><div><span class="stat-value">${db.ingredients.length}</span></div></div>
+    <div class="stat-card" style="border-color:${bas.length?'rgba(224,92,92,.3)':'var(--border)'}"><div class="stat-label">Stock bas</div><div><span class="stat-value" style="color:${bas.length?'var(--red)':'var(--green)'}">${bas.length}</span></div><div class="stat-delta">${bas.map(i=>i.nom).join(', ')||'Tout est OK'}</div></div>
+    <div class="stat-card"><div class="stat-label">Stock OK</div><div><span class="stat-value" style="color:var(--green)">${ok.length}</span></div></div>`;
+
+  document.getElementById('stock-table').innerHTML=db.ingredients.map(i=>{
+    const cls=i.stock<i.seuil?'badge-red':i.stock<i.seuil*1.5?'badge-orange':'badge-green';
+    const lbl=i.stock<i.seuil?'Bas':i.stock<i.seuil*1.5?'Attention':'OK';
+    const reapproBtn = can('reappro') ? `<button class="btn btn-ghost btn-sm" onclick="reappro(${i.id})">Réapprovisionner</button>` : '';
+    const deleteBtn  = can('reappro') ? `<button class="btn btn-danger btn-sm" onclick="deleteIngredient(${i.id})">Supprimer</button>` : '';
+    return `<tr>
+      <td class="primary">${i.nom}</td>
+      <td style="font-family:'DM Mono',monospace">${i.stock}</td>
+      <td style="font-family:'DM Mono',monospace">${i.seuil}</td>
+      <td>${i.unite}</td>
+      <td><span class="badge ${cls}">${lbl}</span></td>
+      <td style="display:flex;gap:6px;align-items:center">${reapproBtn}${deleteBtn}</td></tr>`;
+  }).join('');
+}
+
+async function reappro(id){
+  const ing=db.ingredients.find(i=>i.id===id);
+  const qty=parseFloat(prompt(`Ajouter au stock : ${ing.nom} (${ing.unite})`));
+  if(isNaN(qty)||qty<=0) return;
+  const res=await apiFetch('/stock/'+id,{method:'PATCH',body:JSON.stringify({quantite:qty})});
+  if(res && res.success){
+    ing.stock=res.new_stock;
+    showToast(`${ing.nom} : +${qty}${ing.unite} ajouté`,'success');
+  } else {
+    ing.stock+=qty; // mode hors ligne
+    showToast(`${ing.nom} : +${qty}${ing.unite} (hors ligne)`,'warn');
+  }
+  renderStock(); renderCaisse();
+}
+
+// ══════════════════════════════════════════════
+// COMMANDES
+// ══════════════════════════════════════════════
+async function renderCommandes(){
+  document.getElementById('commandes-table').innerHTML='<tr><td colspan="5"><div class="loading"><div class="spinner"></div>Chargement...</div></td></tr>';
+  const cmds=await apiFetch('/commandes');
+  if(cmds && cmds.length){
+    document.getElementById('commandes-table').innerHTML=cmds.map(c=>`
+      <tr><td class="primary">#${c.id}</td>
+      <td>${new Date(c.created_at).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'})}</td>
+      <td>${(c.commande_items||[]).map(i=>i.quantite+'x '+(i.produits?.nom||'?')).join(', ')}</td>
+      <td style="font-family:'DM Mono',monospace;color:var(--accent)">${parseFloat(c.total).toFixed(3)} DT</td>
+      <td><span class="badge badge-green">${c.statut}</span></td></tr>`).join('');
+  } else {
+    document.getElementById('commandes-table').innerHTML='<tr><td colspan="5" style="text-align:center;color:var(--text3);padding:20px">Aucune commande enregistrée</td></tr>';
+  }
+}
+
+// ══════════════════════════════════════════════
+// ADMIN
+// ══════════════════════════════════════════════
+function renderAdmin(){
+  const ac=document.getElementById('admin-content');
+  const ha=document.getElementById('admin-header-actions');
+
+  if(!can('admin')){
+    ac.innerHTML=`<div class="access-denied"><div class="access-denied-icon">🔒</div><div class="access-denied-title">Accès restreint</div><div class="access-denied-sub">Cette section est réservée aux administrateurs</div></div>`;
+    ha.innerHTML='';
+    return;
+  }
+
+  ha.innerHTML='<button class="btn btn-primary btn-sm" onclick="openAddProduct()">+ Nouveau produit</button>';
+  ac.innerHTML=`<div class="card"><div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:14px">Produits & recettes</div><div id="admin-product-list"></div></div>`;
+
+  document.getElementById('admin-product-list').innerHTML=db.produits.map(p=>{
+    const rec=p.recette.map(r=>{
+      const ing=db.ingredients.find(i=>i.id===r.ing);
+      return ing?`${r.qty}${ing.unite} ${ing.nom}`:'';
+    }).filter(Boolean).join(' · ');
+    return `<div class="product-list-item">
+      <div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="pli-name">${p.nom}</span>
+          <span class="badge badge-accent" style="font-size:10px">${p.cat}</span>
+          ${!p.actif?'<span class="badge badge-red">Désactivé</span>':''}
+        </div>
+        <div class="pli-recette">${rec||'Aucune recette définie'}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="pli-price">${p.prix.toFixed(3)} DT</span>
+        <button class="btn btn-ghost btn-sm" onclick="toggleProduct(${p.id})">${p.actif?'Désactiver':'Activer'}</button>
+        <button class="btn btn-danger btn-sm" onclick="deleteProduct(${p.id})">Supprimer</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+async function deleteProduct(id){
+  if(!can('admin')){ showToast('Action réservée à l\'admin','warn'); return; }
+  const p=db.produits.find(x=>x.id===id);
+  if(!confirm(`Supprimer "${p.nom}" définitivement ?`)) return;
+  const res=await apiFetch('/produits/'+id,{method:'DELETE'});
+  db.produits=db.produits.filter(x=>x.id!==id);
+  showToast(`"${p.nom}" supprimé`,'success');
+  renderAdmin(); renderCaisse();
+}
+
+async function deleteIngredient(id){
+  if(!can('admin')){ showToast('Action réservée à l\'admin','warn'); return; }
+  const ing=db.ingredients.find(i=>i.id===id);
+  if(!confirm(`Supprimer "${ing.nom}" du stock ?`)) return;
+  const res=await apiFetch('/stock/'+id,{method:'DELETE'});
+  db.ingredients=db.ingredients.filter(i=>i.id!==id);
+  showToast(`"${ing.nom}" supprimé`,'success');
+  renderStock(); renderCaisse();
+}
+
+async function toggleProduct(id){
+  if(!can('toggleProduit')){ showToast('Action réservée à l\'admin','warn'); return; }
+  const p=db.produits.find(x=>x.id===id);
+  const newActif=!p.actif;
+  const res=await apiFetch('/produits/'+id+'/toggle',{method:'PATCH',body:JSON.stringify({actif:newActif})});
+  p.actif=newActif; // optimistic
+  showToast(`${p.nom} ${p.actif?'activé':'désactivé'}`,'success');
+  renderAdmin(); renderCaisse();
+}
+
+// ══════════════════════════════════════════════
+// MODAL: PRODUIT
+// ══════════════════════════════════════════════
+function openAddProduct(){
+  if(!can('addProduit')){ showToast('Action réservée à l\'admin','warn'); return; }
+  document.getElementById('new-product-name').value='';
+  document.getElementById('new-product-price').value='';
+  document.getElementById('new-recette-rows').innerHTML='';
+  addRecetteRow();
+  document.getElementById('modal-product').classList.add('open');
+}
+
+function addRecetteRow(){
+  const row=document.createElement('div');
+  row.className='recette-row';
+  const opts=db.ingredients.map(i=>`<option value="${i.id}">${i.nom} (${i.unite})</option>`).join('');
+  row.innerHTML=`
+    <div><label class="form-label">Ingrédient</label><select class="form-input">${opts}</select></div>
+    <div><label class="form-label">Quantité</label><input class="form-input" type="number" placeholder="30" min="0"></div>
+    <div><label class="form-label">Unité</label><select class="form-input"><option>g</option><option>ml</option><option>unité</option><option>cl</option></select></div>
+    <button class="btn-del-ing" onclick="this.closest('.recette-row').remove()">×</button>`;
+  document.getElementById('new-recette-rows').appendChild(row);
+}
+
+async function saveNewProduct(){
+  const nom=document.getElementById('new-product-name').value.trim();
+  const prix=parseFloat(document.getElementById('new-product-price').value);
+  const cat=document.getElementById('new-product-cat').value;
+  if(!nom||isNaN(prix)){ showToast('Remplis tous les champs','warn'); return; }
+  const recette=[];
+  document.querySelectorAll('#new-recette-rows .recette-row').forEach(row=>{
+    const ing=parseInt(row.querySelectorAll('select')[0].value);
+    const qty=parseFloat(row.querySelector('input').value);
+    if(!isNaN(qty)&&qty>0) recette.push({ingredient_id:ing, quantite:qty});
+  });
+  const res=await apiFetch('/produits',{method:'POST',body:JSON.stringify({nom,prix,categorie:cat,recette})});
+  if(res && res.success){
+    await loadProduits();
+    showToast(`"${nom}" ajouté au menu`,'success');
+  } else {
+    // hors ligne : ajouter localement
+    const newId=Math.max(0,...db.produits.map(p=>p.id))+1;
+    db.produits.push({id:newId,nom,prix,cat,actif:true,recette:recette.map(r=>({ing:r.ingredient_id,qty:r.quantite}))});
+    showToast(`"${nom}" ajouté (hors ligne)`,'warn');
+  }
+  closeModal('modal-product');
+  renderAdmin(); renderCaisse();
+}
+
+// ══════════════════════════════════════════════
+// MODAL: INGRÉDIENT
+// ══════════════════════════════════════════════
+function openAddIngredient(){
+  if(!can('addIngredient')){ showToast('Action réservée à l\'admin','warn'); return; }
+  document.getElementById('new-ing-name').value='';
+  document.getElementById('new-ing-stock').value='';
+  document.getElementById('new-ing-seuil').value='';
+  document.getElementById('modal-ingredient').classList.add('open');
+}
+
+async function saveNewIngredient(){
+  const nom=document.getElementById('new-ing-name').value.trim();
+  const stock=parseFloat(document.getElementById('new-ing-stock').value);
+  const seuil=parseFloat(document.getElementById('new-ing-seuil').value);
+  const unite=document.getElementById('new-ing-unite').value;
+  if(!nom||isNaN(stock)||isNaN(seuil)){ showToast('Remplis tous les champs','warn'); return; }
+  const res=await apiFetch('/stock',{method:'POST',body:JSON.stringify({nom,stock_actuel:stock,seuil_minimum:seuil,unite})});
+  if(res && res.success){
+    await loadIngredients();
+    showToast(`"${nom}" ajouté au stock`,'success');
+  } else {
+    const newId=Math.max(0,...db.ingredients.map(i=>i.id))+1;
+    db.ingredients.push({id:newId,nom,stock,unite,seuil});
+    showToast(`"${nom}" ajouté (hors ligne)`,'warn');
+  }
+  closeModal('modal-ingredient');
+  renderStock();
+}
+
+// ══════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m=>{
+  m.addEventListener('click',e=>{ if(e.target===m) m.classList.remove('open'); });
+});
+
+function showToast(msg,type='success'){
+  const icons={success:'✓',warn:'!',error:'✕'};
+  const t=document.createElement('div');
+  t.className=`toast toast-${type}`;
+  t.innerHTML=`<div class="toast-icon">${icons[type]}</div><span>${msg}</span>`;
+  document.getElementById('toastContainer').appendChild(t);
+  requestAnimationFrame(()=>requestAnimationFrame(()=>t.classList.add('show')));
+  setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=>t.remove(),300); },3500);
+}
+
+// ══════════════════════════════════════════════
+// FALLBACK DATA (mode hors ligne)
+// ══════════════════════════════════════════════
+const FALLBACK_INGREDIENTS=[
+  {id:1,nom:'Café arabica',stock:1000,unite:'g',seuil:200},
+  {id:2,nom:'Lait entier',stock:3000,unite:'ml',seuil:2000},
+  {id:3,nom:'Sucre',stock:2000,unite:'g',seuil:500},
+  {id:4,nom:'Glace pilée',stock:2000,unite:'g',seuil:500},
+  {id:5,nom:'Sirop caramel',stock:500,unite:'ml',seuil:100},
+  {id:6,nom:'Crème chantilly',stock:600,unite:'ml',seuil:150},
+  {id:7,nom:'Eau',stock:10000,unite:'ml',seuil:2000},
+  {id:8,nom:'Croissant',stock:20,unite:'unité',seuil:3},
+];
+const FALLBACK_PRODUITS=[
+  {id:1,nom:'Espresso',prix:1.5,cat:'Boisson chaude',actif:true,recette:[{ing:1,qty:7},{ing:3,qty:2}]},
+  {id:2,nom:'Café au lait',prix:2.5,cat:'Boisson chaude',actif:true,recette:[{ing:1,qty:7},{ing:2,qty:120},{ing:3,qty:2}]},
+  {id:3,nom:'Cappuccino',prix:3.0,cat:'Boisson chaude',actif:true,recette:[{ing:1,qty:7},{ing:2,qty:120},{ing:3,qty:2},{ing:6,qty:30}]},
+  {id:4,nom:'Latte macchiato',prix:3.5,cat:'Boisson chaude',actif:true,recette:[{ing:1,qty:7},{ing:2,qty:180},{ing:3,qty:2}]},
+  {id:5,nom:'Frappuccino',prix:5.0,cat:'Boisson froide',actif:true,recette:[{ing:1,qty:30},{ing:2,qty:200},{ing:3,qty:15},{ing:4,qty:100},{ing:5,qty:20}]},
+  {id:6,nom:'Frappuccino caramel',prix:5.5,cat:'Boisson froide',actif:true,recette:[{ing:1,qty:30},{ing:2,qty:200},{ing:3,qty:15},{ing:4,qty:100},{ing:5,qty:20},{ing:6,qty:30}]},
+  {id:7,nom:'Café glacé',prix:4.0,cat:'Boisson froide',actif:true,recette:[{ing:1,qty:14},{ing:4,qty:80},{ing:3,qty:5},{ing:2,qty:50}]},
+  {id:8,nom:'Thé chaud',prix:1.5,cat:'Boisson chaude',actif:true,recette:[{ing:7,qty:250},{ing:3,qty:2}]},
+  {id:9,nom:'Croissant beurre',prix:2.0,cat:'Pâtisserie',actif:true,recette:[{ing:8,qty:1}]},
+];
+</script>
+</body>
+</html>

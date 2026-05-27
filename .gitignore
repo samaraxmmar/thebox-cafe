@@ -1,0 +1,41 @@
+# ──────────────────────────────────────────────
+# THE BOX — .gitignore
+# ──────────────────────────────────────────────
+
+# Secrets & config (NE JAMAIS committer)
+.env
+.env.local
+.env.*.local
+
+# Session WhatsApp (contient les clés de chiffrement Signal)
+auth_info_baileys/
+.thebox-baileys/
+
+# Données locales runtime (users, settings, stock, logs, sessions tables)
+data/
+*.corrupt.*
+
+# Dépendances
+node_modules/
+
+# Builds Electron
+dist/
+build/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS / éditeurs
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Python venv (présent dans le projet)
+.venv/
+__pycache__/
+
+# Cache WhatsApp web
+.wwebjs_cache/
+.wwebjs_auth/
