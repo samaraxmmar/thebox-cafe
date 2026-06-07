@@ -55,36 +55,30 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Fetch : 2 stratégies différentes selon l'URL
+// Fetch : NETWORK-FIRST pour tout (assure que le user a toujours la version fraîche).
+// Cache utilisé seulement en fallback offline.
 self.addEventListener('fetch', (event) => {
   const req = event.request;
   const url = new URL(req.url);
-
-  // Ignorer les non-GET (POST/PATCH/DELETE → toujours réseau)
   if (req.method !== 'GET') return;
-  // Ignorer les requêtes cross-origin
   if (url.origin !== location.origin) return;
 
-  // API : réseau-d'abord (data toujours fraîche)
-  if (url.pathname.startsWith('/api/')) {
-    event.respondWith(
-      fetch(req).catch(() => caches.match(req))
-    );
-    return;
-  }
-
-  // Assets : cache-d'abord (rapide)
   event.respondWith(
-    caches.match(req).then((cached) => {
-      if (cached) return cached;
-      return fetch(req).then((res) => {
-        // Cache la nouvelle ressource (clone car le body ne peut être lu qu'une fois)
-        if (res && res.status === 200) {
-          const clone = res.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(req, clone));
-        }
-        return res;
-      }).catch(() => caches.match('/index.html')); // fallback offline → page principale
+    fetch(req).then((res) => {
+      // Mise à jour du cache en background (pour le mode offline)
+      if (res && res.status === 200) {
+        const clone = res.clone();
+        caches.open(CACHE_NAME).then((cache) => cache.put(req, clone)).catch(() => {});
+      }
+      return res;
+    }).catch(() => {
+      // Hors ligne : fallback sur le cache
+      return caches.match(req).then((cached) => {
+        if (cached) return cached;
+        // Sinon retourne index.html (SPA fallback)
+        if (req.mode === 'navigate') return caches.match('/index.html');
+        return new Response('', { status: 504 });
+      });
     })
   );
 });

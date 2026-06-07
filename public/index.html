@@ -928,6 +928,32 @@
 <script src="/js/mobile/tables-plan-view.js?v=20260607b"></script>
 <script src="/js/mobile/tables-mobile.js?v=20260607b"></script>
 
-<script src="/js/app.js"></script>
+<script src="/js/app.js?v=20260607c"></script>
+
+<!-- Watchdog : si page tables vide après 3 sec sur mobile → message visible -->
+<script>
+(function() {
+  function isMobile() { return window.innerWidth <= 768; }
+  setTimeout(function() {
+    if (!isMobile()) return;
+    var pageTables = document.getElementById('page-tables');
+    if (!pageTables || !pageTables.classList.contains('active')) return;
+    var content = pageTables.querySelector('.page-content');
+    if (!content) return;
+    // Détecte si content est visuellement vide (pas de texte ni d'élément avec contenu)
+    var text = (content.textContent || '').trim();
+    var hasMobileShell = content.querySelector('.mobile-fallback-shell, .mobile-tables-shell');
+    if (!hasMobileShell && text.length < 5) {
+      content.innerHTML =
+        '<div style="padding:24px;background:#fef3c7;border:1px solid #fbbf24;border-radius:12px;margin:16px;color:#92400e;font-size:13px;line-height:1.5">' +
+          '<strong style="font-size:14px">⚠ Rendu mobile manqué</strong><br><br>' +
+          'La page tables n\'a pas pu se rendre. Cliquez le bouton ci-dessous pour recharger forcément :<br><br>' +
+          '<button onclick="location.reload(true)" style="width:100%;padding:14px;background:#16a34a;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700">🔄 Recharger</button><br><br>' +
+          '<small>Si le problème persiste, désinstalle l\'app du home screen puis réinstalle.</small>' +
+        '</div>';
+    }
+  }, 3000);
+})();
+</script>
 </body>
 </html>
