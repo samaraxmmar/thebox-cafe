@@ -6,6 +6,7 @@ const App = {
   async init() {
     this._startClock();
     this._monitorOnline();
+    this._registerServiceWorker();
 
     // ─── PHASE 1 : Affichage immédiat depuis cache localStorage ───
     try { Store.hydrateFromCache(); } catch (e) { console.warn('[App] hydrateFromCache', e); }
@@ -76,6 +77,34 @@ const App = {
     };
     tick();
     setInterval(tick, 1000);
+  },
+
+  // PWA : enregistre le service worker pour install + cache offline
+  _registerServiceWorker() {
+    if (!('serviceWorker' in navigator)) return;
+    // Skip en dev local pour éviter les surprises de cache pendant le dev
+    // (active seulement si servi via HTTPS ou domaine réel ; pas sur 127.0.0.1)
+    if (location.hostname === 'localhost' || location.hostname.startsWith('127.')) {
+      console.log('[PWA] Service worker désactivé en dev local');
+      return;
+    }
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js')
+        .then((reg) => {
+          console.log('[PWA] Service worker enregistré');
+          // Détecte mise à jour disponible → propose un refresh
+          reg.addEventListener('updatefound', () => {
+            const nw = reg.installing;
+            if (!nw) return;
+            nw.addEventListener('statechange', () => {
+              if (nw.state === 'installed' && navigator.serviceWorker.controller) {
+                if (window.Toast) Toast.info('🔄 Nouvelle version disponible — recharge la page');
+              }
+            });
+          });
+        })
+        .catch((err) => console.warn('[PWA] SW erreur :', err.message));
+    });
   },
 
   _monitorOnline() {
