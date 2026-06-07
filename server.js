@@ -23,7 +23,7 @@ const mw           = require('./src/middleware');
 const app  = express();
 app.set('trust proxy', true); // pour req.ip correct derrière nginx/cloudflare
 const PORT = process.env.PORT || 3001;
-const HOST = process.env.HOST || '127.0.0.1'; // par défaut localhost — sécurise
+const HOST = process.env.HOST || '0.0.0.0'; // par défaut localhost — sécurise
 
 /* ── Bootstrap des fichiers JSON par défaut (users, settings...) ── */
 try { authMw.bootstrap(); } catch (e) { log.error('Bootstrap auth: ' + e.message); }
