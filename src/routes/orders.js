@@ -113,11 +113,14 @@ router.post('/', auth.requireAuth, auth.requirePerm('orders.create'), async (req
     const ruptures = [];
     for (const it of items) {
       const cur = overlay.get(it.produit_id);
-      if (!cur) continue;  // produit non suivi → on ne décrémente rien
+      // Si pas d'entrée overlay OU entrée présente juste pour l'image (tracked:false),
+      // on ne décrémente RIEN. Crucial : adjust() renvoie null si tracked!==true.
+      if (!cur || !cur.tracked) continue;
 
       const consumed = parseInt(it.quantite);
       const before = cur.stock;
       const next = overlay.adjust(it.produit_id, -consumed, allowNegativeStock);
+      if (!next) continue;   // sécurité supplémentaire
 
       // Récup nom du produit (pour log/WhatsApp)
       let prodNom = '?';
@@ -172,6 +175,28 @@ router.post('/', auth.requireAuth, auth.requirePerm('orders.create'), async (req
       if (autoClose && table_id && tablesRouter && typeof tablesRouter.closeTableProgrammatic === 'function') {
         tableClosed = tablesRouter.closeTableProgrammatic(table_id);
       }
+    } catch (e) { /* silencieux : ne JAMAIS faire échouer une vente */ }
+
+    // ── 6) Attribution serveur (JSON local) ──────────────────
+    //     Pour l'analyse Performance par serveur dans le dashboard.
+    //     Pas de modif schéma Supabase nécessaire.
+    try {
+      const storage = require('../storage');
+      const attr    = storage.read('commandes_attribution', []) || [];
+      // Préfère le nom d'affichage, sinon username
+      const serveur = (req.user && (req.user.nom || req.user.username)) || 'inconnu';
+      const nbItems = items.reduce((s, i) => s + (parseInt(i.quantite) || 0), 0);
+      attr.push({
+        commande_id: commande.id,
+        serveur:     serveur,
+        total:       total,
+        nb_items:    nbItems,
+        table_id:    safeTableId,
+        created_at:  commande.created_at || new Date().toISOString(),
+      });
+      // Garder seulement les 5000 dernières (anti-bloat)
+      if (attr.length > 5000) attr.splice(0, attr.length - 5000);
+      storage.write('commandes_attribution', attr);
     } catch (e) { /* silencieux : ne JAMAIS faire échouer une vente */ }
 
     console.log(`[ORDER] OK Commande #${commande.id} — ${total.toFixed(3)} DT${ruptures.length ? ` (${ruptures.length} rupture(s))` : ''}${tableClosed ? ' (table libérée)' : ''}`);

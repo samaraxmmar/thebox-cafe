@@ -112,4 +112,18 @@ router.post('/change-pin', auth.requireAuth, (req, res) => {
   res.json({ success: true });
 });
 
+// POST /api/auth/me/photo  { photo: "/uploads/..." } — l'utilisateur connecté met sa photo
+router.post('/me/photo', auth.requireAuth, (req, res) => {
+  const p = ((req.body || {}).photo || '').toString().trim();
+  const safe = (p && (/^https?:\/\//i.test(p) || p.startsWith('/uploads/'))) ? p.slice(0, 500) : null;
+  const users = auth.getUsers();
+  const u = users.find(x => x.id === req.user.id);
+  if (!u) return res.status(404).json({ error: 'Utilisateur introuvable' });
+  u.photo = safe;
+  u.updated_at = new Date().toISOString();
+  auth.saveUsers(users);
+  logs.add('info', 'Photo profil mise à jour', { username: u.username });
+  res.json({ success: true, photo: safe });
+});
+
 module.exports = router;

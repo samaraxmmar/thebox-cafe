@@ -6,10 +6,16 @@
 <title>The Box — Caisse</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/css/base.css">
-<link rel="stylesheet" href="/css/components.css">
-<link rel="stylesheet" href="/css/pages.css">
+<!-- Google Fonts : Poppins (app) + Inter (logo) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Inter:wght@700;800;900&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="/css/base.css?v=20260607b">
+<link rel="stylesheet" href="/css/components.css?v=20260607b">
+<link rel="stylesheet" href="/css/pages.css?v=20260607b">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js" defer></script>
 </head>
 <body>
 
@@ -17,9 +23,22 @@
 <div class="login-screen" id="login-screen">
   <div class="login-box">
     <div class="login-header">
-      <div class="login-logo-icon">☕</div>
-      <div class="login-title">The Box</div>
+      <div class="login-logo-wrap" id="login-logo-wrap">
+        <!-- Logo custom (s'affiche si chargé) -->
+        <img id="login-logo-img" src="" alt="" style="display:none">
+        <!-- Logo par défaut THE BOX texte empilé -->
+        <div class="login-logo-text" id="login-logo-text">
+          <span>THE</span>
+          <span>BOX</span>
+          <span>CAFÉ</span>
+        </div>
+      </div>
       <div class="login-desc">Système de caisse & gestion</div>
+      <!-- Upload logo (visible au hover) -->
+      <label class="login-logo-upload" title="Changer le logo">
+        <input type="file" accept="image/*" id="login-logo-input" style="display:none" onchange="Auth.uploadLogo(event)">
+        <span>✎ Logo</span>
+      </label>
     </div>
     <div class="role-grid" style="grid-template-columns:repeat(2,1fr);gap:8px">
       <button class="role-btn" id="role-admin"    onclick="Auth.selectRole('admin')"><span class="role-icon">👑</span><div class="role-label">Admin</div><div class="role-desc">Accès complet</div></button>
@@ -53,53 +72,56 @@
   <aside class="sidebar">
     <div class="sidebar-logo">
       <div class="logo-mark">
-        <div class="logo-icon">☕</div>
+        <svg class="logo-leaf" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
+          <circle cx="12" cy="12" r="10" fill="#275c3e"/>
+        </svg>
         <div class="logo-text">
-          <div class="logo-name">The Box</div>
-          <div class="logo-sub">Café & Gestion</div>
+          <span>THE</span>
+          <span>BOX</span>
+          <span>CAFÉ</span>
         </div>
       </div>
     </div>
 
     <nav class="sidebar-nav">
-      <button class="nav-item active" data-page="caisse" onclick="Nav.go('caisse')">
+      <button class="nav-item active" data-page="caisse" data-label="Caisse" onclick="Nav.go('caisse')">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/>
         </svg>Caisse
       </button>
-      <button class="nav-item" data-page="tables" onclick="Nav.go('tables')">
+      <button class="nav-item" data-page="tables" data-label="Tables" onclick="Nav.go('tables')">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
           <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
         </svg>Tables
         <span class="nav-badge" id="badge-tables" style="display:none">0</span>
       </button>
-      <button class="nav-item" data-page="dashboard" onclick="Nav.go('dashboard')">
+      <button class="nav-item" data-page="dashboard" data-label="Dashboard" onclick="Nav.go('dashboard')">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M3 3v18h18"/><path d="M7 16l4-4 4 4 4-8"/>
         </svg>Dashboard
       </button>
-      <button class="nav-item" data-page="commandes" onclick="Nav.go('commandes')">
+      <button class="nav-item" data-page="commandes" data-label="Commandes" onclick="Nav.go('commandes')">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
         </svg>Commandes
       </button>
-      <button class="nav-item" data-page="produits" onclick="Nav.go('produits')">
+      <button class="nav-item" data-page="produits" data-label="Produits" onclick="Nav.go('produits')">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><path d="M9 22V12h6v10"/>
         </svg>Produits
       </button>
-      <button class="nav-item" data-page="stock" onclick="Nav.go('stock')">
+      <button class="nav-item" data-page="stock" data-label="Stock" onclick="Nav.go('stock')">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M20 7l-8-4-8 4m16 0v10l-8 4m-8-4V7m8 4l8-4M4 7l8 4"/>
         </svg>Stock
       </button>
-      <button class="nav-item" data-page="users" onclick="Nav.go('users')">
+      <button class="nav-item" data-page="users" data-label="Utilisateurs" onclick="Nav.go('users')">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
         </svg>Utilisateurs
       </button>
-      <button class="nav-item" data-page="parametres" onclick="Nav.go('parametres')">
+      <button class="nav-item" data-page="parametres" data-label="Paramètres" onclick="Nav.go('parametres')">
         <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 01-2.9 2.9l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 01-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.9-2.9l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 010-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.9-2.9l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 014 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.9 2.9l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 010 4h-.1a1.7 1.7 0 00-1.5 1z"/>
         </svg>Paramètres
@@ -134,20 +156,27 @@
     <section class="page active" id="page-caisse">
       <div class="topbar">
         <div class="topbar-left">
-          <div>
-            <div class="page-title">Caisse</div>
-            <div class="page-subtitle" id="caisse-date"></div>
-          </div>
+          <div class="date-chip"><span id="caisse-date">—</span></div>
         </div>
         <div class="topbar-right">
-          <div id="caisse-table-badge"></div>
-          <span style="font-size:12px;color:var(--text-4);font-variant-numeric:tabular-nums" id="cmd-count"></span>
+          <span class="topbar-stat">Total : <strong id="cmd-count">0 Orders</strong></span>
+          <button class="topbar-btn" onclick="window.print()">📄 Report</button>
+          <div class="topbar-bell" title="Notifications">🔔</div>
+          <div class="topbar-user">
+            <div class="topbar-user-avatar" id="topbar-user-avatar">👤</div>
+            <div class="topbar-user-info">
+              <div class="topbar-user-name" id="topbar-user-name">User</div>
+              <div class="topbar-user-role" id="topbar-user-role">Caissier</div>
+            </div>
+          </div>
         </div>
       </div>
       <div class="pos-layout">
         <div class="pos-left">
           <div class="caisse-search-wrap" id="caisse-search"></div>
-          <div class="cat-filter" id="cat-filter"></div>
+          <div class="cat-cards" id="cat-cards-row"></div>
+          <div class="subcat-row" id="subcat-row"></div>
+          <div class="cat-filter" id="cat-filter" style="display:none"></div>
           <div class="products-grid" id="products-grid">
             <div class="loading"><div class="spinner"></div>Chargement...</div>
           </div>
@@ -180,123 +209,400 @@
       </div>
     </section>
 
-    <!-- ══ TABLES ══════════════════════════════════════ -->
+    <!-- ══ TABLES — Premium Floor Management ══════════════ -->
     <section class="page" id="page-tables">
       <div class="topbar">
         <div class="topbar-left">
-          <div><div class="page-title">Tables</div><div class="page-subtitle">Gestion des tables en salle</div></div>
+          <div>
+            <div class="page-title">Plan de salle</div>
+            <div class="page-subtitle">
+              <span class="live-dot"></span>
+              Vue en temps réel · <span id="tables-live-count">—</span>
+            </div>
+          </div>
         </div>
         <div class="topbar-right" id="tables-header-actions"></div>
       </div>
-      <div class="page-content">
-        <div class="tables-grid" id="tables-grid">
-          <div class="loading"><div class="spinner"></div>Chargement...</div>
+
+      <div class="page-content tables-page">
+
+        <!-- ── KPI Strip ── -->
+        <div class="tables-kpi" id="tables-kpi"></div>
+
+        <!-- ── Toolbar (zones + search) ── -->
+        <div class="tables-toolbar-pro">
+          <div class="tables-zones-segmented" id="tables-zones"></div>
+          <div class="tables-search-wrap">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+            <input type="text" id="tables-search" placeholder="Rechercher une table…" oninput="Tables.setSearch(this.value)">
+          </div>
+        </div>
+
+        <!-- ── Floor pleine largeur ── -->
+        <div class="tables-layout-pro" id="tables-layout-pro">
+          <div class="tables-floor-wrap" id="tables-floor-wrap">
+            <div class="tables-floor" id="tables-grid">
+              <div class="loading"><div class="spinner"></div>Chargement...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ── Modal centrale détails table (remplace l'ancien panneau latéral) ── -->
+        <div class="table-details-overlay" id="tables-details-overlay" onclick="if(event.target.id==='tables-details-overlay') Tables.cancelSelection()">
+          <aside class="tables-details-panel" id="tables-details-panel"></aside>
         </div>
       </div>
     </section>
 
-    <!-- ══ DASHBOARD ═══════════════════════════════════ -->
+    <!-- Modal édition table -->
+    <div class="modal-overlay" id="modal-table-edit">
+      <div class="modal modal-sm">
+        <h2 class="modal-title" id="modal-table-edit-title">Nouvelle table</h2>
+        <div class="form-grid-2">
+          <div class="form-group"><label class="form-label">Nom</label><input class="form-input" id="te-nom" placeholder="T-01"></div>
+          <div class="form-group"><label class="form-label">Capacité</label><input class="form-input" type="number" id="te-cap" min="1" max="20" value="4"></div>
+        </div>
+        <div class="form-group"><label class="form-label">Zone</label>
+          <select class="form-input" id="te-zone">
+            <option>Salle</option>
+            <option>Comptoir</option>
+            <option>Terrasse</option>
+            <option>Mezzanine</option>
+          </select>
+        </div>
+
+        <!-- ── Section : taille et forme (visible en mode modification uniquement) ── -->
+        <div id="te-size-section" style="display:none">
+          <div class="form-divider">Taille & forme</div>
+          <div class="form-group">
+            <label class="form-label">Forme</label>
+            <div class="te-shape-row">
+              <button type="button" class="te-shape-btn" data-shape="square" onclick="Tables.setShapeFromModal('square')">▢ Carrée</button>
+              <button type="button" class="te-shape-btn" data-shape="rect"   onclick="Tables.setShapeFromModal('rect')">▭ Rectangulaire</button>
+              <button type="button" class="te-shape-btn" data-shape="round"  onclick="Tables.setShapeFromModal('round')">● Ronde</button>
+            </div>
+          </div>
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label">Largeur (px)</label>
+              <input class="form-input" type="number" id="te-width" min="30" max="600" placeholder="80">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Hauteur (px)</label>
+              <input class="form-input" type="number" id="te-height" min="30" max="600" placeholder="60">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Rotation (degrés)</label>
+            <input class="form-input" type="number" id="te-rotation" min="0" max="359" step="15" value="0">
+          </div>
+          <div class="te-size-hint">💡 Astuce : tu peux aussi redimensionner directement en mode "Éditer le plan" en glissant le coin des tables.</div>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn btn-secondary" onclick="Modal.close('modal-table-edit')">Annuler</button>
+          <button class="btn btn-primary" onclick="Tables.saveEdit()">Enregistrer</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: Réserver une table -->
+    <div class="modal-overlay" id="modal-reserve-table">
+      <div class="modal cover-modal" style="max-width:480px">
+        <div class="cover-modal-header">
+          <div class="cover-modal-icon" style="background:linear-gradient(135deg, #dbeafe, rgba(59,130,246,.10));">📅</div>
+          <div>
+            <h2 class="modal-title" style="margin:0">Réserver <span id="rm-table-name">la table</span></h2>
+            <div class="cover-modal-sub">Saisis les informations de la réservation</div>
+          </div>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label">Nom du client *</label>
+            <input class="form-input" id="rm-client" placeholder="Ex: Mohamed B." maxlength="60">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Téléphone</label>
+            <input class="form-input" id="rm-phone" placeholder="+216 ..." maxlength="20">
+          </div>
+        </div>
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label class="form-label">Date & heure *</label>
+            <input class="form-input" type="datetime-local" id="rm-datetime">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Couverts</label>
+            <input class="form-input" type="number" id="rm-couverts" min="1" max="50" value="2">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Notes (optionnel)</label>
+          <textarea class="form-input" id="rm-notes" rows="2" placeholder="Allergies, occasion spéciale, ..."></textarea>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn btn-secondary" onclick="Tables.cancelReservationModal()">Annuler</button>
+          <button class="btn btn-primary" onclick="Tables.confirmReservation()">📅 Réserver</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal: ouvrir une table (nombre de couverts) -->
+    <div class="modal-overlay" id="modal-open-table">
+      <div class="modal modal-sm cover-modal">
+        <div class="cover-modal-header">
+          <div class="cover-modal-icon">👥</div>
+          <div>
+            <h2 class="modal-title" style="margin:0">Ouvrir <span id="cm-table-name">la table</span></h2>
+            <div class="cover-modal-sub">Combien de personnes seront à cette table&nbsp;?</div>
+          </div>
+        </div>
+
+        <div class="cover-grid" id="cm-grid">
+          <button class="cover-chip" data-n="1">1</button>
+          <button class="cover-chip selected" data-n="2">2</button>
+          <button class="cover-chip" data-n="3">3</button>
+          <button class="cover-chip" data-n="4">4</button>
+          <button class="cover-chip" data-n="5">5</button>
+          <button class="cover-chip" data-n="6">6</button>
+          <button class="cover-chip" data-n="7">7</button>
+          <button class="cover-chip" data-n="8">8</button>
+          <button class="cover-chip" data-n="10">10</button>
+          <button class="cover-chip" data-n="12">12</button>
+        </div>
+
+        <div class="cover-custom">
+          <label class="form-label" style="font-size:11px">Ou saisis un nombre&nbsp;:</label>
+          <input class="form-input" type="number" id="cm-input" min="1" max="50" placeholder="Ex: 12">
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn btn-secondary" onclick="Tables.cancelOpenTable()">Annuler</button>
+          <button class="btn btn-primary" onclick="Tables.confirmOpenTable()">Ouvrir &amp; commander →</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ DASHBOARD (Green Grounds Coffee style) ════════ -->
     <section class="page" id="page-dashboard">
       <div class="topbar">
         <div class="topbar-left">
-          <div><div class="page-title">Dashboard</div><div class="page-subtitle">Analytics & rapports</div></div>
+          <div>
+            <div class="page-title">Tableau de bord</div>
+            <div class="page-subtitle">
+              <span class="live-dot"></span>
+              <span id="dash-date-label">—</span> · vue analytique
+            </div>
+          </div>
         </div>
         <div class="topbar-right" id="dash-header-right"></div>
       </div>
-      <div class="page-content">
+      <div class="page-content dashboard-pro">
 
-        <!-- ── HERO KPIs (4 cartes premium) ─────────────────── -->
-        <div class="kpi-hero mb-12">
-          <div class="kpi-hero-card accent">
-            <div class="kpi-hero-icon">💰</div>
-            <div class="kpi-hero-body">
-              <div class="kpi-hero-label">Chiffre d'affaires</div>
-              <div class="kpi-hero-val"   id="k-revenue">—</div>
-              <div class="kpi-hero-delta" id="k-revenue-delta"></div>
+        <!-- ── KPI STRIP (6 cards dense) ── -->
+        <div class="dash-kpi-strip">
+          <div class="kpi-pro" data-kpi="revenue">
+            <div class="kpi-pro-head">
+              <span class="kpi-pro-icon">💰</span>
+              <span class="kpi-pro-lbl">Chiffre d'affaires</span>
+            </div>
+            <div class="kpi-pro-val" id="dk-revenue">—</div>
+            <div class="kpi-pro-delta" id="dk-revenue-delta"></div>
+          </div>
+          <div class="kpi-pro" data-kpi="orders">
+            <div class="kpi-pro-head">
+              <span class="kpi-pro-icon">🧾</span>
+              <span class="kpi-pro-lbl">Commandes</span>
+            </div>
+            <div class="kpi-pro-val" id="dk-orders">—</div>
+            <div class="kpi-pro-delta" id="dk-orders-delta"></div>
+          </div>
+          <div class="kpi-pro" data-kpi="avg">
+            <div class="kpi-pro-head">
+              <span class="kpi-pro-icon">📊</span>
+              <span class="kpi-pro-lbl">Ticket moyen</span>
+            </div>
+            <div class="kpi-pro-val" id="dk-avg">—</div>
+            <div class="kpi-pro-delta" id="dk-avg-delta"></div>
+          </div>
+          <div class="kpi-pro" data-kpi="customers">
+            <div class="kpi-pro-head">
+              <span class="kpi-pro-icon">👥</span>
+              <span class="kpi-pro-lbl">Clients servis</span>
+            </div>
+            <div class="kpi-pro-val" id="dk-customers">—</div>
+            <div class="kpi-pro-sub" id="dk-customers-sub">—</div>
+          </div>
+          <div class="kpi-pro" data-kpi="occupation">
+            <div class="kpi-pro-head">
+              <span class="kpi-pro-icon">🪑</span>
+              <span class="kpi-pro-lbl">Taux d'occupation</span>
+            </div>
+            <div class="kpi-pro-val" id="dk-occupation">—</div>
+            <div class="kpi-pro-meter"><div class="kpi-pro-meter-fill" id="dk-occupation-fill"></div></div>
+            <div class="kpi-pro-sub" id="dk-occupation-sub">—</div>
+          </div>
+          <div class="kpi-pro" data-kpi="stock">
+            <div class="kpi-pro-head">
+              <span class="kpi-pro-icon">📦</span>
+              <span class="kpi-pro-lbl">Santé du stock</span>
+            </div>
+            <div class="kpi-pro-val" id="dk-stock">—</div>
+            <div class="kpi-pro-sub" id="dk-stock-sub">—</div>
+          </div>
+        </div>
+
+        <!-- ── Legacy KPI row (caché) - garde l'ancien id "dk-progress" pour compat ── -->
+        <div class="dash-kpi-row mb-16" style="display:none">
+          <div class="dash-kpi">
+            <div class="dash-kpi-val sm" id="dk-perf">Good</div>
+            <div class="dash-kpi-sub" id="dk-perf-sub">—</div>
+            <div class="dash-kpi-val" id="dk-progress">—</div>
+          </div>
+        </div>
+
+        <!-- ── Hourly Heatmap (full width) ── -->
+        <div class="card dash-heatmap-card mb-16">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Activité par heure</div>
+              <div class="card-sub">Volume de commandes — aujourd'hui vs moyenne 7j</div>
+            </div>
+            <div class="dash-heatmap-legend">
+              <span class="hm-leg"><span class="hm-leg-sq lvl-0"></span> Faible</span>
+              <span class="hm-leg"><span class="hm-leg-sq lvl-2"></span> Moyen</span>
+              <span class="hm-leg"><span class="hm-leg-sq lvl-4"></span> Pic</span>
             </div>
           </div>
-          <div class="kpi-hero-card green">
-            <div class="kpi-hero-icon">📈</div>
-            <div class="kpi-hero-body">
-              <div class="kpi-hero-label">Bénéfice estimé</div>
-              <div class="kpi-hero-val"   id="k-profit">—</div>
-              <div class="kpi-hero-delta" id="k-profit-delta"></div>
+          <div class="dash-heatmap" id="dash-heatmap"></div>
+        </div>
+
+        <!-- ── Row : Sales Statistic (2/3) + Score (1/3) ─────── -->
+        <div class="dash-row-2 mb-16">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Ventes hebdomadaires</div>
+                <div class="card-sub">Évolution du chiffre d'affaires</div>
+              </div>
+              <div class="dash-period" id="dash-period">
+                <button class="dash-period-btn active" data-period="week">Semaine</button>
+                <button class="dash-period-btn" data-period="month">Mois</button>
+                <button class="dash-period-btn" data-period="year">Année</button>
+                <button class="dash-period-btn" data-period="all">Tout</button>
+              </div>
             </div>
+            <div class="chart-wrap" style="height:260px;margin-top:8px"><canvas id="chart-evolution-c"></canvas></div>
           </div>
-          <div class="kpi-hero-card blue">
-            <div class="kpi-hero-icon">🧾</div>
-            <div class="kpi-hero-body">
-              <div class="kpi-hero-label">Commandes</div>
-              <div class="kpi-hero-val"   id="k-orders">—</div>
-              <div class="kpi-hero-delta" id="k-orders-delta"></div>
+
+          <div class="card dash-score-card">
+            <div class="card-header"><div><div class="card-title">Score</div><div class="card-sub">Performance globale</div></div></div>
+            <div class="dash-score">
+              <svg viewBox="0 0 200 200" class="dash-score-svg">
+                <circle cx="100" cy="100" r="80" fill="none" stroke="var(--surface-2)" stroke-width="14"/>
+                <circle id="dash-score-arc" cx="100" cy="100" r="80" fill="none" stroke="var(--primary)" stroke-width="14"
+                        stroke-linecap="round" stroke-dasharray="502" stroke-dashoffset="502"
+                        transform="rotate(-90 100 100)"
+                        style="transition:stroke-dashoffset .8s ease"/>
+              </svg>
+              <div class="dash-score-val" id="dash-score-val">0</div>
+              <div class="dash-score-lbl">Hits today</div>
             </div>
-          </div>
-          <div class="kpi-hero-card purple">
-            <div class="kpi-hero-icon">🛒</div>
-            <div class="kpi-hero-body">
-              <div class="kpi-hero-label">Panier moyen</div>
-              <div class="kpi-hero-val"   id="k-avg">—</div>
-              <div class="kpi-hero-delta" id="k-avg-delta"></div>
+            <div class="dash-score-meta" id="dash-score-meta">
+              <div class="dash-score-row"><span class="dot warn"></span>Stock bas <strong id="dash-score-alerts">0</strong></div>
+              <div class="dash-score-row"><span class="dot ok"></span>Top vente <strong id="dash-score-top">—</strong></div>
             </div>
           </div>
         </div>
 
-        <!-- ── KPIs compacts ────────────────────────────────── -->
-        <div class="kpi-mini-row mb-16">
-          <div class="kpi-mini"><span class="kpi-mini-icon">👥</span><div><div class="kpi-mini-label">Clients servis</div><div class="kpi-mini-val" id="k-customers">—</div></div></div>
-          <div class="kpi-mini"><span class="kpi-mini-icon">⭐</span><div><div class="kpi-mini-label">Top produit</div><div class="kpi-mini-val sm" id="k-top">—</div></div></div>
-          <div class="kpi-mini"><span class="kpi-mini-icon">⚠️</span><div><div class="kpi-mini-label">Alertes stock</div><div class="kpi-mini-val" id="k-alerts" style="color:var(--orange)">—</div></div></div>
-          <div class="kpi-mini"><span class="kpi-mini-icon">🧮</span><div><div class="kpi-mini-label">TVA collectée</div><div class="kpi-mini-val" id="k-tva">—</div></div></div>
-        </div>
+        <!-- ── Row : Items Performance (pie chart) + Last Orders ── -->
+        <div class="dash-row-2 mb-16">
+          <div class="card">
+            <div class="card-header"><div><div class="card-title">Quantités vendues par produit</div><div class="card-sub">Top produits du jour</div></div></div>
+            <div class="chart-wrap" style="height:280px"><canvas id="chart-pie-products"></canvas></div>
+          </div>
 
-        <!-- ── Row 1 : Évolution + Camembert + Barres horizontales ── -->
-        <div class="dash-grid-3 mb-16">
           <div class="card">
-            <div class="card-header"><div><div class="card-title">Évolution des ventes</div><div class="card-sub">7 derniers jours · cliquer pour naviguer</div></div></div>
-            <div class="chart-wrap"><canvas id="chart-evolution-c"></canvas></div>
-          </div>
-          <div class="card">
-            <div class="card-header"><div><div class="card-title">Plats les plus populaires</div><div class="card-sub">Répartition</div></div></div>
-            <div class="chart-wrap"><canvas id="chart-popular-c"></canvas></div>
-          </div>
-          <div class="card">
-            <div class="card-header"><div><div class="card-title">Ventes par produit</div><div class="card-sub">Top 7 — quantités</div></div></div>
-            <div class="chart-wrap"><canvas id="chart-products-c"></canvas></div>
+            <div class="card-header"><div><div class="card-title">Dernières commandes</div><div class="card-sub">Aujourd'hui</div></div></div>
+            <div class="table-wrap" style="max-height:280px;overflow-y:auto">
+              <table>
+                <thead><tr><th>N°</th><th>Heure</th><th>Table</th><th>Serveur</th><th>Total</th></tr></thead>
+                <tbody id="dash-commandes"></tbody>
+              </table>
+            </div>
           </div>
         </div>
 
-        <!-- ── Row 2 : Heure / Catégories / Stock ───────────── -->
-        <div class="dash-grid-3 mb-16">
-          <div class="card">
-            <div class="card-header"><div><div class="card-title">Ventes par heure</div><div class="card-sub">CA par tranche</div></div></div>
-            <div class="chart-wrap"><canvas id="chart-hours-c"></canvas></div>
+        <!-- ── Row : Performance par serveur (comparaison) ─────── -->
+        <div class="card mb-16">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Performance par serveur</div>
+              <div class="card-sub">Comparaison des ventes — par jour / par mois</div>
+            </div>
+            <div class="dash-period" id="dash-servers-period">
+              <button class="dash-period-btn active" data-srvperiod="day">Jour</button>
+              <button class="dash-period-btn" data-srvperiod="week">Semaine</button>
+              <button class="dash-period-btn" data-srvperiod="month">Mois</button>
+            </div>
           </div>
-          <div class="card">
-            <div class="card-header"><div><div class="card-title">Ventes par catégorie</div><div class="card-sub">Distribution</div></div></div>
-            <div class="chart-wrap"><canvas id="chart-categories-c"></canvas></div>
+          <div class="dash-row-2" style="margin-top:12px">
+            <div>
+              <div class="card-sub" style="margin-bottom:8px">Chiffre d'affaires par serveur</div>
+              <div class="chart-wrap" style="height:260px"><canvas id="chart-servers-ca"></canvas></div>
+            </div>
+            <div>
+              <div class="card-sub" style="margin-bottom:8px">Nombre de commandes</div>
+              <div class="chart-wrap" style="height:260px"><canvas id="chart-servers-orders"></canvas></div>
+            </div>
           </div>
-          <div class="card">
-            <div class="card-header"><div><div class="card-title">Niveaux de stock</div><div class="card-sub">Stock vs seuil</div></div></div>
-            <div id="stock-gauges" style="max-height:240px;overflow:auto"></div>
+          <div class="table-wrap" style="margin-top:16px">
+            <table class="dash-servers-table">
+              <thead>
+                <tr>
+                  <th>Serveur</th>
+                  <th style="text-align:right">Commandes</th>
+                  <th style="text-align:right">CA (DT)</th>
+                  <th style="text-align:right">Ticket moyen</th>
+                  <th style="text-align:right">Articles vendus</th>
+                  <th style="text-align:right">% du total</th>
+                </tr>
+              </thead>
+              <tbody id="dash-servers-tbody"></tbody>
+            </table>
           </div>
         </div>
 
-        <!-- ── Row 3 : Top produits table + Commandes ──────── -->
-        <div class="dash-grid-2 mb-16">
+        <!-- ── Row : Top produits (cards) + Stock gauges ──────── -->
+        <div class="dash-row-2 mb-16">
           <div class="card">
-            <div class="card-header"><div class="card-title">Top produits</div></div>
-            <div class="table-wrap">
-              <table><thead><tr><th>Produit</th><th>Catégorie</th><th>Qté</th><th>Revenu</th></tr></thead>
-              <tbody id="top-products-table"></tbody></table>
+            <div class="card-header">
+              <div><div class="card-title">Meilleures ventes</div><div class="card-sub">Top 5 produits du jour</div></div>
+              <span class="badge badge-accent" id="top-products-total">—</span>
+            </div>
+            <div class="dash-top-products" id="top-products-cards"></div>
+            <!-- table cachée pour compat (l'ancien code écrit dedans) -->
+            <div style="display:none">
+              <table><tbody id="top-products-table"></tbody></table>
             </div>
           </div>
           <div class="card">
-            <div class="card-header"><div class="card-title">Dernières commandes</div></div>
-            <div class="table-wrap">
-              <table><thead><tr><th>N°</th><th>Heure</th><th>Table</th><th>Total</th></tr></thead>
-              <tbody id="dash-commandes"></tbody></table>
+            <div class="card-header">
+              <div><div class="card-title">Niveaux de stock</div><div class="card-sub">Produits suivis</div></div>
+              <span class="badge badge-neutral" id="stock-health-count">—</span>
             </div>
+            <div id="stock-gauges" class="dash-stock-list"></div>
           </div>
+        </div>
+
+        <!-- Charts cachés mais utilisés en background (heures/catégories) -->
+        <div style="display:none">
+          <canvas id="chart-hours-c"></canvas>
+          <canvas id="chart-categories-c"></canvas>
+          <canvas id="chart-products-c"></canvas>
+          <canvas id="chart-popular-c"></canvas>
         </div>
 
       </div>
@@ -311,7 +617,7 @@
       <div class="page-content">
         <div class="card">
           <div class="table-wrap">
-            <table><thead><tr><th>N°</th><th>Date / Heure</th><th>Table</th><th>Produits</th><th>Total</th><th>Statut</th></tr></thead>
+            <table><thead><tr><th>N°</th><th>Date / Heure</th><th>Table</th><th>Serveur</th><th>Produits</th><th>Total</th><th>Statut</th><th>Actions</th></tr></thead>
             <tbody id="commandes-table"></tbody></table>
           </div>
         </div>
@@ -426,10 +732,73 @@
       <div class="form-group"><label class="form-label">Coût d'achat unitaire (DT)</label><input class="form-input" type="number" id="np-cout" placeholder="0.000" step="0.1" min="0"></div>
     </div>
     <div class="form-group"><label class="form-label">Seuil d'alerte</label><input class="form-input" type="number" id="np-seuil" placeholder="5" min="0" step="1" value="5"></div>
+    <div class="form-divider"></div>
+    <div class="form-group">
+      <label class="form-label">Photo du produit (optionnel)</label>
+      <div class="img-upload-row">
+        <div class="img-upload-preview" id="np-image-preview">
+          <span class="img-upload-placeholder">📷 Aucune photo</span>
+        </div>
+        <div class="img-upload-actions">
+          <input type="file" id="np-image-file" accept="image/*" style="display:none" onchange="Admin.handleImageFile(event)">
+          <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('np-image-file').click()">📁 Choisir une photo</button>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="Admin.removeImage()" id="np-image-remove" style="display:none">✕ Retirer</button>
+        </div>
+      </div>
+      <input type="hidden" id="np-image" value="">
+      <div style="font-size:11px;color:var(--text-3);margin-top:6px">JPG/PNG/WebP — max 5 Mo. Photo prise sur ton PC, redimensionnée automatiquement.</div>
+    </div>
+    <div class="form-group" style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface-2);border-radius:8px">
+      <input type="checkbox" id="np-actif" checked style="width:18px;height:18px;cursor:pointer">
+      <label for="np-actif" style="font-weight:600;cursor:pointer;margin:0">Produit actif (visible à la caisse)</label>
+    </div>
     <div class="settings-hint">💡 Stock initial à <strong>0</strong> = produit <strong>non suivi</strong> (idéal pour les cafés/boissons faits sur place).<br>Stock initial &gt; 0 = produit suivi, 1 unité décrémentée à chaque vente.</div>
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="Modal.close('modal-product')">Annuler</button>
       <button class="btn btn-primary" onclick="Admin.saveProduct()">Enregistrer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Gérer les catégories (rename / delete / list) -->
+<div class="modal-overlay" id="modal-categories">
+  <div class="modal" style="max-width:620px">
+    <h2 class="modal-title">📂 Gérer les catégories</h2>
+    <div class="form-group">
+      <input class="form-input" id="cat-search" placeholder="🔍 Rechercher une catégorie…" oninput="Admin.filterCategoriesList(this.value)">
+    </div>
+    <div id="cat-list" style="display:flex;flex-direction:column;gap:6px;max-height:420px;overflow:auto;padding:4px 2px"></div>
+    <div class="settings-hint" style="margin-top:14px">
+      💡 <strong>Famille</strong> = grand groupe (Boisson Chaude, Boisson Froide, Cake…).<br>
+      💡 <strong>Catégorie</strong> = sous-groupe (COFFEE, SMOOTHIES, CREPE…). Le sélecteur à droite de chaque catégorie permet de l'affecter à une famille.<br>
+      💡 <strong>Renommer</strong> applique à TOUS les produits. <strong>Supprimer</strong> déplace vers "Divers" par défaut.
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="Admin.promptCreateFamily()">+ Nouvelle famille</button>
+      <button class="btn btn-secondary" onclick="Admin.openAddCategory()">+ Nouvelle catégorie</button>
+      <button class="btn btn-primary" onclick="Modal.close('modal-categories')">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Nouvelle catégorie avec produits en lot -->
+<div class="modal-overlay" id="modal-category">
+  <div class="modal" style="max-width:680px">
+    <h2 class="modal-title">📂 Nouvelle catégorie</h2>
+    <div class="form-group">
+      <label class="form-label">Nom de la catégorie</label>
+      <input class="form-input" id="nc-nom" placeholder="Ex: COCKTAILS, GLACES, SANDWICHS…" maxlength="40">
+    </div>
+    <div class="form-divider"></div>
+    <div class="section-label">Produits de cette catégorie</div>
+    <div id="nc-products-list" style="display:flex;flex-direction:column;gap:8px;max-height:340px;overflow:auto;padding:4px"></div>
+    <div style="margin-top:10px">
+      <button type="button" class="btn btn-secondary btn-sm" onclick="Admin.addCategoryRow()">+ Ajouter une ligne</button>
+    </div>
+    <div class="settings-hint" style="margin-top:12px">💡 Renseigne au moins un produit. Les lignes vides seront ignorées. Tous les produits seront créés comme actifs.</div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="Modal.close('modal-category')">Annuler</button>
+      <button class="btn btn-primary" onclick="Admin.saveCategory()">Créer la catégorie + produits</button>
     </div>
   </div>
 </div>
@@ -524,6 +893,7 @@
 <script src="/js/theme.js"></script>
 <script src="/js/api.js"></script>
 <script src="/js/store.js"></script>
+<script src="/js/product-images.js"></script>
 <script src="/js/auth.js"></script>
 <script src="/js/toast.js"></script>
 <script src="/js/modal.js"></script>

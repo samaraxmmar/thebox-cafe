@@ -8,22 +8,47 @@ const App = {
     this._monitorOnline();
 
     // ─── PHASE 1 : Affichage immédiat depuis cache localStorage ───
-    Store.hydrateFromCache();             // produits + ingrédients depuis cache
-    if (typeof Tables !== 'undefined' && Tables._load) Tables._load(); // tables cache locale
+    try { Store.hydrateFromCache(); } catch (e) { console.warn('[App] hydrateFromCache', e); }
+    try { if (typeof Tables !== 'undefined' && Tables._load) Tables._load(); } catch (e) {}
 
     // Naviguer immédiatement sur la première page autorisée
     var first = ['caisse','tables','dashboard','produits','stock','users','parametres'].find(function(p){
       return Auth.can(Nav._gates[p]);
     });
-    if (first) Nav.go(first);
+    if (first) {
+      try { Nav.go(first); } catch (e) { console.warn('[App] Nav.go', e); }
+    }
+
+    // ─── SAFETY NET : force re-render après chaque étape clé ──
+    // Étape 1 : 300ms après init (DOM stabilisé)
+    setTimeout(function() {
+      try {
+        if (typeof Caisse !== 'undefined' && Caisse.render) Caisse.render();
+      } catch (e) { console.warn('[App] safety 300ms', e); }
+    }, 300);
+    // Étape 2 : 1.2s après init (si load API a réussi)
+    setTimeout(function() {
+      try {
+        var caissePage = document.getElementById('page-caisse');
+        var grid = document.getElementById('products-grid');
+        if (caissePage && caissePage.classList.contains('active') && grid) {
+          var html = grid.innerHTML || '';
+          // Détection initial loading : contient "Chargement" mais SANS "spinner" de mon nouveau code
+          var stillStuck = html.indexOf('Chargement') >= 0 && html.indexOf('class="empty-state"') < 0;
+          if (stillStuck && typeof Caisse !== 'undefined' && Caisse.render) {
+            console.warn('[App] grid stuck → re-render');
+            Caisse.render();
+          }
+        }
+      } catch (e) { console.warn('[App] safety 1.2s', e); }
+    }, 1200);
 
     // ─── PHASE 2 : Refresh des données depuis le serveur en parallèle ───
     Promise.all([
       API.getSettings().then(s => { if (s && !s.error) window._cachedSettings = s; }).catch(()=>{}),
-      Store.loadProduits({ useCache: false }),
-      Store.loadIngredients({ useCache: false }),
+      Store.loadProduits({ useCache: false }).catch(()=>{}),
+      Store.loadIngredients({ useCache: false }).catch(()=>{}),
     ]).then(() => {
-      // Re-render la page courante avec les données fraîches
       try {
         if (typeof Caisse !== 'undefined' && Caisse.render) Caisse.render();
         if (typeof Dashboard !== 'undefined' && document.getElementById('page-dashboard').classList.contains('active')) Dashboard.render();
@@ -32,6 +57,8 @@ const App = {
 
     this._pollStatus();
     setInterval(() => this._pollStatus(), 30000);
+    this._pollOrdersCount();
+    setInterval(() => this._pollOrdersCount(), 30000);
   },
 
   bootstrap() {
@@ -94,6 +121,37 @@ const App = {
     } else {
       const sb = document.getElementById('supabase-banner');
       if (sb) sb.remove();
+    }
+  },
+
+  async _pollOrdersCount() {
+    // 1) Affiche d'abord la valeur en cache pour éviter le "0" au refresh
+    try {
+      const cached = parseInt(localStorage.getItem('thebox_cmd_count') || '');
+      if (!isNaN(cached) && cached >= 0) {
+        const el = document.getElementById('cmd-count');
+        if (el) el.textContent = cached + ' commande(s) aujourd\'hui';
+      }
+    } catch (_) {}
+    // 2) Fetch la valeur fraîche
+    try {
+      const r = await fetch('/api/stats/count-today', { credentials: 'include', cache: 'no-store' });
+      if (!r.ok) {
+        console.warn('[_pollOrdersCount] HTTP', r.status);
+        return;
+      }
+      const j = await r.json();
+      console.log('[_pollOrdersCount] response', j);
+      const count = parseInt(j.count);
+      const el = document.getElementById('cmd-count');
+      if (el && !isNaN(count)) {
+        el.textContent = count + ' commande(s) aujourd\'hui';
+        try { localStorage.setItem('thebox_cmd_count', String(count)); } catch (_) {}
+      } else if (el && j.error) {
+        console.warn('[_pollOrdersCount] erreur API:', j.error);
+      }
+    } catch (e) {
+      console.warn('[_pollOrdersCount] exception', e);
     }
   },
 

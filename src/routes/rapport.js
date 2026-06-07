@@ -119,115 +119,160 @@ router.get('/', auth.requireAuth, auth.requirePerm('stats.export'), async (req, 
 
   try {
     const W = doc.page.width - 100;
-    const GOLD = '#d97706', GRAY = '#6b7280';
-
-    // En-tête
-    doc.rect(0, 0, doc.page.width, 70).fill('#111827');
-    doc.fontSize(24).font('Helvetica-Bold').fillColor(GOLD)
-       .text('THE BOX', 50, 18, { align: 'center' });
-    doc.fontSize(11).font('Helvetica').fillColor('#9ca3af')
-       .text('Rapport journalier', 50, 46, { align: 'center' });
-    doc.y = 90;
+    // Palette pro
+    const GREEN = '#195334';     // primary brand
+    const GREEN_LIGHT = '#ecf6ef';
+    const TEXT  = '#0c0a09';
+    const MUTED = '#78716c';
+    const BORDER = '#e7e5e4';
+    const SURFACE = '#fafaf9';
 
     const dateLabel = new Date(date + 'T12:00:00').toLocaleDateString('fr-FR', {
       weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',
     });
-    doc.fontSize(14).font('Helvetica-Bold').fillColor('#111827')
-       .text(dateLabel, { align: 'center' });
-    doc.moveDown(1.5);
 
-    // Résumé
-    doc.fontSize(13).font('Helvetica-Bold').fillColor(GOLD).text('Résumé');
-    doc.moveDown(0.3);
-    const statsRows = [
-      ["Chiffre d'affaires", `${totalCA.toFixed(3)} DT`],
-      ['Commandes',          `${nbCmds}`],
-      ['Produit phare',      produits[0]?.nom || '—'],
-      ['Alertes stock',      bas.length === 0 ? 'Tout OK' : `${bas.length} ingrédient(s) bas`],
+    // ─── HEADER : barre verte fine + titre ──
+    doc.rect(0, 0, doc.page.width, 6).fill(GREEN);
+    doc.fontSize(28).font('Helvetica-Bold').fillColor(TEXT)
+       .text('THE BOX CAFÉ', 50, 30);
+    doc.fontSize(10).font('Helvetica').fillColor(MUTED)
+       .text('Système de caisse & gestion', 50, 62);
+    // Date en haut-droite
+    doc.fontSize(10).font('Helvetica-Bold').fillColor(GREEN)
+       .text('RAPPORT JOURNALIER', 50, 30, { align: 'right', width: W });
+    doc.fontSize(11).font('Helvetica').fillColor(TEXT)
+       .text(dateLabel, 50, 48, { align: 'right', width: W });
+    doc.moveTo(50, 88).lineTo(545, 88).strokeColor(BORDER).stroke();
+    doc.y = 110;
+
+    // ─── KPI CARDS (4 mini stats en grille) ──
+    const kpis = [
+      { lbl: "Chiffre d'affaires", val: `${totalCA.toFixed(3)} DT`, color: GREEN },
+      { lbl: 'Commandes',          val: String(nbCmds),              color: '#2563eb' },
+      { lbl: 'Ticket moyen',       val: nbCmds > 0 ? `${(totalCA/nbCmds).toFixed(3)} DT` : '—', color: '#a855f7' },
+      { lbl: 'Alertes stock',      val: bas.length === 0 ? 'Aucune' : `${bas.length}`, color: bas.length > 0 ? '#dc2626' : '#16a34a' },
     ];
-    doc.font('Helvetica').fontSize(12).fillColor('#111827');
-    statsRows.forEach(([l, v]) => {
-      doc.fillColor(GRAY).text(l + ' :', 60, doc.y, { continued: true, width: 220 });
-      doc.fillColor('#111827').font('Helvetica-Bold').text(v);
-      doc.font('Helvetica').moveDown(0.3);
+    const cardW = (W - 30) / 4;
+    let cardX = 50;
+    kpis.forEach(k => {
+      const cardY = doc.y;
+      // Card bg + thin border top colored
+      doc.roundedRect(cardX, cardY, cardW, 70, 8).fillAndStroke('#ffffff', BORDER);
+      doc.rect(cardX, cardY, cardW, 3).fill(k.color);
+      doc.fontSize(8).font('Helvetica-Bold').fillColor(MUTED)
+         .text(k.lbl.toUpperCase(), cardX + 12, cardY + 14, { width: cardW - 24, characterSpacing: 0.5 });
+      doc.fontSize(18).font('Helvetica-Bold').fillColor(TEXT)
+         .text(k.val, cardX + 12, cardY + 32, { width: cardW - 24 });
+      cardX += cardW + 10;
     });
+    doc.y += 90;
 
-    doc.moveDown(1);
-    doc.moveTo(50, doc.y).lineTo(545, doc.y).strokeColor('#e5e7eb').stroke();
-    doc.moveDown(1);
-
-    // Ventes par produit
+    // ─── VENTES PAR PRODUIT (tableau pro) ──
     if (produits.length > 0) {
-      doc.fontSize(13).font('Helvetica-Bold').fillColor(GOLD).text('Ventes par produit');
-      doc.moveDown(0.4);
-      const colX = [55, 290, 380, 470];
-      const y0 = doc.y;
-      doc.rect(50, y0 - 3, W, 18).fill('#f3f4f6');
-      doc.fontSize(10).font('Helvetica-Bold').fillColor(GRAY);
-      ['Produit', 'Quantité', 'Revenu (DT)', ''].forEach((h, i) => doc.text(h, colX[i], y0, { width: 100 }));
-      doc.moveDown(0.4);
-      doc.font('Helvetica').fontSize(11).fillColor('#111827');
-      produits.forEach((p, idx) => {
-        if (doc.y > doc.page.height - 100) doc.addPage();
-        if (idx % 2 === 0) doc.rect(50, doc.y - 2, W, 17).fill('#f9fafb');
+      // Titre section
+      doc.fontSize(13).font('Helvetica-Bold').fillColor(TEXT).text('Ventes par produit', 50, doc.y);
+      doc.fontSize(9).font('Helvetica').fillColor(MUTED).text(`${produits.length} produit${produits.length > 1 ? 's' : ''} vendu${produits.length > 1 ? 's' : ''} aujourd'hui`, 50, doc.y);
+      doc.moveDown(0.8);
+
+      // Header row
+      const colX = [55, 90, 360, 450];
+      const headY = doc.y;
+      doc.rect(50, headY, W, 22).fill(SURFACE);
+      doc.fontSize(9).font('Helvetica-Bold').fillColor(MUTED).text('#', colX[0], headY + 7, { width: 30 });
+      doc.text('PRODUIT',   colX[1], headY + 7, { width: 250 });
+      doc.text('QUANTITÉ',  colX[2], headY + 7, { width: 80 });
+      doc.text('REVENU',    colX[3], headY + 7, { width: 100, align: 'right' });
+      doc.y = headY + 22;
+
+      // Rows
+      doc.font('Helvetica').fontSize(10).fillColor(TEXT);
+      produits.slice(0, 30).forEach((p, idx) => {
+        if (doc.y > doc.page.height - 100) {
+          doc.addPage();
+          doc.rect(0, 0, doc.page.width, 6).fill(GREEN);
+          doc.y = 50;
+        }
         const y = doc.y;
-        doc.fillColor('#111827').text(p.nom, colX[0], y, { width: 230 });
-        doc.text(String(p.qty), colX[1], y, { width: 80 });
-        doc.text(parseFloat(p.revenu).toFixed(3), colX[2], y, { width: 80 });
-        doc.moveDown(0.4);
+        // Alternate row bg
+        if (idx % 2 === 0) doc.rect(50, y - 2, W, 20).fill(SURFACE);
+        doc.fillColor(MUTED).text(String(idx + 1), colX[0], y + 4, { width: 30 });
+        doc.fillColor(TEXT).font('Helvetica-Bold').text(p.nom, colX[1], y + 4, { width: 250, ellipsis: true });
+        doc.font('Helvetica').fillColor(TEXT).text(String(p.qty), colX[2], y + 4, { width: 80 });
+        doc.fillColor(GREEN).font('Helvetica-Bold').text(parseFloat(p.revenu).toFixed(3) + ' DT', colX[3], y + 4, { width: 100, align: 'right' });
+        doc.font('Helvetica');
+        doc.y = y + 20;
       });
+      // Footer total ligne
+      const totalRowY = doc.y + 5;
+      doc.rect(50, totalRowY, W, 24).fill(GREEN_LIGHT);
+      doc.fontSize(10).font('Helvetica-Bold').fillColor(GREEN)
+         .text('TOTAL', colX[1], totalRowY + 8, { width: 250 });
+      doc.text(String(produits.reduce((s,p)=>s+p.qty, 0)), colX[2], totalRowY + 8, { width: 80 });
+      doc.fillColor(GREEN).text(produits.reduce((s,p)=>s+parseFloat(p.revenu), 0).toFixed(3) + ' DT', colX[3], totalRowY + 8, { width: 100, align: 'right' });
+      doc.y = totalRowY + 32;
     }
 
-    // Alertes
+    // ─── ALERTES STOCK ──
     if (bas.length > 0) {
-      if (doc.y > doc.page.height - 120) doc.addPage();
+      if (doc.y > doc.page.height - 130) doc.addPage();
       doc.moveDown(1);
-      doc.moveTo(50, doc.y).lineTo(545, doc.y).strokeColor('#e5e7eb').stroke();
-      doc.moveDown(1);
-      doc.fontSize(13).font('Helvetica-Bold').fillColor('#dc2626').text('Alertes Stock');
-      doc.moveDown(0.4);
-      doc.font('Helvetica').fontSize(11).fillColor('#111827');
+      doc.fontSize(13).font('Helvetica-Bold').fillColor('#dc2626').text('⚠ Alertes stock', 50, doc.y);
+      doc.fontSize(9).font('Helvetica').fillColor(MUTED).text(`${bas.length} ingrédient${bas.length > 1 ? 's' : ''} sous le seuil minimum`, 50, doc.y);
+      doc.moveDown(0.6);
       bas.forEach(i => {
-        doc.text(`• ${i.nom} : ${i.stock_actuel}${i.unite} (seuil: ${i.seuil_minimum}${i.unite})`);
-        doc.moveDown(0.2);
+        const y = doc.y;
+        doc.rect(50, y - 2, W, 22).fill('#fef2f2');
+        doc.fontSize(10).font('Helvetica-Bold').fillColor('#dc2626').text('●', 60, y + 4);
+        doc.fillColor(TEXT).font('Helvetica-Bold').text(i.nom, 80, y + 4, { width: 250 });
+        doc.fillColor(MUTED).font('Helvetica').text(`${i.stock_actuel}${i.unite} / seuil ${i.seuil_minimum}${i.unite}`, 300, y + 4, { width: 240, align: 'right' });
+        doc.y = y + 22;
+        doc.moveDown(0.15);
       });
     }
 
-    // Page 2 : détail
+    // ─── PAGE 2+ : DÉTAIL COMMANDES ──
     if (cmds.length > 0) {
       doc.addPage();
-      doc.rect(0, 0, doc.page.width, 60).fill('#111827');
-      doc.fontSize(18).font('Helvetica-Bold').fillColor(GOLD).text('THE BOX', 50, 14, { align: 'center' });
-      doc.fontSize(11).font('Helvetica').fillColor('#9ca3af').text(`Détail — ${dateLabel}`, 50, 36, { align: 'center' });
-      doc.y = 80; doc.moveDown(0.5);
-      doc.fontSize(13).font('Helvetica-Bold').fillColor(GOLD)
-         .text(`${nbCmds} commande${nbCmds > 1 ? 's' : ''} — Total : ${totalCA.toFixed(3)} DT`);
-      doc.moveDown(0.6);
+      doc.rect(0, 0, doc.page.width, 6).fill(GREEN);
+      doc.fontSize(20).font('Helvetica-Bold').fillColor(TEXT).text('Détail des commandes', 50, 30);
+      doc.fontSize(10).font('Helvetica').fillColor(MUTED).text(`${nbCmds} commande${nbCmds > 1 ? 's' : ''} · Total ${totalCA.toFixed(3)} DT · ${dateLabel}`, 50, 56);
+      doc.moveTo(50, 80).lineTo(545, 80).strokeColor(BORDER).stroke();
+      doc.y = 100;
+
       for (const c of cmds) {
-        if (doc.y > doc.page.height - 120) doc.addPage();
+        if (doc.y > doc.page.height - 120) {
+          doc.addPage();
+          doc.rect(0, 0, doc.page.width, 6).fill(GREEN);
+          doc.y = 40;
+        }
         const heure = new Date(c.created_at).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
         const yCmd = doc.y;
-        doc.rect(50, yCmd - 2, W, 20).fill('#1f2937');
-        doc.fontSize(11).font('Helvetica-Bold').fillColor(GOLD)
-           .text(`#${c.id}  ${heure}`, 55, yCmd, { continued: true, width: 200 });
-        doc.fillColor('#ffffff').font('Helvetica')
-           .text(`${parseFloat(c.total).toFixed(3)} DT`, { align: 'right', width: W - 60 });
-        doc.moveDown(0.5);
-        doc.font('Helvetica').fontSize(10).fillColor(GRAY);
+        // Card commande
+        const cmdHeight = 26 + ((c.commande_items || []).length * 14) + 10;
+        doc.roundedRect(50, yCmd, W, cmdHeight, 6).fillAndStroke('#ffffff', BORDER);
+        // Header card
+        doc.fontSize(11).font('Helvetica-Bold').fillColor(GREEN).text(`Commande #${c.id}`, 60, yCmd + 8);
+        doc.fontSize(9).font('Helvetica').fillColor(MUTED).text(heure, 60, yCmd + 8, { align: 'right', width: 100 });
+        doc.fontSize(12).font('Helvetica-Bold').fillColor(TEXT).text(`${parseFloat(c.total).toFixed(3)} DT`, 50, yCmd + 8, { align: 'right', width: W - 20 });
+        // Items
+        doc.y = yCmd + 26;
+        doc.font('Helvetica').fontSize(9).fillColor(MUTED);
         for (const item of (c.commande_items || [])) {
-          doc.text(`    ${item.quantite}× ${item.produits?.nom || '?'}   —   ${parseFloat(item.prix_unitaire).toFixed(3)} DT/u   =   ${(item.quantite * parseFloat(item.prix_unitaire)).toFixed(3)} DT`);
-          doc.moveDown(0.2);
+          doc.text(`${item.quantite}× ${item.produits?.nom || '?'}`, 70, doc.y, { width: 300, continued: true });
+          doc.fillColor(TEXT).text(`${(item.quantite * parseFloat(item.prix_unitaire)).toFixed(3)} DT`, { align: 'right' });
+          doc.fillColor(MUTED);
+          doc.moveDown(0.05);
         }
-        doc.moveDown(0.4);
+        doc.y = yCmd + cmdHeight + 8;
       }
     }
 
-    // Pied de page
+    // ─── FOOTER (toutes pages) ──
     const range = doc.bufferedPageRange();
     for (let i = 0; i < range.count; i++) {
       doc.switchToPage(range.start + i);
-      doc.fontSize(8).font('Helvetica').fillColor('#9ca3af')
-         .text(`The Box Café — Rapport du ${date} — Page ${i + 1}/${range.count}`,
+      doc.fontSize(8).font('Helvetica').fillColor(MUTED)
+         .text(`The Box Café · Rapport du ${dateLabel} · Page ${i + 1} sur ${range.count}`,
                50, doc.page.height - 30, { align: 'center', width: W });
     }
 

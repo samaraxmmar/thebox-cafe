@@ -3,8 +3,17 @@
 ══════════════════════════════════════════════════════ */
 
 const Stock = {
-  render() {
+  _loading: false,
+  async render() {
     this._renderActions();
+    // Si Store pas encore chargé → afficher loading + fetch + re-render
+    if ((!Store._loaded || !Store._loaded.produits) && !this._loading) {
+      this._loading = true;
+      var cards = document.getElementById('stock-cards');
+      if (cards) cards.innerHTML = '<div class="empty-state" style="grid-column:1/-1;padding:40px;text-align:center"><div class="spinner" style="margin:0 auto 12px"></div>Chargement du stock…</div>';
+      try { await Store.loadProduits({ useCache: false }); } catch (_) {}
+      this._loading = false;
+    }
     this._renderCards();
     this._renderTable();
   },

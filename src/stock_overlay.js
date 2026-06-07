@@ -2,97 +2,155 @@
 
 /* ──────────────────────────────────────────────────────────────────────
    THE BOX — Stock overlay
-   Stockage local du stock par produit (data/stock.json).
-   Sert de fallback / source de vérité quand les colonnes Supabase
-   stock_actuel / seuil_minimum / cout_unitaire n'existent pas en BD.
+   Stockage local par produit dans data/stock.json :
+   { "<produit_id>": { tracked, stock, seuil, cout, image, updated_at } }
 
-   Structure : { "<produit_id>": { stock, seuil, cout, updated_at } }
+   - tracked: true  → produit SUIVI (stock décrémenté, alertes rupture)
+   - tracked: false → produit non suivi (entrée juste pour stocker l'image)
    ────────────────────────────────────────────────────────────────────── */
 
 const storage = require('./storage');
-
 const FILE = 'stock';
 
 function _all() { return storage.read(FILE, {}) || {}; }
 function _save(obj) { storage.write(FILE, obj); }
 
-/** Renvoie {stock, seuil, cout} ou null si non suivi. */
+/** Renvoie {tracked, stock, seuil, cout, image} ou null si entrée absente. */
 function get(produitId) {
   const all = _all();
   const e = all[produitId];
-  return e ? { stock: e.stock || 0, seuil: e.seuil || 0, cout: e.cout || 0 } : null;
+  if (!e) return null;
+  return {
+    tracked: e.tracked === true,
+    stock:   e.stock || 0,
+    seuil:   e.seuil || 0,
+    cout:    e.cout  || 0,
+    image:   e.image || null,
+  };
 }
 
-/** Définit ou remplace l'entrée pour un produit. */
-function set(produitId, { stock, seuil, cout } = {}) {
+/** Définit ou met à jour. Préserve les champs absents. */
+function set(produitId, { tracked, stock, seuil, cout, image } = {}) {
   if (!produitId) return;
   const all = _all();
+  const prev = all[produitId] || {};
   all[produitId] = {
-    stock: stock != null ? parseFloat(stock) : 0,
-    seuil: seuil != null ? parseFloat(seuil) : 0,
-    cout:  cout  != null ? parseFloat(cout)  : 0,
+    tracked: tracked !== undefined ? !!tracked : (prev.tracked === true),
+    stock:   stock != null ? parseFloat(stock) : (prev.stock || 0),
+    seuil:   seuil != null ? parseFloat(seuil) : (prev.seuil || 0),
+    cout:    cout  != null ? parseFloat(cout)  : (prev.cout  || 0),
+    image:   image !== undefined ? image : (prev.image || null),
     updated_at: new Date().toISOString(),
   };
   _save(all);
   return all[produitId];
 }
 
-/** Incrémente le stock (positif=ajout, négatif=retrait). Crée l'entrée si absente. */
+/** Met juste l'image (n'active pas le tracking, ne touche pas au stock). */
+function setImage(produitId, imageUrl) {
+  if (!produitId) return;
+  const all = _all();
+  const prev = all[produitId] || { tracked: false, stock: 0, seuil: 0, cout: 0 };
+  all[produitId] = {
+    ...prev,
+    image: imageUrl || null,
+    updated_at: new Date().toISOString(),
+  };
+  _save(all);
+  return all[produitId];
+}
+
+/** Active le tracking de stock (entrée tracked:true). */
+function enableTracking(produitId, { stock = 0, seuil = 5, cout = 0 } = {}) {
+  return set(produitId, { tracked: true, stock, seuil, cout });
+}
+
+/** Désactive le tracking (mais GARDE l'image éventuelle). */
+function disableTracking(produitId) {
+  const all = _all();
+  const prev = all[produitId];
+  if (!prev) return;
+  all[produitId] = { ...prev, tracked: false, stock: 0, seuil: 0, updated_at: new Date().toISOString() };
+  _save(all);
+  return all[produitId];
+}
+
+/** Incrémente le stock (positif=ajout, négatif=retrait). N'agit QUE si tracked. */
 function adjust(produitId, delta, allowNegative = true) {
   if (!produitId) return null;
   const all = _all();
-  const cur = all[produitId] || { stock: 0, seuil: 0, cout: 0 };
+  const cur = all[produitId];
+  if (!cur || cur.tracked !== true) return null;       // non suivi → on touche rien
   const newStock = allowNegative
     ? cur.stock + parseFloat(delta)
     : Math.max(0, cur.stock + parseFloat(delta));
-  all[produitId] = {
-    ...cur,
-    stock: newStock,
-    updated_at: new Date().toISOString(),
-  };
+  all[produitId] = { ...cur, stock: newStock, updated_at: new Date().toISOString() };
   _save(all);
   return all[produitId];
 }
 
-/** Supprime l'entrée d'un produit (à appeler quand le produit est supprimé). */
 function remove(produitId) {
   const all = _all();
-  if (all[produitId]) {
-    delete all[produitId];
-    _save(all);
-    return true;
-  }
+  if (all[produitId]) { delete all[produitId]; _save(all); return true; }
   return false;
 }
 
-/** Liste des IDs de produits suivis. */
-function trackedIds() { return Object.keys(_all()).map(Number); }
+/** Liste des IDs SUIVIS (tracked:true) — pour la page Stock. */
+function trackedIds() {
+  const all = _all();
+  return Object.keys(all).filter(id => all[id].tracked === true).map(Number);
+}
 
-/** Merge: ajoute stock_actuel/seuil_minimum/cout_unitaire sur les rows produits. */
+/** Merge : ajoute stock_actuel / seuil_minimum / cout_unitaire / image_url
+    selon ce qu'il y a dans l'overlay. Ne marque tracked QUE si entrée tracked:true. */
 function augmentProducts(products) {
   const all = _all();
   return (products || []).map(p => {
     const e = all[p.id];
-    if (!e) {
-      // Pas d'entrée locale : on garde ce qui est en DB (si présent), sinon null
-      return p;
+    const out = { ...p };
+    if (e) {
+      if (e.tracked === true) {
+        out.stock_actuel  = e.stock;
+        out.seuil_minimum = e.seuil;
+        out.tracked       = true;
+      }
+      if (e.cout != null && e.cout > 0) out.cout_unitaire = e.cout;
+      if (e.image) out.image_url = e.image;
     }
-    return {
-      ...p,
-      stock_actuel:  e.stock,
-      seuil_minimum: e.seuil,
-      cout_unitaire: e.cout,
-      tracked:       true,
-    };
+    return out;
   });
 }
 
-/** True si le produit a une entrée stock locale OU une valeur Supabase. */
 function isTracked(produit) {
   if (!produit) return false;
   const all = _all();
-  if (all[produit.id]) return true;
-  return produit.stock_actuel != null;
+  const e = all[produit.id];
+  return e && e.tracked === true;
 }
 
-module.exports = { get, set, adjust, remove, trackedIds, augmentProducts, isTracked };
+/* Migration douce : entrées existantes sans flag `tracked` doivent être
+   normalisées. Règle : une entrée est tracked SEULEMENT si elle avait
+   explicitement un stock > 0 dans la version précédente. Sinon on la met à false. */
+(function _migrateLegacy() {
+  try {
+    const all = _all();
+    let changed = false;
+    for (const id of Object.keys(all)) {
+      const e = all[id];
+      if (typeof e.tracked !== 'boolean') {
+        e.tracked = (parseFloat(e.stock) || 0) > 0;
+        if (!e.tracked) { e.stock = 0; e.seuil = 0; }
+        changed = true;
+      }
+    }
+    if (changed) {
+      _save(all);
+      console.log('[stock_overlay] migration : flag tracked ajouté aux entrées existantes');
+    }
+  } catch (_) {}
+})();
+
+module.exports = {
+  get, set, setImage, enableTracking, disableTracking,
+  adjust, remove, trackedIds, augmentProducts, isTracked,
+};

@@ -22,33 +22,43 @@ var Produits = (function() {
   function _productCard(p) {
     var canEdit = Auth.can('products.edit');
     var tracked = (p.tracked === true) || (p.stock != null && !isNaN(p.stock));
-    var stockBadge = '';
+    var rupture = false, bas = false, stockBadge = '';
     if (tracked) {
       var stock = parseFloat(p.stock != null ? p.stock : p.stock_actuel || 0);
       var seuil = parseFloat(p.seuil != null ? p.seuil : p.seuil_minimum || 5);
-      var rupture = stock <= 0;
-      var bas = !rupture && stock < seuil;
+      rupture = stock <= 0;
+      bas = !rupture && stock < seuil;
       var cls = rupture ? 'badge-red' : bas ? 'badge-orange' : 'badge-green';
       stockBadge = '<span class="badge ' + cls + '">📦 ' + (rupture ? '⚠ Rupture' : stock + ' en stock') + '</span>';
     } else {
       stockBadge = '<span class="badge badge-neutral" style="opacity:.65">stock non suivi</span>';
     }
 
-    return '<div class="prod-card" data-product-id="' + p.id + '">' +
-      '<div class="prod-card-main">' +
-        '<div class="prod-card-name">' + p.nom + '</div>' +
-        '<div class="prod-card-meta">' + stockBadge +
-          (p.actif === false ? '<span class="badge badge-red">inactif</span>' : '') +
-        '</div>' +
+    // Carte style Green Grounds Coffee : image + nom + prix + actions
+    var img = (typeof ProductImages !== 'undefined') ? ProductImages.render(p) : { html: '☕', bg: '#efe6d3' };
+    var classes = 'product-btn product-btn-manage' + (rupture ? ' rupture' : '') + (p.actif === false ? ' inactif' : '');
+
+    var actions = canEdit
+      ? '<div class="prod-actions-row">' +
+          '<button class="btn btn-secondary btn-sm" title="Changer la photo" onclick="event.stopPropagation();Produits.changePhoto(' + p.id + ')">📷</button>' +
+          '<button class="btn btn-primary btn-sm" title="Modifier le produit" onclick="event.stopPropagation();Produits.edit(' + p.id + ')">✎</button>' +
+          '<button class="btn btn-danger btn-sm" title="Supprimer" onclick="event.stopPropagation();Produits.remove(' + p.id + ')">🗑</button>' +
+        '</div>'
+      : '';
+
+    return '<div class="' + classes + '" data-product-id="' + p.id + '">' +
+      '<div class="product-img" style="background:' + img.bg + '">' +
+        img.html +
       '</div>' +
-      '<div class="prod-card-price">' + parseFloat(p.prix).toFixed(3) + ' DT</div>' +
-      (canEdit ?
-        '<div class="prod-card-actions">' +
-          '<button class="btn btn-ghost btn-sm" title="' + (p.actif === false ? 'Activer' : 'Désactiver') + '" onclick="Produits.toggle(' + p.id + ',' + (p.actif === false ? 'true' : 'false') + ')">' +
-            (p.actif === false ? '✓' : '✕') + '</button>' +
-          '<button class="btn btn-danger btn-sm" title="Supprimer" onclick="Produits.remove(' + p.id + ')">🗑</button>' +
-        '</div>' : '') +
-      '</div>';
+      '<div class="product-info">' +
+        '<div>' +
+          '<div class="product-name">' + p.nom + '</div>' +
+          '<div class="product-price">' + parseFloat(p.prix).toFixed(3) + ' DT</div>' +
+          '<div style="margin-top:6px">' + stockBadge + '</div>' +
+        '</div>' +
+        actions +
+      '</div>' +
+    '</div>';
   }
 
   function _renderHeader() {
@@ -56,6 +66,8 @@ var Produits = (function() {
     if (!el) return;
     el.innerHTML = Auth.can('products.edit')
       ? '<button class="btn btn-primary btn-sm" onclick="Admin.openAddProduct && Admin.openAddProduct()">+ Nouveau produit</button>'
+      + '<button class="btn btn-secondary btn-sm" onclick="Admin.openAddCategory && Admin.openAddCategory()">+ Catégorie</button>'
+      + '<button class="btn btn-ghost btn-sm" onclick="Admin.openCategoriesManager && Admin.openCategoriesManager()" title="Renommer / supprimer / réorganiser">📂 Gérer catégories</button>'
       : '';
   }
 
@@ -80,6 +92,25 @@ var Produits = (function() {
     }
   }
 
+  var _famMap = {};   // { categoryName: familyName }
+  var _famList = [];
+
+  async function _loadFamilies() {
+    try {
+      var f = await API.getFamilies();
+      _famMap  = (f && f.mapping)  || {};
+      _famList = (f && f.families) || [];
+    } catch (_) { _famMap = {}; _famList = []; }
+  }
+
+  function _familyOf(cat) {
+    if (!cat) return null;
+    if (_famMap[cat]) return _famMap[cat];
+    var low = cat.toLowerCase();
+    for (var k in _famMap) if (k.toLowerCase() === low) return _famMap[k];
+    return null;
+  }
+
   function _renderSections() {
     var root = document.getElementById('produits-sections');
     if (!root) return;
@@ -95,29 +126,47 @@ var Produits = (function() {
       return;
     }
 
-    // Groupement par catégorie
-    var byCat = {};
+    // Groupement à 2 niveaux : Famille → Catégories → Produits
+    var byFam = {};       // { family: { cat: [products] } }
     filtered.forEach(function(p) {
-      var c = p.cat || p.categorie || 'Autres';
-      if (!byCat[c]) byCat[c] = [];
-      byCat[c].push(p);
+      var cat = p.cat || p.categorie || 'Autres';
+      var fam = _familyOf(cat) || '— Sans famille';
+      if (!byFam[fam]) byFam[fam] = {};
+      if (!byFam[fam][cat]) byFam[fam][cat] = [];
+      byFam[fam][cat].push(p);
     });
 
-    var cats = Object.keys(byCat).sort();
+    // Ordre des familles : celles du backend en premier, puis orphelines
+    var famNames = _famList.slice();
+    Object.keys(byFam).forEach(function(f) { if (famNames.indexOf(f) < 0) famNames.push(f); });
+
     var html = '';
-    cats.forEach(function(cat) {
-      var items = byCat[cat].sort(function(a, b) { return (a.nom || '').localeCompare(b.nom || ''); });
-      var color = Store.CAT_COLORS[cat] || '#888';
-      html += '<section class="cat-section">'
-            +   '<div class="cat-section-header">'
-            +     '<span class="cat-section-dot" style="background:' + color + '"></span>'
-            +     '<span class="cat-section-title">' + cat + '</span>'
-            +     '<span class="cat-section-count">' + items.length + '</span>'
-            +   '</div>'
-            +   '<div class="cat-section-grid">'
-            +     items.map(_productCard).join('')
-            +   '</div>'
-            + '</section>';
+    famNames.forEach(function(fam) {
+      if (!byFam[fam]) return;
+      var cats = Object.keys(byFam[fam]).sort();
+      var totalCount = cats.reduce(function(s, c) { return s + byFam[fam][c].length; }, 0);
+      var isOrphan = fam === '— Sans famille';
+      html += '<div class="family-block' + (isOrphan ? ' family-orphan' : '') + '">'
+            + '  <div class="family-header">'
+            + '    <span class="family-icon">' + (isOrphan ? '⚠' : '📁') + '</span>'
+            + '    <span class="family-title">' + fam + '</span>'
+            + '    <span class="family-count">' + totalCount + ' produit' + (totalCount > 1 ? 's' : '') + '</span>'
+            + '  </div>';
+      cats.forEach(function(cat) {
+        var items = byFam[fam][cat].sort(function(a, b) { return (a.nom || '').localeCompare(b.nom || ''); });
+        var color = (Store.CAT_COLORS && Store.CAT_COLORS[cat]) || '#888';
+        html += '<section class="cat-section">'
+              +   '<div class="cat-section-header">'
+              +     '<span class="cat-section-dot" style="background:' + color + '"></span>'
+              +     '<span class="cat-section-title">' + cat + '</span>'
+              +     '<span class="cat-section-count">' + items.length + '</span>'
+              +   '</div>'
+              +   '<div class="cat-section-grid">'
+              +     items.map(_productCard).join('')
+              +   '</div>'
+              + '</section>';
+      });
+      html += '</div>';
     });
     root.innerHTML = html;
   }
@@ -125,6 +174,7 @@ var Produits = (function() {
   async function render() {
     _renderHeader();
     _wireSearch();
+    await _loadFamilies();
     _renderCatFilter();
     _renderSections();
 
@@ -198,6 +248,12 @@ var Produits = (function() {
 
   /* ── Actions produits ───────────────────────────────── */
 
+  function edit(id) {
+    var p = Store.getProduit(id);
+    if (!p) { Toast.warn('Produit introuvable'); return; }
+    if (Admin && Admin.openEditProduct) Admin.openEditProduct(p);
+  }
+
   async function toggle(id, actif) {
     var r = await API.toggleProduit(id, actif);
     if (r && r.success) {
@@ -234,9 +290,60 @@ var Produits = (function() {
     }
   }
 
+  // Change la photo d'un produit existant via un file picker volatile
+  function changePhoto(id) {
+    var input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = async function(ev) {
+      var file = ev.target.files && ev.target.files[0];
+      if (!file) return;
+      if (file.size > 5 * 1024 * 1024) { Toast.warn('Image trop lourde (max 5 Mo)'); return; }
+      try {
+        // resize → base64
+        var dataUrl = await new Promise(function(resolve, reject) {
+          var fr = new FileReader();
+          fr.onload = function() {
+            var img = new Image();
+            img.onload = function() {
+              var w = img.width, h = img.height;
+              var max = 500;
+              if (w > max || h > max) { var r = Math.min(max/w, max/h); w = Math.round(w*r); h = Math.round(h*r); }
+              var cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+              cv.getContext('2d').drawImage(img, 0, 0, w, h);
+              resolve(cv.toDataURL('image/jpeg', 0.85));
+            };
+            img.onerror = reject;
+            img.src = fr.result;
+          };
+          fr.onerror = reject;
+          fr.readAsDataURL(file);
+        });
+        // upload
+        var up = await fetch('/api/upload', {
+          method:'POST', credentials:'include',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ data: dataUrl }),
+        });
+        var j = await up.json();
+        if (!up.ok || !j.url) throw new Error(j.error || 'Upload échoué');
+        // PATCH produit
+        var r = await API.updateProduit(id, { image_url: j.url });
+        if (!r || !r.success) throw new Error((r && r.error) || 'PATCH échoué');
+        Store.clearCache();
+        await Store.loadProduits({ useCache:false });
+        Toast.success('Photo mise à jour');
+        render();
+        if (typeof Caisse !== 'undefined' && Caisse.render) Caisse.render();
+      } catch (e) { Toast.error(e.message || 'Erreur'); }
+    };
+    input.click();
+  }
+
   return {
     render: render, setCat: setCat,
-    toggle: toggle, remove: remove,
+    toggle: toggle, remove: remove, changePhoto: changePhoto,
+    edit: edit,
     appendNewProduct: appendNewProduct, removeFromDom: removeFromDom,
   };
 })();

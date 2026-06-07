@@ -17,6 +17,7 @@ router.use('/settings',    require('./routes/settings'));
 router.use('/logs',        require('./routes/logs'));
 router.use('/reports',     require('./routes/reports'));
 router.use('/movements',   require('./routes/movements'));
+router.use('/upload',      require('./routes/upload'));
 
 router.use('/produits',    require('./routes/produits'));
 router.use('/stock',       stockLimiter,  require('./routes/stock'));

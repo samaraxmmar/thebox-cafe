@@ -24,6 +24,8 @@ router.post('/', auth.requirePerm('users.manage'), (req, res) => {
   const role     = V.oneOf(body.role, Object.keys(permissions.ROLE_LABELS));
   const pin      = V.str(body.pin, 20);
   const actif    = body.actif !== false;
+  const photo    = (body.photo || '').toString().trim();
+  const safePhoto = (photo && (/^https?:\/\//i.test(photo) || photo.startsWith('/uploads/'))) ? photo.slice(0, 500) : null;
 
   if (!username || username.length < 3) return res.status(400).json({ error: 'Identifiant invalide (min 3 caractères)' });
   if (!nom)                              return res.status(400).json({ error: 'Nom requis' });
@@ -42,6 +44,7 @@ router.post('/', auth.requirePerm('users.manage'), (req, res) => {
     role,
     pinHash:   auth.hash(pin),
     actif,
+    photo:     safePhoto,
     created_at:new Date().toISOString(),
   };
   users.push(u);
@@ -57,11 +60,15 @@ router.patch('/:id', auth.requirePerm('users.manage'), (req, res) => {
   const u = users.find(x => x.id === id);
   if (!u) return res.status(404).json({ error: 'Utilisateur introuvable' });
 
-  const { nom, role, actif, pin } = req.body || {};
+  const { nom, role, actif, pin, photo } = req.body || {};
   if (nom !== undefined)   u.nom = String(nom).trim();
   if (role !== undefined && permissions.ROLE_LABELS[role]) u.role = role;
   if (actif !== undefined) u.actif = !!actif;
   if (pin !== undefined && String(pin).length >= 4) u.pinHash = auth.hash(pin);
+  if (photo !== undefined) {
+    const p = (photo || '').toString().trim();
+    u.photo = (p && (/^https?:\/\//i.test(p) || p.startsWith('/uploads/'))) ? p.slice(0, 500) : null;
+  }
   u.updated_at = new Date().toISOString();
 
   // Empêcher de désactiver le DERNIER admin actif

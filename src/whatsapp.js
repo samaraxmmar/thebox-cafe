@@ -84,6 +84,7 @@ const NUMBER = process.env.WHATSAPP_NUMBER;
 
 let sock   = null;
 let _ready = false;
+let _disconnectCount = 0;
 
 let _initInFlight   = false;
 let _reconnectTimer = null;
@@ -170,14 +171,24 @@ async function initWA() {
         _ready = false;
         const code = lastDisconnect && lastDisconnect.error && lastDisconnect.error.output && lastDisconnect.error.output.statusCode;
         const loggedOut = DisconnectReason && code === DisconnectReason.loggedOut;
-        console.log(`[WA] Déconnecté (code: ${code || '?'})`);
+        // Anti-spam : ne log que toutes les 5 déconnexions consécutives
+        _disconnectCount = (_disconnectCount || 0) + 1;
+        if (_disconnectCount === 1 || _disconnectCount % 5 === 0) {
+          console.log(`[WA] Déconnecté (code: ${code || '?'}) — tentative ${_disconnectCount}`);
+        }
         if (!loggedOut) {
-          _scheduleReconnect(5000);
+          // Backoff exponentiel : 5s, 15s, 30s, 60s, max 5min
+          var delay = Math.min(5000 * Math.pow(2, Math.min(_disconnectCount - 1, 6)), 300000);
+          _scheduleReconnect(delay);
         } else {
           console.log('[WA] Session expirée, suppression...');
           try { if (fs.existsSync(AUTH_DIR)) fs.rmSync(AUTH_DIR, { recursive: true, force: true }); } catch (_) {}
-          _scheduleReconnect(2000);
+          _disconnectCount = 0;
+          _scheduleReconnect(5000);
         }
+      }
+      if (connection === 'open') {
+        _disconnectCount = 0;
       }
     });
 

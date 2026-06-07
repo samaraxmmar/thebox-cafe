@@ -32,11 +32,28 @@ try { authMw.bootstrap(); } catch (e) { log.error('Bootstrap auth: ' + e.message
 app.use(mw.securityHeaders());
 app.use(mw.requestId());
 app.use(mw.requestTimeout(25_000));
-app.use(express.json({ limit: '512kb' })); // payload max raisonnable
+app.use(express.json({ limit: '8mb' })); // 8 Mo pour permettre upload base64 d'images
+// En DEV : pas de cache HTTP pour les changements visibles instantanément
+const isProd = process.env.NODE_ENV === 'production';
 app.use(express.static(path.join(__dirname, 'public'), {
-  etag: true,
-  maxAge: process.env.NODE_ENV === 'production' ? '1d' : 0,
+  etag: isProd,
+  lastModified: isProd,
+  maxAge: isProd ? '1d' : 0,
+  setHeaders: function(res, filePath) {
+    if (!isProd && /\.(html|css|js)$/i.test(filePath)) {
+      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+    }
+  },
 }));
+
+// Servir les images uploadées (data/uploads/) sous /uploads
+try {
+  const storage = require('./src/storage');
+  const uploadDir = require('path').join(storage.DATA_DIR, 'uploads');
+  app.use('/uploads', express.static(uploadDir, { maxAge: '7d', etag: true }));
+} catch (e) { log.warn('Upload dir non monté : ' + e.message); }
 
 // Attache req.user si une session valide est présente (cookie)
 app.use(authMw.attachUser);

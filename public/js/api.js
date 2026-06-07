@@ -94,6 +94,18 @@ const API = {
   toggleProduit(id, actif) { return this._fetch('/produits/' + id + '/toggle', { method:'PATCH', body: JSON.stringify({ actif }) }); },
   deleteProduit(id)        { return this._fetch('/produits/' + id, { method:'DELETE' }); },
 
+  // ── Catégories ──────────────────────────────────────
+  getCategories()            { return this._fetch('/produits/categories'); },
+  renameCategory(from, to)   { return this._fetch('/produits/categories/rename', { method:'POST', body: JSON.stringify({ from, to }) }); },
+  deleteCategory(name, opts) { return this._fetch('/produits/categories/delete', { method:'POST', body: JSON.stringify(Object.assign({ name }, opts || {})) }); },
+  assignCategoryToFamily(category, family) { return this._fetch('/produits/categories/assign', { method:'POST', body: JSON.stringify({ category, family }) }); },
+
+  // ── Familles (groupes de catégories) ────────────────
+  getFamilies()              { return this._fetch('/produits/families'); },
+  createFamily(name)         { return this._fetch('/produits/families', { method:'POST', body: JSON.stringify({ name }) }); },
+  renameFamily(from, to)     { return this._fetch('/produits/families/' + encodeURIComponent(from), { method:'PATCH', body: JSON.stringify({ to }) }); },
+  deleteFamily(name)         { return this._fetch('/produits/families/' + encodeURIComponent(name), { method:'DELETE' }); },
+
   // ── Stock ───────────────────────────────────────────
   getStock()               { return this._fetch('/stock'); },
   createIngredient(data)   { return this._fetch('/stock', { method:'POST', body: JSON.stringify(data) }); },
@@ -104,15 +116,25 @@ const API = {
   createOrder(data)        { return this._fetch('/orders', { method:'POST', body: JSON.stringify(data) }); },
   getCommandes()           { return this._fetch('/commandes'); },
   cancelCommande(id)       { return this._fetch('/commandes/' + id + '/cancel', { method:'PATCH' }); },
+  deleteCommande(id)       { return this._fetch('/commandes/' + id, { method:'DELETE' }); },
+  previewDeleteByDate(date){ return this._fetch('/commandes/by-date/preview?date=' + encodeURIComponent(date)); },
+  deleteByDate(date)       { return this._fetch('/commandes/by-date?date=' + encodeURIComponent(date), { method:'DELETE' }); },
 
   // ── Tables ──────────────────────────────────────────
   getTables()              { return this._fetch('/tables'); },
   openTable(id, couverts)  { return this._fetch('/tables/' + id + '/open', { method:'POST', body: JSON.stringify({ nb_couverts: couverts }) }); },
   closeTable(id)           { return this._fetch('/tables/' + id + '/close', { method:'POST' }); },
+  reserveTable(id, data)   { return this._fetch('/tables/' + id + '/reserve', { method:'POST', body: JSON.stringify(data) }); },
+  cancelReservation(id)    { return this._fetch('/tables/' + id + '/reserve', { method:'DELETE' }); },
   transferTable(from, to)  { return this._fetch('/tables/transfer', { method:'POST', body: JSON.stringify({ from_table_id: from, to_table_id: to }) }); },
+  createTable(data)        { return this._fetch('/tables', { method:'POST', body: JSON.stringify(data) }); },
+  updateTable(id, patch)   { return this._fetch('/tables/' + id, { method:'PATCH', body: JSON.stringify(patch) }); },
+  deleteTable(id)          { return this._fetch('/tables/' + id, { method:'DELETE' }); },
+  saveTableLayout(tables)  { return this._fetch('/tables/layout/save', { method:'PATCH', body: JSON.stringify({ tables }) }); },
 
   // ── Stats (legacy) ──────────────────────────────────
   getStats(date)           { return this._fetch('/stats' + (date ? '?date=' + encodeURIComponent(date) : '')); },
-  getEvolution(days = 7)   { return this._fetch('/stats/evolution?days=' + days); },
+  getEvolution(days = 7, date)    { return this._fetch('/stats/evolution?days=' + days + (date ? '&date=' + encodeURIComponent(date) : '')); },
+  getEvolutionCats(days = 7, date){ return this._fetch('/stats/evolution-cats?days=' + days + (date ? '&date=' + encodeURIComponent(date) : '')); },
   getStatsCmds(date)       { return this._fetch('/stats/commandes' + (date ? '?date=' + encodeURIComponent(date) : '')); },
 };

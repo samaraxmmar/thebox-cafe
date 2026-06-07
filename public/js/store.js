@@ -52,7 +52,9 @@ const Store = {
 
   // ── Mapper Supabase → Store ──────────────────────────
   _map(p) {
-    const isTracked = p.tracked === true || p.stock_actuel != null;
+    // tracked vient EXPLICITEMENT du backend (overlay.tracked === true).
+    // Plus de déduction depuis l'existence de stock_actuel : on respecte le flag.
+    const isTracked = p.tracked === true;
     return {
       id:      p.id,
       nom:     p.nom,
