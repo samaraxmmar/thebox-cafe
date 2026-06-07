@@ -2634,6 +2634,113 @@
 }
 .btn-reattribute:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(16, 185, 129, .4); }
 
+/* ══════════════════════════════════════════════════════
+   DESKTOP : Toggle Plan / Liste + Vue Liste de cards
+   ══════════════════════════════════════════════════════ */
+.tables-view-toggle-desktop {
+  display: inline-flex;
+  gap: 4px;
+  padding: 4px;
+  background: #f1f5f9;
+  border-radius: 12px;
+  margin-bottom: 14px;
+  width: fit-content;
+}
+.tvt-btn {
+  display: inline-flex; align-items: center; gap: 8px;
+  min-height: 36px; padding: 0 16px;
+  border: none; background: transparent;
+  border-radius: 8px;
+  font-size: 13px; font-weight: 600;
+  color: #475569; cursor: pointer;
+  font-family: inherit;
+  transition: all .2s var(--ease-in-out);
+}
+.tvt-btn:hover { color: #0f172a; }
+.tvt-btn.active {
+  background: #fff; color: #0f172a;
+  box-shadow: 0 1px 3px rgba(0,0,0,.08);
+}
+.tvt-btn svg { stroke-width: 2; }
+
+/* Vue Liste Desktop : grille de cards */
+.tables-list-desktop { padding: 4px 0 20px; }
+.tld-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+}
+.tld-card {
+  position: relative; overflow: hidden;
+  background: #fff;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0,0,0,.04);
+  transition: all .25s var(--ease-in-out);
+  cursor: pointer;
+}
+.tld-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px -4px rgba(0,0,0,.08), 0 2px 6px rgba(0,0,0,.04);
+  border-color: var(--border-2);
+}
+.tld-bar {
+  position: absolute; left: 0; top: 0; bottom: 0; width: 5px;
+  background: #cbd5e1;
+}
+.tld-card[data-status="libre"]    .tld-bar { background: linear-gradient(180deg,#86efac,#16a34a); }
+.tld-card[data-status="occupee"]  .tld-bar { background: linear-gradient(180deg,#fb7185,#e11d48); }
+.tld-card[data-status="reservee"] .tld-bar { background: linear-gradient(180deg,#c084fc,#7c3aed); }
+.tld-card[data-status="cleaning"] .tld-bar { background: linear-gradient(180deg,#fbbf24,#d97706); }
+
+.tld-body { padding: 16px 18px 16px 24px; }
+.tld-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 6px; }
+.tld-name {
+  font-size: 18px; font-weight: 800; color: var(--text);
+  margin: 0; letter-spacing: -.01em;
+}
+.tld-meta { font-size: 12.5px; color: var(--text-3); margin-top: 2px; font-weight: 500; }
+.tld-status {
+  flex-shrink: 0; padding: 4px 10px; border-radius: 999px;
+  font-size: 10.5px; font-weight: 700;
+  letter-spacing: .04em;
+}
+.tld-status.status-libre    { background: #d1fae5; color: #047857; }
+.tld-status.status-occupee  { background: #ffe4e6; color: #9f1239; }
+.tld-status.status-reservee { background: #ede9fe; color: #5b21b6; }
+.tld-status.status-cleaning { background: #fef3c7; color: #92400e; }
+
+.tld-info {
+  display: flex; gap: 6px; margin: 8px 0 12px; flex-wrap: wrap;
+}
+.tld-pill {
+  padding: 3px 9px; border-radius: 999px;
+  background: #f1f5f9; color: #475569;
+  font-size: 11.5px; font-weight: 600;
+}
+
+.tld-btn {
+  width: 100%; min-height: 44px;
+  border: none; border-radius: 10px;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: #fff; font-size: 13.5px; font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 3px 10px -2px rgba(22,163,74,.32);
+  transition: all .2s var(--ease-in-out);
+}
+.tld-btn:hover {
+  filter: brightness(1.05);
+  box-shadow: 0 6px 16px -3px rgba(22,163,74,.45);
+}
+.tld-btn:active { transform: scale(.98); }
+
+.tld-empty {
+  text-align: center; padding: 80px 20px;
+  color: var(--text-3);
+}
+.tld-empty-icon { font-size: 48px; opacity: .3; margin-bottom: 12px; }
+.tld-empty-title { font-size: 15px; font-weight: 600; color: var(--text-2); }
+
 /* ── Modal Modifier table : section taille/forme ─────────── */
 .form-divider {
   font-size: 11px;

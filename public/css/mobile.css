@@ -462,6 +462,8 @@ html.is-mobile .tables-kpi {
   /* Cache le floor wrap desktop sur mobile */
   #tables-floor-wrap, .tables-toolbar-pro, .tables-layout-pro { display: none !important; }
   .tables-kpi { display: none !important; }
+  .tables-view-toggle-desktop { display: none !important; }
+  .tables-list-desktop { display: none !important; }
 
   .mobile-fallback-shell {
     padding: 12px 16px 80px;
