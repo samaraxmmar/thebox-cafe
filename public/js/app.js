@@ -80,14 +80,27 @@ const App = {
     setInterval(tick, 1000);
   },
 
-  // Active le mode mobile : override Tables.render par TablesMobile.render
+  // Active le mode mobile : WRAP Tables.render — appelle l'original (qui fetch les data)
+  // puis exécute TablesMobile.render pour afficher la UI mobile sur les data fraîches.
   _initMobileMode() {
     if (typeof MobileDetect === 'undefined' || !MobileDetect.isMobile()) return;
     if (typeof TablesMobile === 'undefined' || typeof Tables === 'undefined') return;
-    // Garde une référence au render desktop au cas où
+    // Garde une référence au render desktop original (fetch data + tente render desktop)
     if (!Tables._desktopRender) Tables._desktopRender = Tables.render;
-    Tables.render = TablesMobile.render;
-    console.log('[App] Mode mobile activé — Tables.render → TablesMobile.render');
+    Tables.render = async function() {
+      try {
+        // 1) Exécute le render desktop original : fetch API + populate _tables/_sessions
+        //    Les fonctions DOM desktop (_renderKPI, _renderFloor) cherchent leurs IDs et
+        //    retournent silencieusement si les IDs n'existent pas (mobile a remplacé le DOM).
+        await Tables._desktopRender.call(Tables);
+      } catch (e) {
+        console.warn('[Mobile] Tables desktop render warning:', e);
+      }
+      // 2) Rend ensuite la UI mobile sur les données fraîches
+      try { TablesMobile.render(); }
+      catch (e) { console.error('[Mobile] TablesMobile.render failed:', e); }
+    };
+    console.log('[App] Mode mobile activé — Tables.render wrappé pour mobile');
   },
 
   // PWA : enregistre le service worker pour install + cache offline
