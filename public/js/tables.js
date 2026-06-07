@@ -689,24 +689,25 @@ var Tables = (function() {
     }
   }
 
-  // ── VUE PLAN : reproduit le plan visuel mais adapté mobile
+  // ── VUE PLAN : scrollable horizontal + vertical, tables aux vraies positions
   function _renderPlanView(tables, walls) {
-    var html = '<div class="mfb-plan-wrap">';
-    html += '<div class="mfb-plan" id="mfb-plan">';
-    // Murs (positionnés)
+    // Canvas virtuel plus large que le viewport mobile → scroll naturel
+    // Largeur : 900px (≈ 2.5x un viewport mobile de 360px) → scroll horizontal
+    // Hauteur : 700px → scroll vertical
+    var html = '<div class="mfb-plan-scroll" id="mfb-plan-scroll">';
+    html += '<div class="mfb-plan" id="mfb-plan" style="width:900px;height:700px">';
+
+    // Murs (à leurs vraies positions, pas de clamp)
     walls.forEach(function(w) {
       var wx = (w.x != null ? parseFloat(w.x) : 0);
       var wy = (w.y != null ? parseFloat(w.y) : 0);
-      if (wx < 0 || wx > 100 || wy < 0 || wy > 100) return; // skip hors zone
       html += '<div class="mfb-pl-wall" style="left:' + wx + '%;top:' + wy + '%"></div>';
     });
-    // Tables (positionnées)
+
+    // Tables (à leurs VRAIES positions, pas de clamp)
     tables.forEach(function(t) {
       var tx = (t.x != null ? parseFloat(t.x) : 50);
       var ty = (t.y != null ? parseFloat(t.y) : 50);
-      // Clamp position dans 5-90% pour éviter sortie de viewport mobile
-      tx = Math.max(2, Math.min(88, tx));
-      ty = Math.max(2, Math.min(88, ty));
       var st = _statusOf(t);
       var sess = _sessions[t.id];
       var miniInfo = '';
@@ -723,11 +724,13 @@ var Tables = (function() {
         + miniInfo
         + '</button>';
     });
+
     html += '</div></div>';
     html += '<div class="mfb-plan-legend">'
       + '<span class="mfb-pll lib"><span class="mfb-pll-dot"></span>Libre</span>'
       + '<span class="mfb-pll occ"><span class="mfb-pll-dot"></span>Occupée</span>'
       + '<span class="mfb-pll res"><span class="mfb-pll-dot"></span>Réservée</span>'
+      + '<span class="mfb-plan-hint">↔ glisse pour explorer</span>'
       + '</div>';
     return html;
   }

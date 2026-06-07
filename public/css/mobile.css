@@ -595,25 +595,36 @@ html.is-mobile .tables-kpi {
     box-shadow: 0 1px 3px rgba(0,0,0,.08);
   }
 
-  /* ── Vue PLAN visuel mobile ─────────────────────────── */
-  .mfb-plan-wrap {
+  /* ── Vue PLAN visuel mobile (scrollable horizontal + vertical) ── */
+  .mfb-plan-scroll {
     width: 100%;
-    aspect-ratio: 1 / 1.1;
-    max-height: 60vh;
+    height: 65vh;
+    max-height: 600px;
     background: #f8fafc;
     background-image:
-      linear-gradient(rgba(0,0,0,.035) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,0,0,.035) 1px, transparent 1px);
-    background-size: 20px 20px;
+      linear-gradient(rgba(0,0,0,.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,0,0,.04) 1px, transparent 1px);
+    background-size: 24px 24px;
     border: 1px solid #e2e8f0;
     border-radius: 14px;
-    position: relative;
-    overflow: hidden;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
     margin-bottom: 12px;
-  }
-  .mfb-plan {
-    width: 100%; height: 100%;
+    touch-action: pan-x pan-y;
     position: relative;
+  }
+  /* Scrollbar visible mais discrète */
+  .mfb-plan-scroll::-webkit-scrollbar { width: 6px; height: 6px; }
+  .mfb-plan-scroll::-webkit-scrollbar-track { background: rgba(0,0,0,.03); border-radius: 3px; }
+  .mfb-plan-scroll::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,.18); border-radius: 3px;
+  }
+  .mfb-plan-scroll::-webkit-scrollbar-thumb:active { background: rgba(0,0,0,.32); }
+
+  .mfb-plan {
+    /* width et height inline via style */
+    position: relative;
+    min-width: 100%; min-height: 100%;
   }
   .mfb-pl-wall {
     position: absolute;
@@ -676,4 +687,9 @@ html.is-mobile .tables-kpi {
   .mfb-pll.lib .mfb-pll-dot { background: #16a34a; color: rgba(22,163,74,.3); }
   .mfb-pll.occ .mfb-pll-dot { background: #e11d48; color: rgba(225,29,72,.3); }
   .mfb-pll.res .mfb-pll-dot { background: #7c3aed; color: rgba(124,58,237,.3); }
+  .mfb-plan-hint {
+    margin-left: auto;
+    font-size: 10.5px; font-weight: 500;
+    color: #94a3b8; font-style: italic;
+  }
 }
