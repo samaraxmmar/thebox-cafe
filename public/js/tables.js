@@ -609,9 +609,101 @@ var Tables = (function() {
       }
     }
     _renderKPI(); _renderZones(); _renderFloor(); _renderSide(); _renderActionbar();
+    _renderDesktopListView();
 
-    // ⚡ FALLBACK MOBILE BULLETPROOF (plan visuel mobile)
+    // ⚡ FALLBACK MOBILE BULLETPROOF (plan visuel mobile + toggle liste)
     _renderMobileFallback();
+  }
+
+  // ── Toggle Plan / Liste (desktop + mobile) ────────────
+  var _viewMode = 'plan';   // 'plan' | 'list'
+  function setView(v) {
+    _viewMode = (v === 'list') ? 'list' : 'plan';
+    // Desktop : toggle visibilité
+    var floor = document.getElementById('tables-layout-pro');
+    var list  = document.getElementById('tables-list-desktop');
+    if (floor) floor.style.display = (_viewMode === 'plan') ? '' : 'none';
+    if (list)  list.style.display  = (_viewMode === 'list') ? '' : 'none';
+    document.querySelectorAll('.tvt-btn').forEach(function(b) {
+      b.classList.toggle('active', b.dataset.view === _viewMode);
+    });
+    _renderDesktopListView();
+    // Mobile : re-render le fallback (qui lit _viewMode)
+    var host = document.getElementById('mobile-tables-fallback');
+    if (host) {
+      host.setAttribute('data-view', _viewMode);
+      _renderMobileFallback();
+    }
+  }
+
+  function _renderDesktopListView() {
+    if (_viewMode !== 'list') return;
+    var host = document.getElementById('tables-list-desktop');
+    if (!host) return;
+    var realTables = _tables.filter(function(t) { return t.kind !== 'wall'; });
+    var filtered = realTables.filter(_matches);
+    filtered.sort(function(a, b) {
+      var sa = _sessions[a.id] ? 0 : (a.statut === 'reservee' ? 1 : 2);
+      var sb = _sessions[b.id] ? 0 : (b.statut === 'reservee' ? 1 : 2);
+      if (sa !== sb) return sa - sb;
+      return (a.nom || '').localeCompare(b.nom || '', undefined, { numeric: true });
+    });
+
+    if (!filtered.length) {
+      host.innerHTML = '<div class="tld-empty"><div class="tld-empty-icon">🪑</div><div class="tld-empty-title">Aucune table dans cette zone</div></div>';
+      return;
+    }
+
+    var html = '<div class="tld-grid">';
+    filtered.forEach(function(t) {
+      var st = _statusOf(t);
+      var sess = _sessions[t.id];
+      var stLbl = st === 'occupee' ? 'OCCUPÉE' : st === 'reservee' ? 'RÉSERVÉE' : st === 'cleaning' ? 'MÉNAGE' : 'LIBRE';
+      var actionLbl = sess ? '📋 Reprendre la commande →' : '+ Ouvrir & commander';
+      var info = '';
+      if (sess) {
+        var total = getTableTotal(t.id);
+        info = '<div class="tld-info">'
+          + '<span class="tld-pill">⏱ ' + _timeSinceMfb(sess.ouverte_at) + '</span>'
+          + '<span class="tld-pill">👥 ' + (sess.nb_couverts || 0) + ' couverts</span>'
+          + '<span class="tld-pill">💰 ' + (total > 0 ? total.toFixed(2) + ' DT' : '—') + '</span>'
+          + '</div>';
+      } else if (t.statut === 'reservee' && t.reservation) {
+        var r = t.reservation;
+        info = '<div class="tld-info">'
+          + '<span class="tld-pill">📅 ' + _formatRTime(r.date_time) + '</span>'
+          + '<span class="tld-pill">👤 ' + _esc(r.client_name || '—') + '</span>'
+          + '<span class="tld-pill">👥 ' + (r.nb_couverts || 2) + '</span>'
+          + '</div>';
+      }
+      html += '<article class="tld-card" data-id="' + t.id + '" data-status="' + st + '">'
+        + '<div class="tld-bar"></div>'
+        + '<div class="tld-body">'
+        +   '<div class="tld-head">'
+        +     '<div><h3 class="tld-name">' + _esc(t.nom || ('Table ' + t.id)) + '</h3>'
+        +     '<div class="tld-meta">' + _esc(t.zone || 'Salle') + ' · ' + (t.capacite || 4) + ' places</div></div>'
+        +     '<span class="tld-status status-' + st + '">' + stLbl + '</span>'
+        +   '</div>'
+        +   info
+        +   '<button class="tld-btn">' + actionLbl + '</button>'
+        + '</div>'
+        + '</article>';
+    });
+    html += '</div>';
+    host.innerHTML = html;
+
+    host.querySelectorAll('.tld-card').forEach(function(card) {
+      card.addEventListener('click', function() { select(parseInt(card.dataset.id)); });
+      var btn = card.querySelector('.tld-btn');
+      if (btn) btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var id = parseInt(card.dataset.id);
+        select(id);
+        setTimeout(function() {
+          if (typeof actionSelected === 'function') actionSelected();
+        }, 50);
+      });
+    });
   }
 
   // Fallback mobile intégré (zéro dépendance externe)
@@ -654,12 +746,24 @@ var Tables = (function() {
         return true;
       });
 
-      // Render : stats + zones + plan visuel uniquement
+      // Render : stats + toggle + zones + (plan ou liste selon _viewMode)
       var html = '<div class="mfb-stats">'
         + '<div class="mfb-stat"><span class="mfb-stat-val">' + realTables.length + '</span><span class="mfb-stat-lbl">Total</span></div>'
         + '<div class="mfb-stat occ"><span class="mfb-stat-val">' + occupied + '</span><span class="mfb-stat-lbl">Occupées</span></div>'
         + '<div class="mfb-stat res"><span class="mfb-stat-val">' + reserved + '</span><span class="mfb-stat-lbl">Réservées</span></div>'
         + '<div class="mfb-stat free"><span class="mfb-stat-val">' + free + '</span><span class="mfb-stat-lbl">Libres</span></div>'
+        + '</div>';
+
+      // Toggle Plan / Liste (mobile)
+      html += '<div class="mfb-view-toggle">'
+        + '<button class="mfb-vt-btn' + (_viewMode === 'plan' ? ' active' : '') + '" data-view="plan">'
+        +   '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>'
+        +   ' Plan'
+        + '</button>'
+        + '<button class="mfb-vt-btn' + (_viewMode === 'list' ? ' active' : '') + '" data-view="list">'
+        +   '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3" cy="6" r="1"/><circle cx="3" cy="12" r="1"/><circle cx="3" cy="18" r="1"/></svg>'
+        +   ' Liste'
+        + '</button>'
         + '</div>';
 
       // Zones
@@ -672,8 +776,11 @@ var Tables = (function() {
 
       if (!visible.length) {
         html += '<div class="mfb-empty"><div class="mfb-empty-icon">🪑</div><div>Aucune table</div></div>';
+      } else if (_viewMode === 'list') {
+        // Vue liste mobile (cards)
+        html += _renderListView(visible);
       } else {
-        // Plan visuel uniquement (pas de liste)
+        // Vue plan visuel scrollable (par défaut)
         html += _renderPlanView(visible, walls);
       }
 
@@ -775,8 +882,60 @@ var Tables = (function() {
     return html;
   }
 
-  // ── Wire events : zones + click tables → modal détails
+  // ── VUE LISTE MOBILE (cards verticales) ──────────────
+  function _renderListView(tables) {
+    var sorted = tables.slice().sort(function(a, b) {
+      var sa = _sessions[a.id] ? 0 : (a.statut === 'reservee' ? 1 : 2);
+      var sb = _sessions[b.id] ? 0 : (b.statut === 'reservee' ? 1 : 2);
+      if (sa !== sb) return sa - sb;
+      return (a.nom || '').localeCompare(b.nom || '', undefined, { numeric: true });
+    });
+    var html = '<div class="mfb-list">';
+    sorted.forEach(function(t) {
+      var st = _statusOf(t);
+      var sess = _sessions[t.id];
+      var stLbl = st === 'occupee' ? 'OCCUPÉE' : st === 'reservee' ? 'RÉSERVÉE' : st === 'cleaning' ? 'MÉNAGE' : 'LIBRE';
+      var actionLbl = sess ? '📋 Reprendre la commande →' : '+ Ouvrir & commander';
+      var meta = (t.zone || 'Salle') + ' · ' + (t.capacite || 4) + ' places';
+      var info = '';
+      if (sess) {
+        var total = getTableTotal(t.id);
+        info = '<div class="mfb-info">'
+          + '<span class="mfb-pill">⏱ ' + _timeSinceMfb(sess.ouverte_at) + '</span>'
+          + '<span class="mfb-pill">💰 ' + (total > 0 ? total.toFixed(2) + ' DT' : '—') + '</span>'
+          + '</div>';
+      } else if (t.statut === 'reservee' && t.reservation) {
+        var r = t.reservation;
+        info = '<div class="mfb-info">'
+          + '<span class="mfb-pill">📅 ' + _formatRTime(r.date_time) + '</span>'
+          + '<span class="mfb-pill">👥 ' + (r.nb_couverts || 2) + '</span>'
+          + '</div>';
+      }
+      html += '<article class="mfb-card" data-id="' + t.id + '" data-status="' + st + '">'
+        + '<div class="mfb-bar"></div>'
+        + '<div class="mfb-body">'
+        +   '<div class="mfb-head">'
+        +     '<div><div class="mfb-name">' + _esc(t.nom || ('Table ' + t.id)) + '</div>'
+        +     '<div class="mfb-meta">' + _esc(meta) + '</div></div>'
+        +     '<span class="mfb-status status-' + st + '">' + stLbl + '</span>'
+        +   '</div>'
+        +   info
+        +   '<button class="mfb-btn">' + actionLbl + '</button>'
+        + '</div>'
+        + '</article>';
+    });
+    html += '</div>';
+    return html;
+  }
+
+  // ── Wire events : toggle + zones + click tables → modal détails
   function _wirePlanInteractions(host) {
+    // Toggle Plan / Liste
+    host.querySelectorAll('.mfb-vt-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        setView(btn.dataset.view);
+      });
+    });
     // Zones
     host.querySelectorAll('.mfb-zone').forEach(function(btn) {
       btn.addEventListener('click', function() {
@@ -789,6 +948,21 @@ var Tables = (function() {
       el.addEventListener('click', function() {
         var id = parseInt(el.dataset.id);
         select(id);
+      });
+    });
+    // Liste : click cards
+    host.querySelectorAll('.mfb-card').forEach(function(card) {
+      card.addEventListener('click', function() {
+        select(parseInt(card.dataset.id));
+      });
+      var btn = card.querySelector('.mfb-btn');
+      if (btn) btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var id = parseInt(card.dataset.id);
+        select(id);
+        setTimeout(function() {
+          if (typeof actionSelected === 'function') actionSelected();
+        }, 50);
       });
     });
   }
@@ -1136,7 +1310,7 @@ var Tables = (function() {
     promptTransfer: promptTransfer, printBill: printBill, closeFromPanel: closeFromPanel,
     openReservationModal: openReservationModal, cancelReservationModal: cancelReservationModal, confirmReservation: confirmReservation, cancelReservation: cancelReservation,
     enterEditMode: enterEditMode, exitEditMode: exitEditMode, cancelEditMode: cancelEditMode,
-    openAddModal: openAddModal, openEditModal: openEditModal, saveEdit: saveEdit, setShapeFromModal: setShapeFromModal, cycleShape: cycleShape, rotate: rotate,
+    openAddModal: openAddModal, openEditModal: openEditModal, saveEdit: saveEdit, setShapeFromModal: setShapeFromModal, cycleShape: cycleShape, rotate: rotate, setView: setView,
     addWall: addWall, autoArrangeTables: autoArrangeTables, delete: deleteTable,
     savePanier: savePanier, clearPanier: clearPanier, getTableTotal: getTableTotal, getTableCount: getTableCount,
     _paniers: _paniers, _sessions: _sessions,
