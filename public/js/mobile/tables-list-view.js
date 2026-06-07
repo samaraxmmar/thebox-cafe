@@ -78,7 +78,8 @@ const TablesListView = (function() {
   }
 
   function _statusOrder(s) {
-    return { occupee: 0, reservee: 1, cleaning: 2, libre: 3 }[s] ?? 9;
+    var orders = { occupee: 0, reservee: 1, cleaning: 2, libre: 3 };
+    return orders[s] === undefined ? 9 : orders[s];
   }
 
   // ── Card template ───────────────────────────────────────

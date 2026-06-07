@@ -453,3 +453,123 @@ html.is-mobile .tables-layout-pro,
 html.is-mobile .tables-kpi {
   display: none !important;
 }
+
+/* ════════════════════════════════════════════════════════
+   FALLBACK MOBILE BULLETPROOF — intégré directement dans tables.js
+   Cette section assure un rendu visible même si les modules échouent.
+   ════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  /* Cache le floor wrap desktop sur mobile */
+  #tables-floor-wrap, .tables-toolbar-pro, .tables-layout-pro { display: none !important; }
+  .tables-kpi { display: none !important; }
+
+  .mobile-fallback-shell {
+    padding: 12px 16px 80px;
+    background: #f8fafc;
+    min-height: calc(100vh - 200px);
+  }
+
+  /* Stats KPI mini */
+  .mfb-stats {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 6px; margin-bottom: 14px;
+  }
+  .mfb-stat {
+    background: #fff; border: 1px solid #e2e8f0;
+    border-radius: 10px; padding: 8px 6px;
+    display: flex; flex-direction: column; align-items: center;
+  }
+  .mfb-stat-val { font-size: 18px; font-weight: 800; color: #0f172a; line-height: 1; }
+  .mfb-stat-lbl { font-size: 10px; color: #64748b; font-weight: 600; margin-top: 3px; text-transform: uppercase; letter-spacing: .03em; }
+  .mfb-stat.occ  .mfb-stat-val { color: #e11d48; }
+  .mfb-stat.res  .mfb-stat-val { color: #7c3aed; }
+  .mfb-stat.free .mfb-stat-val { color: #16a34a; }
+
+  /* Search */
+  .mfb-search { margin-bottom: 12px; }
+  .mfb-search input {
+    width: 100%; height: 44px;
+    padding: 0 14px;
+    border: 1px solid #e2e8f0; border-radius: 12px;
+    background: #fff; font-size: 14px;
+    outline: none;
+  }
+  .mfb-search input:focus { border-color: #16a34a; }
+
+  /* Zones chips */
+  .mfb-zones {
+    display: flex; gap: 6px; overflow-x: auto;
+    margin-bottom: 14px; scrollbar-width: none;
+    padding-bottom: 4px;
+  }
+  .mfb-zones::-webkit-scrollbar { display: none; }
+  .mfb-zone {
+    flex-shrink: 0; min-height: 34px; padding: 0 14px;
+    border-radius: 999px; border: 1px solid #e2e8f0;
+    background: #fff; font-size: 12.5px; font-weight: 600;
+    color: #475569; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 6px;
+  }
+  .mfb-zone span {
+    background: #f1f5f9; color: #64748b;
+    padding: 1px 7px; border-radius: 999px;
+    font-size: 11px; font-weight: 700;
+  }
+  .mfb-zone.active { background: #0f172a; color: #fff; border-color: #0f172a; }
+  .mfb-zone.active span { background: rgba(255,255,255,.2); color: #fff; }
+
+  /* Cards de tables */
+  .mfb-list { display: flex; flex-direction: column; gap: 10px; }
+  .mfb-card {
+    position: relative; overflow: hidden;
+    background: #fff; border-radius: 14px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 3px rgba(0,0,0,.04);
+    cursor: pointer;
+  }
+  .mfb-card:active { transform: scale(.98); }
+  .mfb-bar {
+    position: absolute; left: 0; top: 0; bottom: 0; width: 4px;
+    background: #cbd5e1;
+  }
+  .mfb-card[data-status="libre"]    .mfb-bar { background: linear-gradient(180deg,#86efac,#16a34a); }
+  .mfb-card[data-status="occupee"]  .mfb-bar { background: linear-gradient(180deg,#fb7185,#e11d48); }
+  .mfb-card[data-status="reservee"] .mfb-bar { background: linear-gradient(180deg,#c084fc,#7c3aed); }
+  .mfb-card[data-status="cleaning"] .mfb-bar { background: linear-gradient(180deg,#fbbf24,#d97706); }
+
+  .mfb-body { padding: 12px 14px 12px 20px; }
+  .mfb-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 6px; }
+  .mfb-name { font-size: 16px; font-weight: 800; color: #0f172a; letter-spacing: -.01em; }
+  .mfb-meta { font-size: 12px; color: #64748b; margin-top: 2px; font-weight: 500; }
+  .mfb-status {
+    flex-shrink: 0; padding: 4px 9px; border-radius: 999px;
+    font-size: 10px; font-weight: 700; letter-spacing: .04em;
+  }
+  .mfb-status.status-libre    { background: #d1fae5; color: #047857; }
+  .mfb-status.status-occupee  { background: #ffe4e6; color: #9f1239; }
+  .mfb-status.status-reservee { background: #ede9fe; color: #5b21b6; }
+  .mfb-status.status-cleaning { background: #fef3c7; color: #92400e; }
+
+  .mfb-info { display: flex; gap: 6px; margin: 6px 0 10px; flex-wrap: wrap; }
+  .mfb-pill {
+    padding: 3px 9px; border-radius: 999px;
+    background: #f1f5f9; color: #475569;
+    font-size: 11.5px; font-weight: 600;
+  }
+
+  .mfb-btn {
+    width: 100%; min-height: 44px;
+    border: none; border-radius: 10px;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: #fff; font-size: 14px; font-weight: 700;
+    cursor: pointer; margin-top: 6px;
+    box-shadow: 0 3px 10px -2px rgba(22,163,74,.35);
+  }
+  .mfb-btn:active { transform: scale(.98); }
+
+  .mfb-empty {
+    text-align: center; padding: 60px 20px;
+    color: #64748b; font-size: 14px; font-weight: 500;
+  }
+  .mfb-empty-icon { font-size: 40px; opacity: .3; margin-bottom: 10px; }
+}

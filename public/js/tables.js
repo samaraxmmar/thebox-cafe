@@ -609,6 +609,182 @@ var Tables = (function() {
       }
     }
     _renderKPI(); _renderZones(); _renderFloor(); _renderSide(); _renderActionbar();
+
+    // ⚡ FALLBACK MOBILE BULLETPROOF
+    //    Si on est sur mobile (≤768px), injecte une vue liste simple
+    //    directement dans .page-content, en complément du desktop render.
+    _renderMobileFallback();
+  }
+
+  // Fallback mobile intégré (zéro dépendance externe)
+  function _renderMobileFallback() {
+    try {
+      if (window.innerWidth > 768) return; // desktop : ne fait rien
+
+      var page = document.getElementById('page-tables');
+      if (!page) return;
+      var content = page.querySelector('.page-content');
+      if (!content) return;
+
+      // Crée ou récupère le host mobile
+      var host = document.getElementById('mobile-tables-fallback');
+      if (!host) {
+        host = document.createElement('div');
+        host.id = 'mobile-tables-fallback';
+        host.className = 'mobile-fallback-shell';
+        content.insertBefore(host, content.firstChild);
+      }
+
+      var realTables = _tables.filter(function(t) { return t.kind !== 'wall'; });
+      var zones = ['Toutes'];
+      realTables.forEach(function(t) {
+        var z = t.zone || 'Salle';
+        if (zones.indexOf(z) === -1) zones.push(z);
+      });
+      var filter = host.getAttribute('data-zone') || 'Toutes';
+      var search = (host.getAttribute('data-search') || '').toLowerCase();
+
+      // Stats
+      var occupied = realTables.filter(function(t){ return _sessions[t.id]; }).length;
+      var reserved = realTables.filter(function(t){ return t.statut === 'reservee'; }).length;
+      var free     = realTables.length - occupied - reserved;
+
+      // Filter & sort (occupées d'abord, puis nom alphabétique)
+      var visible = realTables.filter(function(t) {
+        if (filter !== 'Toutes' && (t.zone || 'Salle') !== filter) return false;
+        if (search && (t.nom || ('Table ' + t.id)).toLowerCase().indexOf(search) < 0) return false;
+        return true;
+      });
+      visible.sort(function(a, b) {
+        var sa = _sessions[a.id] ? 0 : (a.statut === 'reservee' ? 1 : 2);
+        var sb = _sessions[b.id] ? 0 : (b.statut === 'reservee' ? 1 : 2);
+        if (sa !== sb) return sa - sb;
+        return (a.nom || '').localeCompare(b.nom || '', undefined, { numeric: true });
+      });
+
+      // Render
+      var html = '<div class="mfb-stats">'
+        + '<div class="mfb-stat"><span class="mfb-stat-val">' + realTables.length + '</span><span class="mfb-stat-lbl">Total</span></div>'
+        + '<div class="mfb-stat occ"><span class="mfb-stat-val">' + occupied + '</span><span class="mfb-stat-lbl">Occupées</span></div>'
+        + '<div class="mfb-stat res"><span class="mfb-stat-val">' + reserved + '</span><span class="mfb-stat-lbl">Réservées</span></div>'
+        + '<div class="mfb-stat free"><span class="mfb-stat-val">' + free + '</span><span class="mfb-stat-lbl">Libres</span></div>'
+        + '</div>';
+
+      html += '<div class="mfb-search"><input type="search" placeholder="🔍 Rechercher une table…" id="mfb-search-input" value="' + _esc(search) + '"></div>';
+
+      html += '<div class="mfb-zones">';
+      zones.forEach(function(z) {
+        var count = z === 'Toutes' ? realTables.length : realTables.filter(function(t){ return (t.zone || 'Salle') === z; }).length;
+        html += '<button class="mfb-zone' + (z === filter ? ' active' : '') + '" data-zone="' + _esc(z) + '">' + _esc(z) + ' <span>' + count + '</span></button>';
+      });
+      html += '</div>';
+
+      if (!visible.length) {
+        html += '<div class="mfb-empty"><div class="mfb-empty-icon">🪑</div><div>Aucune table</div></div>';
+      } else {
+        html += '<div class="mfb-list">';
+        visible.forEach(function(t) {
+          var st = _statusOf(t);
+          var sess = _sessions[t.id];
+          var stLbl = st === 'occupee' ? 'OCCUPÉE' : st === 'reservee' ? 'RÉSERVÉE' : st === 'cleaning' ? 'MÉNAGE' : 'LIBRE';
+          var actionLbl = sess ? '📋 Reprendre la commande →' : '+ Ouvrir & commander';
+          var meta = (t.zone || 'Salle') + ' · ' + (t.capacite || 4) + ' places';
+          var info = '';
+          if (sess) {
+            var total = getTableTotal(t.id);
+            info = '<div class="mfb-info">'
+              + '<span class="mfb-pill">⏱ ' + _timeSinceMfb(sess.ouverte_at) + '</span>'
+              + '<span class="mfb-pill">💰 ' + (total > 0 ? total.toFixed(2) + ' DT' : '—') + '</span>'
+              + '</div>';
+          } else if (t.statut === 'reservee' && t.reservation) {
+            var r = t.reservation;
+            info = '<div class="mfb-info">'
+              + '<span class="mfb-pill">📅 ' + _formatRTime(r.date_time) + '</span>'
+              + '<span class="mfb-pill">👥 ' + (r.nb_couverts || 2) + '</span>'
+              + '</div>';
+          }
+          html += '<article class="mfb-card" data-id="' + t.id + '" data-status="' + st + '">'
+            + '<div class="mfb-bar"></div>'
+            + '<div class="mfb-body">'
+            +   '<div class="mfb-head">'
+            +     '<div><div class="mfb-name">' + _esc(t.nom || ('Table ' + t.id)) + '</div>'
+            +     '<div class="mfb-meta">' + _esc(meta) + '</div></div>'
+            +     '<span class="mfb-status status-' + st + '">' + stLbl + '</span>'
+            +   '</div>'
+            +   info
+            +   '<button class="mfb-btn">' + actionLbl + '</button>'
+            + '</div>'
+            + '</article>';
+        });
+        html += '</div>';
+      }
+
+      host.innerHTML = html;
+
+      // Wire search
+      var input = document.getElementById('mfb-search-input');
+      if (input) {
+        var t = null;
+        input.addEventListener('input', function() {
+          clearTimeout(t);
+          t = setTimeout(function() {
+            host.setAttribute('data-search', input.value);
+            _renderMobileFallback();
+          }, 150);
+        });
+      }
+      // Wire zones
+      host.querySelectorAll('.mfb-zone').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          host.setAttribute('data-zone', btn.dataset.zone);
+          _renderMobileFallback();
+        });
+      });
+      // Wire cards
+      host.querySelectorAll('.mfb-card').forEach(function(card) {
+        card.addEventListener('click', function() {
+          var id = parseInt(card.dataset.id);
+          select(id);
+        });
+        var btn = card.querySelector('.mfb-btn');
+        if (btn) btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          var id = parseInt(card.dataset.id);
+          select(id);
+          setTimeout(function() {
+            if (typeof actionSelected === 'function') actionSelected();
+          }, 50);
+        });
+      });
+    } catch (err) {
+      console.error('[MobileFallback] crash:', err);
+      // Affiche l'erreur dans la page pour debug
+      var content = document.querySelector('#page-tables .page-content');
+      if (content) {
+        content.innerHTML = '<div style="padding:20px;color:#dc2626;font-size:13px;font-family:monospace;white-space:pre-wrap">' +
+          '⚠ Erreur mobile fallback :\n' + (err.message || err) + '</div>';
+      }
+    }
+  }
+
+  function _timeSinceMfb(d) {
+    if (!d) return '';
+    var diff = Math.floor((Date.now() - new Date(d).getTime()) / 60000);
+    if (diff < 1) return "à l'instant";
+    if (diff < 60) return diff + ' min';
+    var h = Math.floor(diff / 60);
+    return h + 'h' + String(diff % 60).padStart(2, '0');
+  }
+  function _formatRTime(s) {
+    if (!s) return '—';
+    var d = new Date(s);
+    if (isNaN(d)) return s;
+    return d.toLocaleString('fr-FR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+  }
+  function _esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function(c) {
+      return ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' })[c];
+    });
   }
 
   function handleCardClick(ev, id) { if (_editing) return; select(id); }
