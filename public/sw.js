@@ -5,7 +5,7 @@
    - Stratégie cache-d'abord pour les assets statiques
    ────────────────────────────────────────────────────────────────────── */
 
-const CACHE_VERSION = 'thebox-v1';
+const CACHE_VERSION = 'thebox-v2-mobile';
 const CACHE_NAME    = 'thebox-shell-' + CACHE_VERSION;
 
 const SHELL_FILES = [
@@ -14,6 +14,7 @@ const SHELL_FILES = [
   '/css/base.css',
   '/css/components.css',
   '/css/pages.css',
+  '/css/mobile.css',
   '/js/app.js',
   '/js/api.js',
   '/js/store.js',
@@ -22,6 +23,12 @@ const SHELL_FILES = [
   '/js/commandes.js',
   '/js/dashboard.js',
   '/js/nav.js',
+  '/js/mobile/mobile-detect.js',
+  '/js/mobile/gestures.js',
+  '/js/mobile/bottom-sheet.js',
+  '/js/mobile/tables-list-view.js',
+  '/js/mobile/tables-plan-view.js',
+  '/js/mobile/tables-mobile.js',
   '/manifest.json',
 ];
 
