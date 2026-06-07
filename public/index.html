@@ -241,18 +241,6 @@
         <!-- ── KPI Strip ── -->
         <div class="tables-kpi" id="tables-kpi"></div>
 
-        <!-- ── View Toggle Plan / Liste (desktop) ── -->
-        <div class="tables-view-toggle-desktop" id="tables-view-toggle-desktop">
-          <button class="tvt-btn active" data-view="plan" onclick="Tables.setView('plan')">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-            Plan
-          </button>
-          <button class="tvt-btn" data-view="list" onclick="Tables.setView('list')">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="3" cy="6" r="1"/><circle cx="3" cy="12" r="1"/><circle cx="3" cy="18" r="1"/></svg>
-            Liste
-          </button>
-        </div>
-
         <!-- ── Toolbar (zones + search) ── -->
         <div class="tables-toolbar-pro">
           <div class="tables-zones-segmented" id="tables-zones"></div>
@@ -262,7 +250,7 @@
           </div>
         </div>
 
-        <!-- ── Floor pleine largeur (Vue Plan) ── -->
+        <!-- ── Floor pleine largeur ── -->
         <div class="tables-layout-pro" id="tables-layout-pro">
           <div class="tables-floor-wrap" id="tables-floor-wrap">
             <div class="tables-floor" id="tables-grid">
@@ -270,9 +258,6 @@
             </div>
           </div>
         </div>
-
-        <!-- ── Vue Liste desktop (cachée par défaut, switch via toggle) ── -->
-        <div class="tables-list-desktop" id="tables-list-desktop" style="display:none"></div>
 
         <!-- ── Modal centrale détails table (remplace l'ancien panneau latéral) ── -->
         <div class="table-details-overlay" id="tables-details-overlay" onclick="if(event.target.id==='tables-details-overlay') Tables.cancelSelection()">

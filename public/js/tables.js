@@ -609,98 +609,9 @@ var Tables = (function() {
       }
     }
     _renderKPI(); _renderZones(); _renderFloor(); _renderSide(); _renderActionbar();
-    _renderDesktopListView();  // Vue liste desktop (visible seulement si _viewDesktop === 'list')
 
-    // ⚡ FALLBACK MOBILE BULLETPROOF
+    // ⚡ FALLBACK MOBILE BULLETPROOF (plan visuel mobile)
     _renderMobileFallback();
-  }
-
-  // ── Toggle Plan / Liste sur DESKTOP ────────────────────
-  var _viewDesktop = 'plan';
-  function setView(v) {
-    _viewDesktop = (v === 'list') ? 'list' : 'plan';
-    // Toggle visibility
-    var floor = document.getElementById('tables-layout-pro');
-    var list  = document.getElementById('tables-list-desktop');
-    if (floor) floor.style.display = (_viewDesktop === 'plan') ? '' : 'none';
-    if (list)  list.style.display  = (_viewDesktop === 'list') ? '' : 'none';
-    // Update toggle buttons
-    document.querySelectorAll('.tvt-btn').forEach(function(b) {
-      b.classList.toggle('active', b.dataset.view === _viewDesktop);
-    });
-    _renderDesktopListView();
-  }
-
-  function _renderDesktopListView() {
-    if (_viewDesktop !== 'list') return;
-    var host = document.getElementById('tables-list-desktop');
-    if (!host) return;
-    var realTables = _tables.filter(function(t) { return t.kind !== 'wall'; });
-    var filtered = realTables.filter(_matches);
-    // Tri : occupées d'abord, puis nom
-    filtered.sort(function(a, b) {
-      var sa = _sessions[a.id] ? 0 : (a.statut === 'reservee' ? 1 : 2);
-      var sb = _sessions[b.id] ? 0 : (b.statut === 'reservee' ? 1 : 2);
-      if (sa !== sb) return sa - sb;
-      return (a.nom || '').localeCompare(b.nom || '', undefined, { numeric: true });
-    });
-
-    if (!filtered.length) {
-      host.innerHTML = '<div class="tld-empty"><div class="tld-empty-icon">🪑</div><div class="tld-empty-title">Aucune table dans cette zone</div></div>';
-      return;
-    }
-
-    var html = '<div class="tld-grid">';
-    filtered.forEach(function(t) {
-      var st = _statusOf(t);
-      var sess = _sessions[t.id];
-      var stLbl = st === 'occupee' ? 'OCCUPÉE' : st === 'reservee' ? 'RÉSERVÉE' : st === 'cleaning' ? 'MÉNAGE' : 'LIBRE';
-      var actionLbl = sess ? '📋 Reprendre la commande →' : '+ Ouvrir & commander';
-      var info = '';
-      if (sess) {
-        var total = getTableTotal(t.id);
-        info = '<div class="tld-info">'
-          + '<span class="tld-pill">⏱ ' + _timeSinceMfb(sess.ouverte_at) + '</span>'
-          + '<span class="tld-pill">👥 ' + (sess.nb_couverts || 0) + ' couverts</span>'
-          + '<span class="tld-pill">💰 ' + (total > 0 ? total.toFixed(2) + ' DT' : '—') + '</span>'
-          + '</div>';
-      } else if (t.statut === 'reservee' && t.reservation) {
-        var r = t.reservation;
-        info = '<div class="tld-info">'
-          + '<span class="tld-pill">📅 ' + _formatRTime(r.date_time) + '</span>'
-          + '<span class="tld-pill">👤 ' + _esc(r.client_name || '—') + '</span>'
-          + '<span class="tld-pill">👥 ' + (r.nb_couverts || 2) + '</span>'
-          + '</div>';
-      }
-      html += '<article class="tld-card" data-id="' + t.id + '" data-status="' + st + '">'
-        + '<div class="tld-bar"></div>'
-        + '<div class="tld-body">'
-        +   '<div class="tld-head">'
-        +     '<div><h3 class="tld-name">' + _esc(t.nom || ('Table ' + t.id)) + '</h3>'
-        +     '<div class="tld-meta">' + _esc(t.zone || 'Salle') + ' · ' + (t.capacite || 4) + ' places</div></div>'
-        +     '<span class="tld-status status-' + st + '">' + stLbl + '</span>'
-        +   '</div>'
-        +   info
-        +   '<button class="tld-btn">' + actionLbl + '</button>'
-        + '</div>'
-        + '</article>';
-    });
-    html += '</div>';
-    host.innerHTML = html;
-
-    // Wire clicks
-    host.querySelectorAll('.tld-card').forEach(function(card) {
-      card.addEventListener('click', function() { select(parseInt(card.dataset.id)); });
-      var btn = card.querySelector('.tld-btn');
-      if (btn) btn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        var id = parseInt(card.dataset.id);
-        select(id);
-        setTimeout(function() {
-          if (typeof actionSelected === 'function') actionSelected();
-        }, 50);
-      });
-    });
   }
 
   // Fallback mobile intégré (zéro dépendance externe)
@@ -731,39 +642,25 @@ var Tables = (function() {
         if (zones.indexOf(z) === -1) zones.push(z);
       });
       var filter = host.getAttribute('data-zone') || 'Toutes';
-      var view = host.getAttribute('data-view') || 'plan';   // 'plan' (default) | 'list'
-      var search = (host.getAttribute('data-search') || '').toLowerCase();
 
       // Stats
       var occupied = realTables.filter(function(t){ return _sessions[t.id]; }).length;
       var reserved = realTables.filter(function(t){ return t.statut === 'reservee'; }).length;
       var free     = realTables.length - occupied - reserved;
 
-      // Filter tables
+      // Filter tables (zone uniquement, plus de search)
       var visible = realTables.filter(function(t) {
         if (filter !== 'Toutes' && (t.zone || 'Salle') !== filter) return false;
-        if (search && (t.nom || ('Table ' + t.id)).toLowerCase().indexOf(search) < 0) return false;
         return true;
       });
 
-      // Render
+      // Render : stats + zones + plan visuel uniquement
       var html = '<div class="mfb-stats">'
         + '<div class="mfb-stat"><span class="mfb-stat-val">' + realTables.length + '</span><span class="mfb-stat-lbl">Total</span></div>'
         + '<div class="mfb-stat occ"><span class="mfb-stat-val">' + occupied + '</span><span class="mfb-stat-lbl">Occupées</span></div>'
         + '<div class="mfb-stat res"><span class="mfb-stat-val">' + reserved + '</span><span class="mfb-stat-lbl">Réservées</span></div>'
         + '<div class="mfb-stat free"><span class="mfb-stat-val">' + free + '</span><span class="mfb-stat-lbl">Libres</span></div>'
         + '</div>';
-
-      // View toggle
-      html += '<div class="mfb-view-toggle">'
-        + '<button class="mfb-vt-btn' + (view === 'plan' ? ' active' : '') + '" data-view="plan">🗺 Plan</button>'
-        + '<button class="mfb-vt-btn' + (view === 'list' ? ' active' : '') + '" data-view="list">📋 Liste</button>'
-        + '</div>';
-
-      // Search (visible seulement en mode liste)
-      if (view === 'list') {
-        html += '<div class="mfb-search"><input type="search" placeholder="🔍 Rechercher une table…" id="mfb-search-input" value="' + _esc(search) + '"></div>';
-      }
 
       // Zones
       html += '<div class="mfb-zones">';
@@ -775,16 +672,13 @@ var Tables = (function() {
 
       if (!visible.length) {
         html += '<div class="mfb-empty"><div class="mfb-empty-icon">🪑</div><div>Aucune table</div></div>';
-      } else if (view === 'plan') {
-        // ── VUE PLAN VISUEL ─────────────────────────────────
-        html += _renderPlanView(visible, walls);
       } else {
-        // ── VUE LISTE ───────────────────────────────────────
-        html += _renderListView(visible);
+        // Plan visuel uniquement (pas de liste)
+        html += _renderPlanView(visible, walls);
       }
 
       host.innerHTML = html;
-      _wirePlanInteractions(host, view);
+      _wirePlanInteractions(host);
     } catch (err) {
       console.error('[MobileFallback] crash:', err);
       var content2 = document.querySelector('#page-tables .page-content');
@@ -878,16 +772,8 @@ var Tables = (function() {
     return html;
   }
 
-  // ── Wire all events (plan tables + list cards + filters)
-  function _wirePlanInteractions(host, view) {
-    // View toggle
-    host.querySelectorAll('.mfb-vt-btn').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        host.setAttribute('data-view', btn.dataset.view);
-        _renderMobileFallback();
-      });
-    });
-
+  // ── Wire events : zones + click tables → modal détails
+  function _wirePlanInteractions(host) {
     // Zones
     host.querySelectorAll('.mfb-zone').forEach(function(btn) {
       btn.addEventListener('click', function() {
@@ -895,41 +781,11 @@ var Tables = (function() {
         _renderMobileFallback();
       });
     });
-
-    // Search (mode liste uniquement)
-    var input = document.getElementById('mfb-search-input');
-    if (input) {
-      var dt = null;
-      input.addEventListener('input', function() {
-        clearTimeout(dt);
-        dt = setTimeout(function() {
-          host.setAttribute('data-search', input.value);
-          _renderMobileFallback();
-        }, 150);
-      });
-    }
-
     // Plan : click tables → ouvrir détails
     host.querySelectorAll('.mfb-pl-table').forEach(function(el) {
       el.addEventListener('click', function() {
         var id = parseInt(el.dataset.id);
         select(id);
-      });
-    });
-
-    // List : click cards
-    host.querySelectorAll('.mfb-card').forEach(function(card) {
-      card.addEventListener('click', function() {
-        select(parseInt(card.dataset.id));
-      });
-      var btn = card.querySelector('.mfb-btn');
-      if (btn) btn.addEventListener('click', function(e) {
-        e.stopPropagation();
-        var id = parseInt(card.dataset.id);
-        select(id);
-        setTimeout(function() {
-          if (typeof actionSelected === 'function') actionSelected();
-        }, 50);
       });
     });
   }
@@ -1277,7 +1133,7 @@ var Tables = (function() {
     promptTransfer: promptTransfer, printBill: printBill, closeFromPanel: closeFromPanel,
     openReservationModal: openReservationModal, cancelReservationModal: cancelReservationModal, confirmReservation: confirmReservation, cancelReservation: cancelReservation,
     enterEditMode: enterEditMode, exitEditMode: exitEditMode, cancelEditMode: cancelEditMode,
-    openAddModal: openAddModal, openEditModal: openEditModal, saveEdit: saveEdit, setShapeFromModal: setShapeFromModal, cycleShape: cycleShape, rotate: rotate, setView: setView,
+    openAddModal: openAddModal, openEditModal: openEditModal, saveEdit: saveEdit, setShapeFromModal: setShapeFromModal, cycleShape: cycleShape, rotate: rotate,
     addWall: addWall, autoArrangeTables: autoArrangeTables, delete: deleteTable,
     savePanier: savePanier, clearPanier: clearPanier, getTableTotal: getTableTotal, getTableCount: getTableCount,
     _paniers: _paniers, _sessions: _sessions,
