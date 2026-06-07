@@ -7,6 +7,7 @@ const App = {
     this._startClock();
     this._monitorOnline();
     this._registerServiceWorker();
+    this._initMobileMode();
 
     // ─── PHASE 1 : Affichage immédiat depuis cache localStorage ───
     try { Store.hydrateFromCache(); } catch (e) { console.warn('[App] hydrateFromCache', e); }
@@ -77,6 +78,16 @@ const App = {
     };
     tick();
     setInterval(tick, 1000);
+  },
+
+  // Active le mode mobile : override Tables.render par TablesMobile.render
+  _initMobileMode() {
+    if (typeof MobileDetect === 'undefined' || !MobileDetect.isMobile()) return;
+    if (typeof TablesMobile === 'undefined' || typeof Tables === 'undefined') return;
+    // Garde une référence au render desktop au cas où
+    if (!Tables._desktopRender) Tables._desktopRender = Tables.render;
+    Tables.render = TablesMobile.render;
+    console.log('[App] Mode mobile activé — Tables.render → TablesMobile.render');
   },
 
   // PWA : enregistre le service worker pour install + cache offline
