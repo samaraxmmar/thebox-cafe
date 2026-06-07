@@ -871,6 +871,83 @@
   .tables-layout-pro { flex-direction: column; height: auto; min-height: 60vh; }
   .tables-floor-wrap { height: 60vh; min-height: 400px; }
 }
+
+/* ════════════════════════════════════════════════════
+   MOBILE (<= 768px) : Plan transformé en GRILLE de CARTES verticale
+   Plus pratique au smartphone pour les serveurs en main
+   ════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  /* Floor wrap : auto height, scroll vertical, plus de grille de fond */
+  .tables-floor-wrap {
+    height: auto !important;
+    min-height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    padding: 12px;
+    background: transparent !important;
+    background-image: none !important;
+    border: none !important;
+  }
+  /* Floor : grille 2 colonnes (4 sur tablette horizontale) */
+  .tables-floor {
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    position: static !important;
+  }
+  /* Cartes : positionnement statique (plus d'absolute) */
+  .tables-floor .table-card {
+    position: static !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 100px;
+    left: auto !important;
+    top: auto !important;
+    transform: none !important;
+    padding: 14px;
+    border-radius: 14px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  /* Cacher les murs (pas de sens sur mobile en mode liste) */
+  .tables-floor .table-card.wall { display: none !important; }
+  /* Texte plus lisible sur mobile */
+  .tables-floor .table-name {
+    font-size: 15px !important;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .tables-floor .table-status-pill {
+    font-size: 10px !important;
+    padding: 2px 8px;
+    align-self: flex-start;
+  }
+  .tables-floor .table-card-bottom {
+    margin-top: 8px;
+    display: flex;
+    gap: 8px;
+    font-size: 11px;
+  }
+  /* Cacher les éléments du mode édition sur mobile (pas pratique) */
+  .tables-floor.edit-mode .table-card-del,
+  .tables-floor.edit-mode .table-card-edit,
+  .tables-floor.edit-mode .table-card-resize { display: none !important; }
+  /* Modal détails : prend presque tout l'écran */
+  .tables-details-panel {
+    width: 100% !important;
+    max-width: calc(100vw - 24px) !important;
+    max-height: 92vh !important;
+  }
+  .table-details-overlay { padding: 12px !important; }
+  /* KPI strip : 2 colonnes au lieu de 5 */
+  .tables-kpi { grid-template-columns: repeat(2, 1fr) !important; gap: 8px !important; }
+  .tables-kpi .kpi-pro { padding: 8px 10px !important; }
+  .tables-kpi .kpi-pro-val { font-size: 18px !important; }
+}
 .table-card[data-shape="round"] .table-status-pill { font-size: 9px; padding: 1px 5px; }
 
 /* ──────────────────────────────────────────────
