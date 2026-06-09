@@ -133,9 +133,15 @@ async function initSupabaseSync() {
       });
       console.log('[storage] Sync Supabase ACTIF — ' + pulled + ' clé(s) chargée(s) depuis Supabase');
     } else {
-      console.log('[storage] Sync Supabase ACTIF — table app_data vide (1er boot, les données locales y seront pushées)');
-      // Push initial des données locales existantes vers Supabase
-      await _pushAllLocalToSupabase();
+      console.log('[storage] Sync Supabase ACTIF — table app_data vide');
+      // Push initial UNIQUEMENT si la variable d'env l'autorise explicitement
+      // (à set sur ton PC local au 1er sync, JAMAIS sur Railway)
+      if (process.env.THEBOX_INITIAL_PUSH === 'true') {
+        console.log('[storage] THEBOX_INITIAL_PUSH=true → push initial du local vers Supabase');
+        await _pushAllLocalToSupabase();
+      } else {
+        console.log('[storage] Tip: set THEBOX_INITIAL_PUSH=true en local pour pousser tes données vers Supabase');
+      }
     }
     _supabaseSyncReady = true;
   } catch (e) {
