@@ -610,9 +610,8 @@ var Tables = (function() {
     }
     _renderKPI(); _renderZones(); _renderFloor(); _renderSide(); _renderActionbar();
     _renderDesktopListView();
-
-    // ⚡ FALLBACK MOBILE BULLETPROOF (plan visuel mobile + toggle liste)
-    _renderMobileFallback();
+    // Note : on n'utilise PLUS le mobile fallback. Le mobile affiche exactement
+    // le même plan que le desktop, juste scrollable au doigt (via mobile.css).
   }
 
   // ── Toggle Plan / Liste (desktop + mobile) ────────────
