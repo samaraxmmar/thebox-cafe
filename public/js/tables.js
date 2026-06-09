@@ -610,8 +610,40 @@ var Tables = (function() {
     }
     _renderKPI(); _renderZones(); _renderFloor(); _renderSide(); _renderActionbar();
     _renderDesktopListView();
-    // Note : on n'utilise PLUS le mobile fallback. Le mobile affiche exactement
-    // le même plan que le desktop, juste scrollable au doigt (via mobile.css).
+    // Mobile : applique pinch-zoom + pan + auto-fit sur le plan
+    _setupMobilePinchZoom();
+  }
+
+  // ── Pinch-zoom + pan + auto-fit (mobile uniquement) ────
+  var _pzpController = null;
+  function _setupMobilePinchZoom() {
+    if (typeof PinchZoomPan === 'undefined') return;
+    if (window.innerWidth > 768) {
+      // Desktop : pas de pinch, on cleanup si jamais on était en mobile avant
+      if (_pzpController) { try { _pzpController.destroy(); } catch (_) {} _pzpController = null; }
+      return;
+    }
+    var floor = document.getElementById('tables-grid');
+    if (!floor) return;
+    // Cleanup ancien controller avant d'en créer un nouveau
+    if (_pzpController) { try { _pzpController.destroy(); } catch (_) {} _pzpController = null; }
+    // En mode édition : pas de pinch (pour pas interférer avec le drag des tables)
+    if (_editing) return;
+    _pzpController = PinchZoomPan.attach(floor, { min: 0.3, max: 3, initial: 'fit' });
+    // Bouton "Centrer" : recalcule l'auto-fit
+    _injectCenterButton();
+  }
+
+  function _injectCenterButton() {
+    var wrap = document.getElementById('tables-floor-wrap');
+    if (!wrap) return;
+    if (wrap.querySelector('.mobile-center-btn')) return;
+    var btn = document.createElement('button');
+    btn.className = 'mobile-center-btn';
+    btn.setAttribute('aria-label', 'Centrer le plan');
+    btn.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3"/><path d="M12 19v3"/><path d="M2 12h3"/><path d="M19 12h3"/></svg>';
+    btn.onclick = function() { if (_pzpController) _pzpController.fit(); };
+    wrap.appendChild(btn);
   }
 
   // ── Toggle Plan / Liste (desktop + mobile) ────────────

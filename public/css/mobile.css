@@ -1,8 +1,10 @@
 /* ══════════════════════════════════════════════════════
    THE BOX — CSS Mobile (≤768px)
-   Sur mobile on garde EXACTEMENT le même plan que desktop.
-   Juste : floor scrollable au doigt, KPI cards en grille 2 cols,
-   widgets compactes.
+   Le plan desktop est conservé tel quel. On le rend juste :
+   - Plus grand (75vh)
+   - Avec pinch-zoom + pan + auto-fit (via PinchZoomPan)
+   - Bouton "Centrer le plan" en bas à droite
+   - KPI + filtres compactés pour laisser max d'espace au plan
 ═══════════════════════════════════════════════════════ */
 
 @media (max-width: 768px) {
@@ -11,67 +13,119 @@
     --safe-bottom: env(safe-area-inset-bottom, 0px);
   }
 
-  /* KPI strip mobile : 2 cols (au lieu de 5) */
+  /* ── KPI strip : pills horizontales scrollables et compactes ── */
   .tables-kpi {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-    gap: 8px !important;
+    grid-template-columns: repeat(5, minmax(72px, 1fr)) !important;
+    gap: 6px !important;
+    margin-bottom: 8px !important;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
   }
+  .tables-kpi::-webkit-scrollbar { display: none; }
   .tables-kpi .kpi-pro {
-    padding: 10px 12px 8px !important;
+    padding: 7px 8px 6px !important;
+    border-radius: 10px !important;
+    min-width: 72px;
   }
-  .tables-kpi .kpi-pro-val { font-size: 18px !important; }
-  .tables-kpi .kpi-pro-sub { font-size: 10px !important; }
-  .tables-kpi .kpi-pro-icon { width: 26px !important; height: 26px !important; font-size: 12px !important; }
+  .tables-kpi .kpi-pro-head { gap: 5px !important; margin-bottom: 4px !important; }
+  .tables-kpi .kpi-pro-icon { width: 20px !important; height: 20px !important; font-size: 11px !important; border-radius: 6px !important; }
+  .tables-kpi .kpi-pro-lbl { font-size: 8.5px !important; }
+  .tables-kpi .kpi-pro-val { font-size: 15px !important; line-height: 1 !important; }
+  .tables-kpi .kpi-pro-sub { display: none !important; }
+  .tables-kpi .kpi-pro-meter { height: 2px !important; margin-top: 3px !important; }
 
-  /* Toggle Plan/Liste : full width on mobile */
-  .tables-view-toggle-desktop { display: flex; width: 100%; margin-bottom: 12px; }
-  .tables-view-toggle-desktop .tvt-btn { flex: 1; }
+  /* ── Toggle Plan/Liste : full width, plus petit ── */
+  .tables-view-toggle-desktop {
+    display: flex !important;
+    width: 100%;
+    margin-bottom: 8px !important;
+    padding: 3px !important;
+  }
+  .tables-view-toggle-desktop .tvt-btn {
+    flex: 1;
+    min-height: 32px !important;
+    font-size: 12px !important;
+    padding: 0 10px !important;
+  }
 
-  /* Toolbar zones + search : stack vertical */
+  /* ── Toolbar zones+search : compact ── */
   .tables-toolbar-pro {
     flex-direction: column !important;
-    gap: 10px !important;
+    gap: 6px !important;
     align-items: stretch !important;
+    margin-bottom: 8px !important;
   }
   .tables-zones-segmented {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 6px !important;
   }
   .tables-zones-segmented::-webkit-scrollbar { display: none; }
+  .tables-zones-segmented .zone-seg {
+    flex-shrink: 0 !important;
+    min-height: 32px !important;
+    padding: 0 12px !important;
+    font-size: 12px !important;
+  }
   .tables-search-wrap { width: 100% !important; }
+  .tables-search-wrap input { font-size: 14px !important; min-height: 36px !important; }
 
-  /* === LE PLAN DESKTOP — INCHANGÉ, juste scrollable au doigt === */
-  /* Le wrapper devient scrollable horizontalement et verticalement */
+  /* ── LE PLAN — 75vh, pinch-zoom + pan ── */
   .tables-layout-pro {
     height: auto !important;
     min-height: auto !important;
+    display: block !important;
   }
   .tables-floor-wrap {
     width: 100% !important;
-    height: 65vh !important;
+    height: 75vh !important;
     min-height: 480px !important;
-    max-height: 600px !important;
-    overflow: auto !important;
-    -webkit-overflow-scrolling: touch !important;
-    touch-action: pan-x pan-y !important;
+    max-height: calc(100vh - 240px) !important;
+    overflow: hidden !important;
+    position: relative !important;
+    border-radius: 14px !important;
+    background: #f8fafc !important;
+    background-image:
+      linear-gradient(rgba(0,0,0,.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,0,0,.04) 1px, transparent 1px) !important;
+    background-size: 32px 32px !important;
+    touch-action: none !important;     /* PinchZoomPan gère tous les gestures */
   }
-  /* Le floor reste à 100% du wrap MAIS on lui donne aussi une taille min
-     pour qu'on puisse scroller si les tables sont placées loin */
+  /* Le floor garde sa taille mais sera scaled/translated via PinchZoomPan */
   .tables-floor {
-    min-width: 800px;
-    min-height: 600px;
-  }
-  /* Scrollbar discrète mobile */
-  .tables-floor-wrap::-webkit-scrollbar { width: 6px; height: 6px; }
-  .tables-floor-wrap::-webkit-scrollbar-track { background: rgba(0,0,0,.03); }
-  .tables-floor-wrap::-webkit-scrollbar-thumb { background: rgba(0,0,0,.18); border-radius: 3px; }
-
-  /* Vue Liste desktop : 1 colonne sur mobile */
-  .tables-list-desktop .tld-grid {
-    grid-template-columns: 1fr !important;
+    width: 100% !important;
+    height: 100% !important;
+    transform-origin: 0 0;
+    will-change: transform;
   }
 
-  /* Modal détails : prend 95% du viewport */
+  /* Bouton "Centrer le plan" */
+  .mobile-center-btn {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    border: none;
+    background: #fff;
+    color: #16a34a;
+    box-shadow: 0 4px 14px rgba(0,0,0,.15), 0 0 0 1px rgba(0,0,0,.04);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    z-index: 20;
+    transition: transform .15s ease;
+  }
+  .mobile-center-btn:active {
+    transform: scale(.92);
+    background: #f0fdf4;
+  }
+
+  /* ── Vue Liste desktop : 1 col sur mobile ── */
+  .tables-list-desktop .tld-grid { grid-template-columns: 1fr !important; }
+
+  /* ── Modal détails : presque plein écran ── */
   .tables-details-panel {
     width: 100% !important;
     max-width: calc(100vw - 16px) !important;
@@ -79,11 +133,25 @@
   }
   .table-details-overlay { padding: 8px !important; }
 
-  /* Header de page : compact */
-  #page-tables .topbar { padding: 12px 16px !important; }
-  #page-tables .page-title { font-size: 20px !important; }
+  /* ── Header de page : compact ── */
+  #page-tables .topbar { padding: 10px 14px !important; flex-wrap: wrap; gap: 8px !important; }
+  #page-tables .page-title { font-size: 18px !important; }
   #page-tables .page-subtitle { font-size: 11px !important; }
-  /* Bouton "+ Ajouter une table" en mode icône seulement (mobile) */
+  #page-tables .topbar-right { gap: 6px !important; flex-wrap: wrap; }
+  #page-tables .topbar-right .btn-floor-add {
+    padding: 8px 10px !important;
+    font-size: 12px !important;
+  }
   #page-tables .topbar-right .btn-floor-add span { display: none !important; }
-  #page-tables .topbar-right .btn-floor-add { padding: 8px 12px !important; }
+  #page-tables .topbar-right .btn-secondary,
+  #page-tables .topbar-right .btn-ghost { padding: 6px 10px !important; font-size: 12px !important; }
+
+  /* En mode édition : pas de pinch (pour laisser le drag des tables marcher) */
+  .tables-floor.edit-mode {
+    touch-action: auto !important;
+  }
+  .tables-floor-wrap:has(.tables-floor.edit-mode) {
+    overflow: auto !important;
+    touch-action: auto !important;
+  }
 }
