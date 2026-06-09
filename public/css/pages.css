@@ -830,18 +830,7 @@
 
 .details-actions { display: flex; flex-direction: column; gap: 8px; margin-top: 20px; }
 
-/* --- KPI Tiles --- */
-.tables-kpi { display: flex; gap: 12px; margin-bottom: 16px; overflow-x: auto; padding-bottom: 4px; }
-.kpi-tile { flex: 1; min-width: 140px; background: #fff; border: 1px solid #f1f5f9; border-radius: 10px; padding: 14px; display: flex; align-items: center; gap: 12px; position: relative; overflow: hidden; }
-.kpi-tile-icon { font-size: 22px; }
-.kpi-tile-body { flex: 1; }
-.kpi-tile-val { font-size: 22px; font-weight: 800; color: #0f172a; line-height: 1.1; }
-.kpi-tile-lbl { font-size: 11px; color: #94a3b8; font-weight: 500; text-transform: uppercase; letter-spacing: 0.3px; margin-top: 2px; }
-.kpi-tile-meter { position: absolute; bottom: 0; left: 0; right: 0; height: 4px; background: #f1f5f9; }
-.kpi-tile-meter-fill { height: 100%; background: #3b82f6; transition: width 0.5s ease; }
-.kpi-occ .kpi-tile-val { color: #ef4444; }
-.kpi-res .kpi-tile-val { color: #f59e0b; }
-.kpi-free .kpi-tile-val { color: #10b981; }
+/* --- KPI Tiles legacy retirés : .kpi-pro est utilisé maintenant (voir ligne 306+ et 1839+) --- */
 
 /* --- Toolbar (Zones + Search) --- */
 .tables-toolbar-pro { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; gap: 16px; flex-wrap: wrap; }
