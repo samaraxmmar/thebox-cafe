@@ -25,8 +25,15 @@ app.set('trust proxy', true); // pour req.ip correct derrière nginx/cloudflare
 const PORT = process.env.PORT || 3001;
 const HOST = process.env.HOST || '0.0.0.0'; // par défaut localhost — sécurise
 
-/* ── Bootstrap des fichiers JSON par défaut (users, settings...) ── */
-try { authMw.bootstrap(); } catch (e) { log.error('Bootstrap auth: ' + e.message); }
+/* ── Sync Supabase (pull) + Bootstrap ─────────────────────────────
+   On synchronise d'abord avec Supabase (si configuré) pour avoir les
+   dernières données AVANT le bootstrap qui crée les défauts manquants.
+   En async pour ne pas bloquer le require/import. */
+const storage = require('./src/storage');
+(async () => {
+  try { await storage.initSupabaseSync(); } catch (e) { log.warn('Sync Supabase : ' + e.message); }
+  try { authMw.bootstrap(); } catch (e) { log.error('Bootstrap auth: ' + e.message); }
+})();
 
 /* ── Middleware ─────────────────────────────────────────────────── */
 app.use(mw.securityHeaders());
