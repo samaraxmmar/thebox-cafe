@@ -313,16 +313,15 @@
 }
 .tables-kpi .kpi-pro {
   min-width: 0; width: 100%;
-  padding: 8px 11px 7px;             /* encore plus compact */
-  border-radius: 11px;
+  padding: 14px 18px 12px;
+  border-radius: 14px;
 }
-.tables-kpi .kpi-pro-head { gap: 7px; margin-bottom: 5px; }
-.tables-kpi .kpi-pro-icon { width: 22px; height: 22px; font-size: 11px; border-radius: 7px; }
-.tables-kpi .kpi-pro-lbl  { font-size: 9px; letter-spacing: .03em; }
-.tables-kpi .kpi-pro-val  { font-size: 17px; line-height: 1; }
-.tables-kpi .kpi-pro-sub  { font-size: 9.5px; margin-top: 2px; }
-.tables-kpi .kpi-pro-meter { height: 2.5px; margin-top: 4px; }
-.tables-kpi .kpi-pro:hover { transform: translateY(-1px); }
+.tables-kpi .kpi-pro-head { gap: 9px; margin-bottom: 10px; }
+.tables-kpi .kpi-pro-icon { width: 30px; height: 30px; font-size: 14px; border-radius: 9px; }
+.tables-kpi .kpi-pro-lbl  { font-size: 10.5px; letter-spacing: .03em; }
+.tables-kpi .kpi-pro-val  { font-size: 24px; line-height: 1; }
+.tables-kpi .kpi-pro-sub  { font-size: 11px; margin-top: 5px; }
+.tables-kpi .kpi-pro-meter { height: 3px; margin-top: 6px; }
 @media (max-width: 1280px) {
   .tables-kpi { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
