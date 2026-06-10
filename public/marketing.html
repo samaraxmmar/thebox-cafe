@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>thebox — The operating system for modern restaurants</title>
+<meta name="description" content="Orders, payments, inventory, tables, and reporting — held together in one calm, fast system. Built for service. Designed for stillness.">
+<meta name="theme-color" content="#5C1A24">
+<link rel="icon" type="image/svg+xml" href="/brand/logo-cube.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/css/base.css?v=20260610tb">
+<style>
+  /* ── Marketing-only layer (editorial, premium, the 2026 glow) ── */
+  html, body { height: auto; overflow: auto; }
+  body {
+    margin: 0;
+    background: var(--cream, #F4ECD8);
+    background: #F4ECD8;
+    color: #2A1418;
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    display: block;
+  }
+  :root {
+    --cream: #F4ECD8; --bone: #FAFAF5; --burgundy: #5C1A24; --burgundy-soft: rgba(92,26,36,.08);
+    --burgundy-line: rgba(92,26,36,.14); --charcoal: #2A1418; --ash: #8A7F70; --mist: #D4CFC0;
+    --tan: #C9A26B; --tan-deep: #A8854E; --tan-soft: rgba(201,162,107,.16); --sage: #6B7A5C;
+    --signal: #B83A2E; --cream-sunk: #ECE3CC;
+    --radius-card: 12px; --radius-button: 8px; --radius-modal: 20px;
+    --glow-tan: 0 6px 22px rgba(201,162,107,.40), 0 2px 8px rgba(201,162,107,.28);
+    --shadow-card: 0 1px 2px rgba(92,26,36,.06);
+    --shadow-modal: 0 24px 64px rgba(42,20,24,.22), 0 4px 12px rgba(42,20,24,.12);
+    --ease-out: cubic-bezier(0.2,0,0,1);
+  }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 28px; }
+  .mlabel { font-family: 'Inter'; font-weight: 500; font-size: 12px; letter-spacing: 0.10em; text-transform: uppercase; color: var(--ash); }
+  a { text-decoration: none; }
+
+  /* Buttons */
+  .mbtn { display: inline-flex; align-items: center; gap: 9px; font-family: 'Inter'; font-weight: 600; font-size: 15px;
+          border-radius: var(--radius-button); padding: 12px 20px; cursor: pointer; border: 1px solid transparent;
+          transition: transform .15s var(--ease-out), box-shadow .2s var(--ease-out), background .15s var(--ease-out); }
+  .mbtn-lg { padding: 15px 26px; font-size: 16px; }
+  .mbtn-hero { background: var(--tan); color: var(--burgundy); box-shadow: var(--glow-tan); }
+  .mbtn-hero:hover { transform: translateY(-1px); box-shadow: 0 10px 30px rgba(201,162,107,.52), 0 3px 10px rgba(201,162,107,.34); background: #d2ad78; }
+  .mbtn-ghost { background: transparent; color: var(--burgundy); border-color: var(--mist); }
+  .mbtn-ghost:hover { background: var(--burgundy-soft); border-color: var(--burgundy-line); }
+  .mbtn-inverse { background: rgba(250,250,245,.12); color: var(--cream); border-color: rgba(250,250,245,.28); }
+  .mbtn-inverse:hover { background: rgba(250,250,245,.20); }
+
+  /* Nav */
+  header.nav { position: sticky; top: 0; z-index: 50; background: rgba(244,236,216,.82); backdrop-filter: blur(10px); border-bottom: 1px solid var(--mist); }
+  .nav-inner { display: flex; align-items: center; gap: 12px; padding: 14px 0; }
+  .nav-links { display: flex; gap: 6px; margin-left: 22px; }
+  .nav-links a { padding: 8px 12px; font-size: 14.5px; font-weight: 500; color: var(--ash); border-radius: 8px; transition: color .15s, background .15s; }
+  .nav-links a:hover { color: var(--burgundy); background: var(--burgundy-soft); }
+  .nav-cta { margin-left: auto; display: flex; align-items: center; gap: 14px; }
+  .nav-cta .signin { font-size: 14.5px; font-weight: 500; color: var(--burgundy); }
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .wordmark { font-family: 'Inter'; font-weight: 700; letter-spacing: -0.03em; color: var(--burgundy); text-transform: lowercase; line-height: 1; }
+
+  /* Hero */
+  .hero { text-align: center; padding: 76px 0 40px; }
+  .hero h1 { font-family: 'Inter'; font-weight: 700; font-size: clamp(40px, 6vw, 68px); letter-spacing: -0.03em; line-height: 1.05; color: var(--burgundy); margin: 20px auto 0; max-width: 860px; }
+  .hero p.sub { font-size: clamp(17px, 2vw, 20px); line-height: 1.6; color: var(--charcoal); margin: 22px auto 0; max-width: 580px; }
+  .hero .cta-row { display: flex; gap: 12px; justify-content: center; margin-top: 30px; flex-wrap: wrap; }
+  .hero .fine { margin-top: 14px; font-size: 13px; color: var(--ash); }
+
+  /* Hero mock */
+  .mock { margin-top: 52px; position: relative; }
+  .mock-glow { position: absolute; inset: 8% 12% auto; height: 200px; background: var(--tan-soft); filter: blur(70px); border-radius: 999px; z-index: 0; }
+  .mock-card { position: relative; z-index: 1; background: var(--bone); border: 1px solid var(--mist); border-radius: var(--radius-modal); box-shadow: var(--shadow-modal); overflow: hidden; text-align: left; }
+  .mock-head { display: flex; align-items: center; gap: 10px; padding: 14px 18px; border-bottom: 1px solid var(--mist); font-size: 12.5px; color: var(--ash); }
+  .mock-stats { padding: 20px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .mock-stat { background: var(--cream); border: 1px solid var(--mist); border-radius: var(--radius-card); padding: 14px 16px; }
+  .mock-stat .v { font-family: 'JetBrains Mono'; font-weight: 600; font-size: 26px; letter-spacing: -0.02em; color: var(--burgundy); font-variant-numeric: tabular-nums; }
+  .mock-lower { padding: 0 20px 20px; display: grid; grid-template-columns: 1.4fr 1fr; gap: 12px; }
+  .mock-panel { background: var(--cream); border: 1px solid var(--mist); border-radius: var(--radius-card); padding: 16px; }
+  .bars { display: flex; align-items: flex-end; gap: 8px; height: 84px; margin-top: 14px; }
+  .bars > div { flex: 1; border-radius: 4px 4px 0 0; }
+
+  /* Features */
+  .section { padding: 64px 0; }
+  .features-head { text-align: center; margin-bottom: 44px; }
+  .features-head h2 { font-family: 'Inter'; font-weight: 700; font-size: clamp(30px, 4vw, 42px); letter-spacing: -0.025em; color: var(--burgundy); margin: 14px auto 0; max-width: 640px; }
+  .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .feature { background: var(--bone); border: 1px solid var(--mist); border-radius: var(--radius-card); box-shadow: var(--shadow-card); padding: 26px 24px; }
+  .feature .ic { width: 44px; height: 44px; border-radius: var(--radius-button); background: var(--burgundy-soft); color: var(--burgundy); display: inline-flex; align-items: center; justify-content: center; margin-bottom: 18px; }
+  .feature h3 { font-family: 'Inter'; font-weight: 600; font-size: 20px; letter-spacing: -0.01em; color: var(--burgundy); margin: 0 0 9px; }
+  .feature p { font-size: 15px; line-height: 1.6; color: var(--charcoal); margin: 0; }
+
+  /* Quote */
+  .quote { max-width: 820px; margin: 0 auto; padding: 40px 28px 72px; text-align: center; }
+  .quote p { font-family: 'Inter'; font-weight: 600; font-size: clamp(26px, 3.4vw, 36px); letter-spacing: -0.02em; line-height: 1.3; color: var(--burgundy); margin: 0; }
+  .quote .who { margin-top: 24px; display: flex; align-items: center; justify-content: center; gap: 11px; }
+  .quote .av { width: 38px; height: 38px; border-radius: 50%; background: var(--tan-soft); color: var(--tan-deep); display: inline-flex; align-items: center; justify-content: center; font-weight: 600; font-size: 14px; }
+
+  /* CTA band */
+  .cta { padding: 0 0 72px; }
+  .cta-band { background: var(--burgundy); border-radius: var(--radius-modal); padding: 64px 40px; text-align: center; position: relative; overflow: hidden; }
+  .cta-glow { position: absolute; top: -40px; left: 50%; transform: translateX(-50%); width: 280px; height: 160px; background: rgba(201,162,107,.22); filter: blur(80px); }
+  .cta-inner { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 18px; }
+  .cta-band h2 { font-family: 'Inter'; font-weight: 700; font-size: clamp(28px, 4vw, 40px); letter-spacing: -0.025em; color: var(--cream); margin: 0; max-width: 560px; }
+  .cta-band p { font-size: 16.5px; line-height: 1.6; color: rgba(244,236,216,.78); margin: 0; max-width: 460px; }
+
+  /* Footer */
+  footer.ft { border-top: 1px solid var(--mist); background: var(--bone); }
+  .ft-grid { display: grid; grid-template-columns: 1.4fr repeat(4, 1fr); gap: 28px; padding: 52px 28px 28px; }
+  .ft-grid p { font-size: 13.5px; line-height: 1.6; color: var(--ash); max-width: 220px; }
+  .ft-col a { display: block; font-size: 14px; color: var(--charcoal); margin-top: 9px; }
+  .ft-col a:hover { color: var(--burgundy); }
+  .ft-bottom { padding: 20px 28px 36px; border-top: 1px solid var(--mist); display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; font-size: 12.5px; color: var(--ash); }
+  .ft-bottom a { color: var(--ash); margin-left: 18px; }
+
+  @media (max-width: 860px) {
+    .nav-links { display: none; }
+    .mock-stats { grid-template-columns: repeat(2, 1fr); }
+    .mock-lower { grid-template-columns: 1fr; }
+    .features { grid-template-columns: 1fr; }
+    .ft-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<header class="nav">
+  <div class="wrap nav-inner">
+    <div class="brand"><img src="/brand/logo-cube.svg" width="28" height="28" alt=""><span class="wordmark" style="font-size:21px">thebox</span></div>
+    <nav class="nav-links">
+      <a href="#product">Product</a><a href="#restaurants">Restaurants</a><a href="#pricing">Pricing</a><a href="#about">About</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="signin" href="/">Sign in</a>
+      <a class="mbtn mbtn-hero" href="/">Start free</a>
+    </div>
+  </div>
+</header>
+
+<!-- ══ HERO ══ -->
+<section class="wrap hero">
+  <div class="mlabel" style="letter-spacing:.18em">Restaurant operating system</div>
+  <h1>The operating system for modern restaurants.</h1>
+  <p class="sub">Orders, payments, inventory, tables, and reporting — held together in one calm, fast system. Built for service. Designed for stillness.</p>
+  <div class="cta-row">
+    <a class="mbtn mbtn-hero mbtn-lg" href="/">See how it runs
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+    <a class="mbtn mbtn-ghost mbtn-lg" href="#product">Book a walkthrough</a>
+  </div>
+  <div class="fine">Two minutes to set up · no card required</div>
+
+  <!-- Hero mock -->
+  <div class="mock">
+    <div class="mock-glow"></div>
+    <div class="mock-card">
+      <div class="mock-head">
+        <img src="/brand/logo-cube.svg" width="22" height="22" alt=""><span class="wordmark" style="font-size:16px">thebox</span>
+        <span style="margin-left:8px">Dashboard · Mardi soir</span>
+        <span style="margin-left:auto;display:inline-flex;align-items:center;gap:6px;font-size:12px"><span style="width:7px;height:7px;border-radius:50%;background:var(--sage)"></span>En ligne</span>
+      </div>
+      <div class="mock-stats">
+        <div class="mock-stat"><div class="mlabel" style="font-size:10.5px">Revenue today</div><div style="display:flex;align-items:baseline;gap:4px;margin-top:9px"><span class="v">1,284.5</span><span style="font-size:12px;color:var(--ash)">DT</span></div><div style="font-size:11.5px;color:var(--sage);margin-top:6px">↑ +18%</div></div>
+        <div class="mock-stat"><div class="mlabel" style="font-size:10.5px">Orders</div><div style="margin-top:9px"><span class="v">43</span></div><div style="font-size:11.5px;color:var(--ash);margin-top:6px">today</div></div>
+        <div class="mock-stat"><div class="mlabel" style="font-size:10.5px">Avg ticket</div><div style="display:flex;align-items:baseline;gap:4px;margin-top:9px"><span class="v">29.9</span><span style="font-size:12px;color:var(--ash)">DT</span></div><div style="font-size:11.5px;color:var(--sage);margin-top:6px">↑ +2.4%</div></div>
+        <div class="mock-stat"><div class="mlabel" style="font-size:10.5px">Tables open</div><div style="margin-top:9px"><span class="v">3 / 8</span></div><div style="font-size:11.5px;color:var(--ash);margin-top:6px">service</div></div>
+      </div>
+      <div class="mock-lower">
+        <div class="mock-panel">
+          <div class="mlabel" style="font-size:10.5px">Ventes par heure</div>
+          <div class="bars">
+            <div style="height:18%;background:var(--burgundy-soft);border:1px solid var(--burgundy-line)"></div>
+            <div style="height:38%;background:var(--burgundy-soft);border:1px solid var(--burgundy-line)"></div>
+            <div style="height:72%;background:var(--burgundy-soft);border:1px solid var(--burgundy-line)"></div>
+            <div style="height:52%;background:var(--burgundy-soft);border:1px solid var(--burgundy-line)"></div>
+            <div style="height:42%;background:var(--burgundy-soft);border:1px solid var(--burgundy-line)"></div>
+            <div style="height:61%;background:var(--burgundy-soft);border:1px solid var(--burgundy-line)"></div>
+            <div style="height:80%;background:var(--tan);border:1px solid var(--tan)"></div>
+            <div style="height:28%;background:var(--burgundy-soft);border:1px solid var(--burgundy-line)"></div>
+          </div>
+        </div>
+        <div class="mock-panel">
+          <div class="mlabel" style="font-size:10.5px">Stock</div>
+          <div style="margin-top:12px"><div style="display:flex;justify-content:space-between;font-size:12px;color:var(--charcoal);margin-bottom:5px"><span>Lait</span></div><div style="height:6px;background:var(--cream-sunk);border-radius:999px"><div style="width:70%;height:100%;background:var(--sage);border-radius:999px"></div></div></div>
+          <div style="margin-top:12px"><div style="display:flex;justify-content:space-between;font-size:12px;color:var(--charcoal);margin-bottom:5px"><span>Café</span></div><div style="height:6px;background:var(--cream-sunk);border-radius:999px"><div style="width:64%;height:100%;background:var(--sage);border-radius:999px"></div></div></div>
+          <div style="margin-top:12px"><div style="display:flex;justify-content:space-between;font-size:12px;color:var(--charcoal);margin-bottom:5px"><span>Citrons</span></div><div style="height:6px;background:var(--cream-sunk);border-radius:999px"><div style="width:28%;height:100%;background:var(--signal);border-radius:999px"></div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FEATURES ══ -->
+<section class="wrap section" id="product">
+  <div class="features-head">
+    <div class="mlabel">Everything in its place</div>
+    <h2>A point-of-sale that doesn't get in the way of the point.</h2>
+  </div>
+  <div class="features">
+    <div class="feature">
+      <div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+      <h3>Order entry that keeps up</h3>
+      <p>Single-tap on the floor, rich on the back end. The queue moves at the speed of service — no loading states, no friction.</p>
+    </div>
+    <div class="feature">
+      <div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96 12 12l8.73-5.04M12 22V12"/></svg></div>
+      <h3>Inventory that closes the books</h3>
+      <p>Stock updates itself with every sale. Closing the night doesn't mean closing the books — and you're warned before you run out.</p>
+    </div>
+    <div class="feature">
+      <div class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div>
+      <h3>A floor you can read at a glance</h3>
+      <p>Tables, covers, and running totals on one plan. Open, transfer, reserve, and encaisser — without leaving the room.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══ QUOTE ══ -->
+<section class="quote">
+  <p>"Friday night doesn't care about your software. thebox is the first system that kept up with the rush instead of adding to it."</p>
+  <div class="who">
+    <span class="av">RM</span>
+    <div style="text-align:left">
+      <div style="font-weight:600;font-size:14px;color:var(--charcoal)">Rim Mansour</div>
+      <div style="font-size:13px;color:var(--ash)">Chef-owner, Café Médina</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ CTA BAND ══ -->
+<section class="wrap cta" id="pricing">
+  <div class="cta-band">
+    <div class="cta-glow"></div>
+    <div class="cta-inner">
+      <img src="/brand/logo-cube-inverse.svg" width="46" height="46" alt="">
+      <h2>Software that runs at the speed of service.</h2>
+      <p>Start with your menu. Be taking orders in two minutes.</p>
+      <div style="display:flex;gap:12px;margin-top:8px;flex-wrap:wrap;justify-content:center">
+        <a class="mbtn mbtn-hero mbtn-lg" href="/">Start free
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+        <a class="mbtn mbtn-inverse mbtn-lg" href="#about">Talk to us</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FOOTER ══ -->
+<footer class="ft" id="about">
+  <div class="wrap" style="padding:0">
+    <div class="ft-grid">
+      <div>
+        <div class="brand" style="margin-bottom:12px"><img src="/brand/logo-cube.svg" width="26" height="26" alt=""><span class="wordmark" style="font-size:19px">thebox</span></div>
+        <p>The operating system for modern restaurants.</p>
+      </div>
+      <div class="ft-col"><div class="mlabel" style="font-size:11px">Product</div><a href="#product">Point of sale</a><a href="#product">Tables</a><a href="#product">Inventory</a><a href="#product">Reporting</a><a href="#pricing">Pricing</a></div>
+      <div class="ft-col"><div class="mlabel" style="font-size:11px">Restaurants</div><a href="#restaurants">Cafés</a><a href="#restaurants">Bistros</a><a href="#restaurants">Restaurant groups</a><a href="#restaurants">Counter service</a></div>
+      <div class="ft-col"><div class="mlabel" style="font-size:11px">Company</div><a href="#about">About</a><a href="#about">Careers</a><a href="#about">Blog</a><a href="#about">Contact</a></div>
+      <div class="ft-col"><div class="mlabel" style="font-size:11px">Resources</div><a href="#">Help center</a><a href="#">Onboarding</a><a href="#">Status</a><a href="#">API</a></div>
+    </div>
+    <div class="ft-bottom">
+      <span>© 2026 thebox. Software for restaurants.</span>
+      <div><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Security</a></div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

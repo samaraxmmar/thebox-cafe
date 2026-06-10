@@ -19,9 +19,9 @@ const Store = {
 
   CAT_COLORS: {
     'Boisson chaude': '#c8a96e',
-    'Boisson froide': '#5c9fe0',
+    'Boisson froide': '#6b7a5c',
     'Pâtisserie':     '#e0935c',
-    'Snack':          '#4caf7d',
+    'Snack':          '#a8854e',
   },
 
   // ── Cache localStorage (30 min — refresh quasi-instantané) ──

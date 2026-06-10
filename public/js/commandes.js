@@ -88,8 +88,8 @@ const Commandes = {
    *  (même index dans la palette → même couleur partout) */
   _serveurBadge(name) {
     const palette = (typeof THEBOX_PALETTE !== 'undefined') ? THEBOX_PALETTE : [
-      ['#34d399', '#059669'], ['#22d3ee', '#0891b2'], ['#818cf8', '#4338ca'],
-      ['#a78bfa', '#6d28d9'], ['#f472b6', '#be185d'], ['#fbbf24', '#b45309'],
+      ['#9e5560', '#5c1a24'], ['#d8b985', '#a8854e'], ['#8a9a78', '#566348'],
+      ['#d99873', '#b5683c'], ['#a06b72', '#7a2230'], ['#e0b066', '#b5772e'],
     ];
     const map = window._SERVER_COLOR_MAP || {};
     let idx = map[name];

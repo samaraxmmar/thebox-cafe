@@ -1,0 +1,139 @@
+/* ══════════════════════════════════════════════════════
+   thebox — Brand layer (loaded last)
+   Editorial details on top of the token remap:
+   cube logo, small-caps labels, mono numerals, the 2026 glow.
+   "The operating system for modern restaurants."
+   ══════════════════════════════════════════════════════ */
+
+/* ── Wordmark ─────────────────────────────────────────── */
+.tb-wordmark {
+  font-family: var(--font-logo);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--primary);
+  text-transform: lowercase;
+  line-height: 1;
+}
+
+/* ── Sidebar logo : cube + wordmark (flat, no gradient) ── */
+.logo-mark { align-items: center; gap: 10px; }
+.logo-cube-img { width: 26px; height: 26px; flex-shrink: 0; display: block; }
+.logo-text {
+  /* kill the legacy gradient-text; flat burgundy wordmark */
+  background: none !important;
+  -webkit-text-fill-color: var(--primary) !important;
+  color: var(--primary) !important;
+  flex-direction: row !important;
+  font-weight: 700 !important;
+  font-size: 21px !important;
+  letter-spacing: -0.03em !important;
+  text-transform: lowercase !important;
+}
+.logo-text span { display: inline !important; }
+.logo-text span + span { display: none !important; } /* show only "thebox" */
+
+/* ── Login : cube mark instead of green box ───────────── */
+.login-logo-wrap {
+  background: transparent !important;
+  box-shadow: none !important;
+  width: 84px; height: 84px;
+  padding: 0;
+}
+.login-logo-cube { width: 72px; height: 72px; display: block; margin: 0 auto; }
+.login-logo-text { display: none; }
+.login-desc {
+  font-family: var(--font-ui);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-3);
+}
+
+/* ── The editorial signature: small-caps labels ───────── */
+th,
+.section-label,
+.kpi-pro-lbl,
+.dash-kpi-sub,
+.settings-section-head,
+.card-eyebrow,
+.topbar-stat-mini-lbl {
+  text-transform: uppercase;
+  letter-spacing: 0.10em;
+  font-weight: 500;
+  color: var(--text-3);
+}
+th { font-size: 11px; }
+
+/* ── Tables: horizontal hairlines only (no vertical rules) */
+table { border-collapse: collapse; }
+th { background: transparent; border-bottom: 1px solid var(--border); }
+td { border-bottom: 1px solid var(--border); }
+
+/* ── Tabular mono numerals on money & metrics ─────────── */
+.order-total-val,
+.order-line .val,
+#subtotal,
+.kpi-pro-val,
+.dash-kpi-val,
+.dash-score-val,
+.receipt-total span,
+.stat-card-value,
+.price,
+.product-price {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+  letter-spacing: -0.01em;
+}
+
+/* ── Calm, flat primary buttons in-product ────────────── */
+.btn-primary,
+.login-btn,
+.validate-btn {
+  background: var(--primary);
+  border: 1px solid var(--primary);
+  color: var(--surface);
+}
+.btn-primary {
+  /* calm, flat in-product button — no glossy inset highlight */
+  box-shadow: var(--shadow-1);
+}
+.btn-primary:hover,
+.validate-btn:hover { background: var(--primary-dark); border-color: var(--primary-dark); }
+.btn-primary:hover { filter: none; box-shadow: var(--shadow-2); }
+
+/* ── The 2026 glow — reserved for the two hero moments ── */
+.login-btn {
+  box-shadow: var(--glow-burgundy);
+  transition: box-shadow var(--motion-default) var(--ease-out),
+              transform var(--motion-fast) var(--ease-out),
+              background var(--motion-fast) var(--ease-out);
+}
+.login-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 28px rgba(92, 26, 36, 0.34), 0 2px 8px rgba(92, 26, 36, 0.20);
+}
+.validate-btn:not(:disabled) { box-shadow: var(--glow-burgundy); }
+.validate-btn:not(:disabled):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 28px rgba(92, 26, 36, 0.34);
+}
+
+/* Role select — burgundy wash when active (no green) */
+.role-btn.selected,
+.role-btn:hover { border-color: var(--primary); color: var(--primary); }
+.role-btn.selected { background: var(--primary-soft); }
+
+/* Status dot = sage (open/online), not the loud green */
+.status-dot { box-shadow: 0 0 0 3px rgba(107, 122, 92, 0.18); }
+.live-dot { background: var(--success) !important; }
+
+/* Focus polish — warm burgundy ring everywhere */
+*:focus-visible { box-shadow: var(--ring); }
+
+/* PIN input: mono, calmer */
+.pin-input { font-family: var(--font-mono); }
+
+/* Receipt: warm paper */
+.receipt-logo { font-family: var(--font-logo); font-weight: 700; letter-spacing: -0.02em; color: var(--primary); text-transform: lowercase; }
