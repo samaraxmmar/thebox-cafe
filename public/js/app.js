@@ -122,7 +122,7 @@ const App = {
             if (!nw) return;
             nw.addEventListener('statechange', () => {
               if (nw.state === 'installed' && navigator.serviceWorker.controller) {
-                if (window.Toast) Toast.info('🔄 Nouvelle version disponible — recharge la page');
+                if (window.Toast) Toast.info('Nouvelle version disponible — recharge la page');
               }
             });
           });
@@ -158,10 +158,10 @@ const App = {
 
     if (res && res.server) {
       dot.style.background = 'var(--green)';
-      lbl.textContent      = res.whatsapp ? '📱 WA connecté' : 'WA hors ligne';
+      lbl.textContent      = res.whatsapp ? 'WA connecté' : 'WA hors ligne';
     } else {
       dot.style.background = 'var(--red)';
-      lbl.textContent      = '⚠️ Serveur hors ligne';
+      lbl.textContent      = 'Serveur hors ligne';
     }
 
     // Nettoyer un éventuel ancien bandeau migration
@@ -213,7 +213,7 @@ const App = {
     const div = document.createElement('div');
     div.id = 'supabase-banner';
     div.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9998;background:#b83a2e;color:#fff;padding:12px 16px;text-align:center;font-size:13px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,.2)';
-    div.innerHTML = '⚠ Supabase non configuré — édite <code style="background:rgba(255,255,255,.2);padding:2px 8px;border-radius:4px">%APPDATA%\\TheBox\\.env</code> (SUPABASE_URL + SUPABASE_KEY) puis relance l\'application.';
+    div.innerHTML = 'Supabase non configuré — édite <code style="background:rgba(255,255,255,.2);padding:2px 8px;border-radius:4px">%APPDATA%\\TheBox\\.env</code> (SUPABASE_URL + SUPABASE_KEY) puis relance l\'application.';
     document.body.appendChild(div);
   },
 };

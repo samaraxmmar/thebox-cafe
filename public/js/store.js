@@ -5,7 +5,7 @@
 ══════════════════════════════════════════════════════ */
 
 const Store = {
-  // ⚠ Politique caisse : stock négatif AUTORISÉ — on ne bloque jamais.
+  // Politique caisse : stock négatif AUTORISÉ — on ne bloque jamais.
   allowNegativeStock: true,
 
   produits:     [],

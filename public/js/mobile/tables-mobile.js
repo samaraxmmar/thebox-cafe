@@ -278,20 +278,20 @@ const TablesMobile = (function() {
     let html = '';
     if (canManage) {
       if (session) {
-        html += `<button class="btn-mobile-primary" onclick="TablesMobile.openOrderQuick(${t.id})">📋 Reprendre la commande →</button>`;
+        html += `<button class="btn-mobile-primary" onclick="TablesMobile.openOrderQuick(${t.id})">Reprendre la commande →</button>`;
       } else {
         html += `<button class="btn-mobile-primary" onclick="BottomSheet.close(); TablesMobile.quickOpen(${t.id})">▶ Ouvrir & commander</button>`;
       }
     }
     if (canManage && !session && status !== 'reservee') {
-      html += `<button class="btn-mobile-secondary" onclick="BottomSheet.close(); TablesMobile.quickReserve(${t.id})">📅 Réserver la table</button>`;
+      html += `<button class="btn-mobile-secondary" onclick="BottomSheet.close(); TablesMobile.quickReserve(${t.id})">Réserver la table</button>`;
     }
     if (session) {
       if (canAdmin) html += `<button class="btn-mobile-secondary" onclick="window.Tables.promptTransfer(${t.id}); BottomSheet.close();">⇄ Transférer la table</button>`;
-      if (canAdmin) html += `<button class="btn-mobile-secondary" onclick="window.Tables.printBill(${t.id}); BottomSheet.close();">🖨 Imprimer l'addition</button>`;
-      if (canAdmin) html += `<button class="btn-mobile-danger" onclick="window.Tables.closeFromPanel(${t.id}); BottomSheet.close();">✕ Fermer la table</button>`;
+      if (canAdmin) html += `<button class="btn-mobile-secondary" onclick="window.Tables.printBill(${t.id}); BottomSheet.close();">Imprimer l'addition</button>`;
+      if (canAdmin) html += `<button class="btn-mobile-danger" onclick="window.Tables.closeFromPanel(${t.id}); BottomSheet.close();">Fermer la table</button>`;
     }
-    if (canAdmin) html += `<button class="btn-mobile-ghost" onclick="window.Tables.openEditModal(${t.id}); BottomSheet.close();">✎ Modifier la table</button>`;
+    if (canAdmin) html += `<button class="btn-mobile-ghost" onclick="window.Tables.openEditModal(${t.id}); BottomSheet.close();">Modifier la table</button>`;
     return html;
   }
 

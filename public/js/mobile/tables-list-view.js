@@ -137,7 +137,7 @@ const TablesListView = (function() {
 
   function _actionBtn(t, status, session) {
     if (status === 'occupee') {
-      return `<button class="btn-mobile-primary" onclick="event.stopPropagation(); TablesMobile.openOrderQuick(${t.id})">📋 Reprendre la commande →</button>`;
+      return `<button class="btn-mobile-primary" onclick="event.stopPropagation(); TablesMobile.openOrderQuick(${t.id})">Reprendre la commande →</button>`;
     }
     if (status === 'reservee') {
       return `<button class="btn-mobile-secondary" onclick="event.stopPropagation(); TablesMobile.selectTable(${t.id})">Voir détails →</button>`;

@@ -44,7 +44,7 @@
       <!-- Upload logo (visible au hover) -->
       <label class="login-logo-upload" title="Changer le logo">
         <input type="file" accept="image/*" id="login-logo-input" style="display:none" onchange="Auth.uploadLogo(event)">
-        <span>✎ Logo</span>
+        <span>Logo</span>
       </label>
     </div>
     <div class="role-grid" style="grid-template-columns:repeat(2,1fr);gap:8px">
@@ -319,7 +319,7 @@
             <label class="form-label">Rotation (degrés)</label>
             <input class="form-input" type="number" id="te-rotation" min="0" max="359" step="15" value="0">
           </div>
-          <div class="te-size-hint">💡 Astuce : tu peux aussi redimensionner directement en mode "Éditer le plan" en glissant le coin des tables.</div>
+          <div class="te-size-hint">Astuce : tu peux aussi redimensionner directement en mode "Éditer le plan" en glissant le coin des tables.</div>
         </div>
 
         <div class="modal-actions">
@@ -333,7 +333,7 @@
     <div class="modal-overlay" id="modal-reserve-table">
       <div class="modal cover-modal" style="max-width:480px">
         <div class="cover-modal-header">
-          <div class="cover-modal-icon" style="background:linear-gradient(135deg, #dbeafe, rgba(59,130,246,.10));">📅</div>
+          <div class="cover-modal-icon" style="background:linear-gradient(135deg, #f3e6e7, rgba(92,26,36,.06));"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
           <div>
             <h2 class="modal-title" style="margin:0">Réserver <span id="rm-table-name">la table</span></h2>
             <div class="cover-modal-sub">Saisis les informations de la réservation</div>
@@ -367,7 +367,7 @@
 
         <div class="modal-actions">
           <button class="btn btn-secondary" onclick="Tables.cancelReservationModal()">Annuler</button>
-          <button class="btn btn-primary" onclick="Tables.confirmReservation()">📅 Réserver</button>
+          <button class="btn btn-primary" onclick="Tables.confirmReservation()">Réserver</button>
         </div>
       </div>
     </div>
@@ -376,7 +376,7 @@
     <div class="modal-overlay" id="modal-open-table">
       <div class="modal modal-sm cover-modal">
         <div class="cover-modal-header">
-          <div class="cover-modal-icon">👥</div>
+          <div class="cover-modal-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
           <div>
             <h2 class="modal-title" style="margin:0">Ouvrir <span id="cm-table-name">la table</span></h2>
             <div class="cover-modal-sub">Combien de personnes seront à cette table&nbsp;?</div>
@@ -673,7 +673,7 @@
       </div>
       <div class="page-content">
         <div style="margin-bottom:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-          <input class="form-input" id="produits-search" placeholder="🔍 Rechercher un produit..." style="max-width:320px;flex:1">
+          <input class="form-input" id="produits-search" placeholder="Rechercher un produit..." style="max-width:320px;flex:1">
           <div id="produits-cat-filter" style="display:flex;gap:6px;flex-wrap:wrap"></div>
         </div>
         <div id="produits-sections"></div>
@@ -697,7 +697,7 @@
         <div class="card">
           <div class="card-header">
             <div><div class="card-title">Matrice de permissions</div><div class="card-sub">L'administrateur a toujours toutes les permissions</div></div>
-            <button class="btn btn-ghost btn-sm" onclick="Users.resetPerms()">↺ Réinitialiser</button>
+            <button class="btn btn-ghost btn-sm" onclick="Users.resetPerms()">Réinitialiser</button>
           </div>
           <div class="table-wrap"><table id="perms-table"></table></div>
         </div>
@@ -709,23 +709,23 @@
       <div class="topbar">
         <div class="topbar-left"><div><div class="page-title">Paramètres</div><div class="page-subtitle">Configuration du système</div></div></div>
         <div class="topbar-right">
-          <button class="btn btn-secondary btn-sm" onclick="Settings.backup()">⬇ Sauvegarde</button>
-          <button class="btn btn-primary btn-sm" onclick="Settings.save()">💾 Enregistrer</button>
+          <button class="btn btn-secondary btn-sm" onclick="Settings.backup()">Sauvegarde</button>
+          <button class="btn btn-primary btn-sm" onclick="Settings.save()">Enregistrer</button>
         </div>
       </div>
       <div class="page-content">
         <div class="settings-layout">
           <aside class="settings-tabs" id="settings-tabs">
-            <button class="settings-tab active" data-tab="cafe">☕ Café</button>
-            <button class="settings-tab" data-tab="pos">💳 POS</button>
-            <button class="settings-tab" data-tab="taxes">📊 Taxes & devise</button>
-            <button class="settings-tab" data-tab="printer">🖨 Imprimante</button>
-            <button class="settings-tab" data-tab="whatsapp">💬 WhatsApp</button>
-            <button class="settings-tab" data-tab="supabase">🗄 Supabase</button>
-            <button class="settings-tab" data-tab="security">🔐 Sécurité</button>
-            <button class="settings-tab" data-tab="theme">🎨 Thème & langue</button>
-            <button class="settings-tab" data-tab="backup">💾 Sauvegarde</button>
-            <button class="settings-tab" data-tab="logs">📜 Logs</button>
+            <button class="settings-tab active" data-tab="cafe">Café</button>
+            <button class="settings-tab" data-tab="pos">POS</button>
+            <button class="settings-tab" data-tab="taxes">Taxes & devise</button>
+            <button class="settings-tab" data-tab="printer">Imprimante</button>
+            <button class="settings-tab" data-tab="whatsapp">WhatsApp</button>
+            <button class="settings-tab" data-tab="supabase">Supabase</button>
+            <button class="settings-tab" data-tab="security">Sécurité</button>
+            <button class="settings-tab" data-tab="theme">Thème & langue</button>
+            <button class="settings-tab" data-tab="backup">Sauvegarde</button>
+            <button class="settings-tab" data-tab="logs">Logs</button>
           </aside>
           <div class="settings-panel" id="settings-panel"></div>
         </div>
@@ -760,12 +760,12 @@
       <label class="form-label">Photo du produit (optionnel)</label>
       <div class="img-upload-row">
         <div class="img-upload-preview" id="np-image-preview">
-          <span class="img-upload-placeholder">📷 Aucune photo</span>
+          <span class="img-upload-placeholder">Aucune photo</span>
         </div>
         <div class="img-upload-actions">
           <input type="file" id="np-image-file" accept="image/*" style="display:none" onchange="Admin.handleImageFile(event)">
-          <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('np-image-file').click()">📁 Choisir une photo</button>
-          <button type="button" class="btn btn-ghost btn-sm" onclick="Admin.removeImage()" id="np-image-remove" style="display:none">✕ Retirer</button>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('np-image-file').click()">Choisir une photo</button>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="Admin.removeImage()" id="np-image-remove" style="display:none">Retirer</button>
         </div>
       </div>
       <input type="hidden" id="np-image" value="">
@@ -775,7 +775,7 @@
       <input type="checkbox" id="np-actif" checked style="width:18px;height:18px;cursor:pointer">
       <label for="np-actif" style="font-weight:600;cursor:pointer;margin:0">Produit actif (visible à la caisse)</label>
     </div>
-    <div class="settings-hint">💡 Stock initial à <strong>0</strong> = produit <strong>non suivi</strong> (idéal pour les cafés/boissons faits sur place).<br>Stock initial &gt; 0 = produit suivi, 1 unité décrémentée à chaque vente.</div>
+    <div class="settings-hint">Stock initial à <strong>0</strong> = produit <strong>non suivi</strong> (idéal pour les cafés/boissons faits sur place).<br>Stock initial &gt; 0 = produit suivi, 1 unité décrémentée à chaque vente.</div>
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="Modal.close('modal-product')">Annuler</button>
       <button class="btn btn-primary" onclick="Admin.saveProduct()">Enregistrer</button>
@@ -786,15 +786,15 @@
 <!-- Modal: Gérer les catégories (rename / delete / list) -->
 <div class="modal-overlay" id="modal-categories">
   <div class="modal" style="max-width:620px">
-    <h2 class="modal-title">📂 Gérer les catégories</h2>
+    <h2 class="modal-title">Gérer les catégories</h2>
     <div class="form-group">
-      <input class="form-input" id="cat-search" placeholder="🔍 Rechercher une catégorie…" oninput="Admin.filterCategoriesList(this.value)">
+      <input class="form-input" id="cat-search" placeholder="Rechercher une catégorie…" oninput="Admin.filterCategoriesList(this.value)">
     </div>
     <div id="cat-list" style="display:flex;flex-direction:column;gap:6px;max-height:420px;overflow:auto;padding:4px 2px"></div>
     <div class="settings-hint" style="margin-top:14px">
-      💡 <strong>Famille</strong> = grand groupe (Boisson Chaude, Boisson Froide, Cake…).<br>
-      💡 <strong>Catégorie</strong> = sous-groupe (COFFEE, SMOOTHIES, CREPE…). Le sélecteur à droite de chaque catégorie permet de l'affecter à une famille.<br>
-      💡 <strong>Renommer</strong> applique à TOUS les produits. <strong>Supprimer</strong> déplace vers "Divers" par défaut.
+      <strong>Famille</strong> = grand groupe (Boisson Chaude, Boisson Froide, Cake…).<br>
+      <strong>Catégorie</strong> = sous-groupe (COFFEE, SMOOTHIES, CREPE…). Le sélecteur à droite de chaque catégorie permet de l'affecter à une famille.<br>
+      <strong>Renommer</strong> applique à TOUS les produits. <strong>Supprimer</strong> déplace vers "Divers" par défaut.
     </div>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="Admin.promptCreateFamily()">+ Nouvelle famille</button>
@@ -807,7 +807,7 @@
 <!-- Modal: Nouvelle catégorie avec produits en lot -->
 <div class="modal-overlay" id="modal-category">
   <div class="modal" style="max-width:680px">
-    <h2 class="modal-title">📂 Nouvelle catégorie</h2>
+    <h2 class="modal-title">Nouvelle catégorie</h2>
     <div class="form-group">
       <label class="form-label">Nom de la catégorie</label>
       <input class="form-input" id="nc-nom" placeholder="Ex: COCKTAILS, GLACES, SANDWICHS…" maxlength="40">
@@ -818,7 +818,7 @@
     <div style="margin-top:10px">
       <button type="button" class="btn btn-secondary btn-sm" onclick="Admin.addCategoryRow()">+ Ajouter une ligne</button>
     </div>
-    <div class="settings-hint" style="margin-top:12px">💡 Renseigne au moins un produit. Les lignes vides seront ignorées. Tous les produits seront créés comme actifs.</div>
+    <div class="settings-hint" style="margin-top:12px">Renseigne au moins un produit. Les lignes vides seront ignorées. Tous les produits seront créés comme actifs.</div>
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="Modal.close('modal-category')">Annuler</button>
       <button class="btn btn-primary" onclick="Admin.saveCategory()">Créer la catégorie + produits</button>
@@ -858,7 +858,7 @@
     <div class="receipt-footer">Merci pour votre visite !<br>The Box Café</div>
     <div class="receipt-btns">
       <button class="btn btn-secondary" onclick="Modal.close('modal-receipt')">Fermer</button>
-      <button class="btn btn-primary" onclick="Modal.close('modal-receipt')">OK ✓</button>
+      <button class="btn btn-primary" onclick="Modal.close('modal-receipt')">OK</button>
     </div>
   </div>
 </div>
@@ -954,7 +954,7 @@
     if (!hasMobileShell && text.length < 5) {
       content.innerHTML =
         '<div style="padding:24px;background:#fef3c7;border:1px solid #fbbf24;border-radius:12px;margin:16px;color:#92400e;font-size:13px;line-height:1.5">' +
-          '<strong style="font-size:14px">⚠ Rendu mobile manqué</strong><br><br>' +
+          '<strong style="font-size:14px">Rendu mobile manqué</strong><br><br>' +
           'La page tables n\'a pas pu se rendre. Cliquez le bouton ci-dessous pour recharger forcément :<br><br>' +
           '<button onclick="location.reload(true)" style="width:100%;padding:14px;background:#5C1A24;color:#FAFAF5;border:none;border-radius:10px;font-size:14px;font-weight:700">Recharger</button><br><br>' +
           '<small>Si le problème persiste, désinstalle l\'app du home screen puis réinstalle.</small>' +

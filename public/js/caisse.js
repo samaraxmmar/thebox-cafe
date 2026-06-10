@@ -50,7 +50,7 @@ var Caisse = (function() {
   function _renderGrid() {
     var grid = document.getElementById('products-grid');
     if (!grid) return;
-    // ⚡ TOUJOURS clear l'initial "Chargement..." dès qu'on entre dans render
+    // TOUJOURS clear l'initial "Chargement..." dès qu'on entre dans render
     if (grid.querySelector('.loading')) grid.innerHTML = '';
     if (!_tableId) {
       grid.innerHTML = '<div class="caisse-empty-modern" style="grid-column:1/-1">' +
@@ -101,7 +101,7 @@ var Caisse = (function() {
         var stock = parseFloat(p.stock || 0);
         rupture = stock <= 0;
         bas = !rupture && stock < (p.seuil || 0);
-        if (rupture) stockLbl = '⚠ Rupture';
+        if (rupture) stockLbl = 'Rupture';
         else if (bas) stockLbl = stock + ' en stock';
       }
       var img = (typeof ProductImages !== 'undefined') ? ProductImages.render(p) : { html: '☕', bg: '#efe6d3' };
@@ -323,8 +323,8 @@ var Caisse = (function() {
     if (!_tableId) { Toast.warn('Sélectionne d\'abord une table'); return; }
     var p = Store.getProduit(id);
     if (!p) return;
-    // ⚠ Politique caisse : on NE BLOQUE JAMAIS — on prévient seulement.
-    if (Store.isRupture(p)) { Toast.warn('⚠ Produit en rupture — commande autorisée'); }
+    // Politique caisse : on NE BLOQUE JAMAIS — on prévient seulement.
+    if (Store.isRupture(p)) { Toast.warn('Produit en rupture — commande autorisée'); }
     var ex = null;
     for (var i = 0; i < _order.length; i++) { if (_order[i].id === id) { ex = _order[i]; break; } }
     if (ex) ex.qty++;
@@ -506,7 +506,7 @@ var Caisse = (function() {
     if (_tableLabel) {
       el.innerHTML = '<span class="badge badge-accent" style="cursor:pointer;padding:5px 12px" onclick="Caisse.clearTable()">📋 ' + _tableLabel + ' ×</span>';
     } else {
-      el.innerHTML = '<span class="badge" style="background:var(--bg3);color:var(--text3);padding:5px 12px;border:1px dashed var(--border2);cursor:pointer" onclick="Nav.go(\'tables\')">📋 Aucune table</span>';
+      el.innerHTML = '<span class="badge" style="background:var(--bg3);color:var(--text3);padding:5px 12px;border:1px dashed var(--border2);cursor:pointer" onclick="Nav.go(\'tables\')">Aucune table</span>';
     }
   }
 
@@ -541,7 +541,7 @@ var Caisse = (function() {
 
   function validerEtLiberer() { return valider({ closeTable: true }); }
 
-  // 🛡 AUTO-RENDER : si la page caisse est active et que le grid contient
+  // AUTO-RENDER : si la page caisse est active et que le grid contient
   //    encore l'initial "Chargement..." après que tout le JS soit chargé,
   //    on force un render. Multiple tentatives pour être sûr.
   function _autoRender() {

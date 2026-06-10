@@ -29,7 +29,7 @@ var Produits = (function() {
       rupture = stock <= 0;
       bas = !rupture && stock < seuil;
       var cls = rupture ? 'badge-red' : bas ? 'badge-orange' : 'badge-green';
-      stockBadge = '<span class="badge ' + cls + '">📦 ' + (rupture ? '⚠ Rupture' : stock + ' en stock') + '</span>';
+      stockBadge = '<span class="badge ' + cls + '">📦 ' + (rupture ? 'Rupture' : stock + ' en stock') + '</span>';
     } else {
       stockBadge = '<span class="badge badge-neutral" style="opacity:.65">stock non suivi</span>';
     }
@@ -67,7 +67,7 @@ var Produits = (function() {
     el.innerHTML = Auth.can('products.edit')
       ? '<button class="btn btn-primary btn-sm" onclick="Admin.openAddProduct && Admin.openAddProduct()">+ Nouveau produit</button>'
       + '<button class="btn btn-secondary btn-sm" onclick="Admin.openAddCategory && Admin.openAddCategory()">+ Catégorie</button>'
-      + '<button class="btn btn-ghost btn-sm" onclick="Admin.openCategoriesManager && Admin.openCategoriesManager()" title="Renommer / supprimer / réorganiser">📂 Gérer catégories</button>'
+      + '<button class="btn btn-ghost btn-sm" onclick="Admin.openCategoriesManager && Admin.openCategoriesManager()" title="Renommer / supprimer / réorganiser">Gérer catégories</button>'
       : '';
   }
 

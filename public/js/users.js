@@ -10,8 +10,8 @@ var Users = (function() {
   async function render() {
     document.getElementById('users-actions').innerHTML = Auth.can('users.manage')
       ? '<button class="btn btn-primary btn-sm" onclick="Users.openNew()">+ Nouvel utilisateur</button> ' +
-        '<button class="btn btn-ghost btn-sm" onclick="Users.openChangePin()">🔑 Mon PIN</button>'
-      : '<button class="btn btn-ghost btn-sm" onclick="Users.openChangePin()">🔑 Mon PIN</button>';
+        '<button class="btn btn-ghost btn-sm" onclick="Users.openChangePin()">Mon PIN</button>'
+      : '<button class="btn btn-ghost btn-sm" onclick="Users.openChangePin()">Mon PIN</button>';
 
     if (!Auth.can('users.manage')) {
       document.getElementById('users-table').innerHTML  = '<tr><td colspan="6" class="empty-td">Accès refusé</td></tr>';

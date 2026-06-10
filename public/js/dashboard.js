@@ -119,7 +119,7 @@ const Dashboard = (() => {
 
     // Courbe unique — total (style Sales Overview moderne)
     if (evo && !evo.error) _renderEvolutionLine(evo);
-    // ⚡ Charger les serveurs AVANT les dernières commandes →
+    // Charger les serveurs AVANT les dernières commandes →
     //    construit _SERVER_COLOR_MAP qui synchronise les chips avec le bar chart
     _wireServersPeriod();
     await _renderServers(_srvPeriod);
@@ -157,7 +157,7 @@ const Dashboard = (() => {
     const servers = (payload && payload.serveurs) || [];
     const nbNonAttr = (payload && payload.nb_non_attribuees) || 0;
 
-    // ⚡ Mémorise l'ordre (rang par CA desc) → utilisé pour colorer les chips serveur
+    // Mémorise l'ordre (rang par CA desc) → utilisé pour colorer les chips serveur
     //    partout (dashboard widget, page Commandes) de manière cohérente avec le bar chart.
     window._SERVER_COLOR_MAP = {};
     servers.forEach((s, i) => { window._SERVER_COLOR_MAP[s.serveur] = i; });
@@ -414,9 +414,9 @@ const Dashboard = (() => {
                onchange="Dashboard.setDate(this.value)">
         <button class="btn btn-ghost btn-sm" onclick="Dashboard.nextDay()">›</button>
         <button class="btn btn-ghost btn-sm" onclick="Dashboard.setDate('${today}')">Auj.</button>
-        ${canZ      ? `<button class="btn btn-secondary btn-sm" onclick="Dashboard.openZ()">📋 Z caisse</button>` : ''}
+        ${canZ      ? `<button class="btn btn-secondary btn-sm" onclick="Dashboard.openZ()">Z caisse</button>` : ''}
         ${canExport ? `<a class="btn btn-ghost btn-sm" href="${API.exportUrl('produits', _date, _date)}" target="_blank">⬇ CSV</a>` : ''}
-        <a class="btn btn-primary btn-sm" href="/api/rapport?date=${_date}" target="_blank">📄 PDF</a>
+        <a class="btn btn-primary btn-sm" href="/api/rapport?date=${_date}" target="_blank">PDF</a>
       </div>`;
   }
 
@@ -1316,7 +1316,7 @@ const Dashboard = (() => {
     if (!el) return;
     // Filtre : uniquement les produits avec tracking actif (pas tous les produits)
     const all = (typeof Store !== 'undefined' && Store.produits) || [];
-    // ⚡ Store pas encore chargé ? On force le chargement et on re-render après
+    // Store pas encore chargé ? On force le chargement et on re-render après
     if (typeof Store !== 'undefined' && !all.length && !Store._loaded.produits) {
       // Loading state pendant le fetch
       el.innerHTML = '<div class="empty-state" style="padding:20px;text-align:center"><div class="spinner" style="margin:0 auto"></div></div>';
