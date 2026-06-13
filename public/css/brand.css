@@ -137,3 +137,141 @@ td { border-bottom: 1px solid var(--border); }
 
 /* Receipt: warm paper */
 .receipt-logo { font-family: var(--font-logo); font-weight: 700; letter-spacing: -0.02em; color: var(--primary); text-transform: lowercase; }
+
+/* ══════════════════════════════════════════════════════
+   Tables page — pills inline, search bar, zone tabs
+   Aligns the KPI strip with the kit mock (compact pills
+   side-by-side instead of 5 large cards).
+   ══════════════════════════════════════════════════════ */
+
+/* KPIs → compact horizontal pills */
+.tables-kpi {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 10px !important;
+  grid-template-columns: none !important;
+}
+.tables-kpi .kpi-pro {
+  flex: 0 0 auto !important;
+  width: auto !important;
+  display: inline-flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 10px !important;
+  padding: 9px 15px !important;
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--r-md) !important;
+  box-shadow: none !important;
+  min-width: 0 !important;
+  margin: 0 !important;
+}
+.tables-kpi .kpi-pro::before,
+.tables-kpi .kpi-pro::after { display: none !important; }
+.tables-kpi .kpi-pro:hover { transform: none !important; box-shadow: none !important; }
+
+/* Status dot per KPI (replaces the big icon) */
+.tables-kpi .kpi-pro-head { display: flex; align-items: center; gap: 9px; order: 2; margin: 0 !important; }
+.tables-kpi .kpi-pro-icon {
+  width: 9px !important; height: 9px !important;
+  border-radius: 50% !important;
+  font-size: 0 !important;
+  color: transparent !important;
+  background: var(--ash, var(--text-3)) !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+.tables-kpi .kpi-pro[data-kpi="tables-occ"]  .kpi-pro-icon { background: var(--primary) !important; }
+.tables-kpi .kpi-pro[data-kpi="tables-res"]  .kpi-pro-icon { background: var(--tan, var(--accent)) !important; }
+.tables-kpi .kpi-pro[data-kpi="tables-rate"] .kpi-pro-icon { background: var(--sage, var(--success)) !important; }
+
+.tables-kpi .kpi-pro-lbl {
+  font-size: 10.5px !important;
+  letter-spacing: 0.10em !important;
+}
+.tables-kpi .kpi-pro-val {
+  order: 1;
+  font-family: var(--font-mono) !important;
+  font-weight: 600 !important;
+  font-size: 16px !important;
+  line-height: 1 !important;
+  color: var(--primary) !important;
+  margin: 0 !important;
+}
+.tables-kpi .kpi-pro-sub,
+.tables-kpi .kpi-pro-meter { display: none !important; }
+
+/* Zone tabs → pills 999px */
+.tables-zones-segmented {
+  display: inline-flex !important;
+  gap: 6px !important;
+  flex-wrap: wrap;
+}
+.tables-zones-segmented .zone-seg,
+.tables-zones-segmented button {
+  padding: 7px 14px !important;
+  height: 32px !important;
+  border-radius: 999px !important;
+  border: 1px solid var(--border) !important;
+  background: transparent !important;
+  color: var(--text-2) !important;
+  font-weight: 500 !important;
+  font-size: 13px !important;
+  cursor: pointer;
+  transition: all var(--motion-fast) var(--ease-out);
+  white-space: nowrap;
+}
+.tables-zones-segmented .zone-seg:hover,
+.tables-zones-segmented button:hover {
+  border-color: var(--primary) !important;
+  color: var(--primary) !important;
+}
+.tables-zones-segmented .zone-seg.active,
+.tables-zones-segmented button.active,
+.tables-zones-segmented .zone-seg[aria-selected="true"] {
+  background: var(--primary) !important;
+  border-color: var(--primary) !important;
+  color: var(--surface) !important;
+}
+
+/* Search bar → pill with icon */
+.tables-search-wrap {
+  position: relative !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  width: 280px !important;
+  min-width: 220px !important;
+  max-width: 320px !important;
+  margin-left: auto !important;
+  flex: 0 0 280px !important;
+}
+.tables-search-wrap svg {
+  position: absolute !important;
+  left: 12px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  width: 14px !important; height: 14px !important;
+  color: var(--text-3) !important;
+  pointer-events: none !important;
+  z-index: 2;
+}
+.tables-search-wrap input,
+#tables-search {
+  width: 100% !important;
+  height: 36px !important;
+  min-height: 36px !important;
+  padding: 0 14px 0 34px !important;
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 999px !important;
+  font-size: 13px !important;
+  color: var(--text) !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+.tables-search-wrap input:focus,
+#tables-search:focus {
+  border-color: var(--primary) !important;
+  box-shadow: var(--ring) !important;
+}
+.tables-search-wrap input::placeholder { color: var(--text-3) !important; }
