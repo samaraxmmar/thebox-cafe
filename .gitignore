@@ -39,3 +39,15 @@ __pycache__/
 # Cache WhatsApp web
 .wwebjs_cache/
 .wwebjs_auth/
+
+# Backup CSS avant refonte editorial (local only)
+.backup-pre-editorial/
+**/.backup-pre-editorial/
+
+# Dev server logs
+.dev-server.log*
+
+
+# Temp backup local
+.tmp-my-design-system.css
+
