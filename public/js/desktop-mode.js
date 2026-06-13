@@ -31,7 +31,7 @@ const DesktopMode = (function() {
 
   function _updateLabel() {
     var label = document.getElementById('desktop-mode-label');
-    if (label) label.textContent = isActive() ? '✓ Mode Desktop' : 'Mode Desktop';
+    if (label) label.textContent = isActive() ? 'Mode Desktop' : 'Mode Desktop';
     var btn = document.getElementById('desktop-mode-btn');
     if (btn) btn.classList.toggle('active', isActive());
   }
@@ -51,8 +51,8 @@ const DesktopMode = (function() {
     // Feedback visuel
     if (window.Toast) {
       Toast[next ? 'success' : 'info'](next
-        ? '🖥 Mode Desktop activé — utilise le pinch pour zoomer'
-        : '📱 Mode Mobile rétabli');
+        ? 'Mode Desktop activé — utilise le pinch pour zoomer'
+        : 'Mode Mobile rétabli');
     }
   }
 

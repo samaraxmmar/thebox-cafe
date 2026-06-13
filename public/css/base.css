@@ -4,85 +4,99 @@
 ══════════════════════════════════════════════════════ */
 
 :root {
-  /* ─── NEUTRAL SCALE (cool slate) — Stripe/Linear ─────
-     12-step scale, premium SaaS feel */
-  --neutral-50:  #f8fafc;
-  --neutral-100: #f1f5f9;
-  --neutral-150: #eaeff5;
-  --neutral-200: #e2e8f0;
-  --neutral-300: #cbd5e1;
-  --neutral-400: #94a3b8;
-  --neutral-500: #64748b;
-  --neutral-600: #475569;
-  --neutral-700: #334155;
-  --neutral-800: #1e293b;
-  --neutral-900: #0f172a;
-  --neutral-950: #020617;
+  /* ════════════════════════════════════════════════════
+     THE BOX — brand system v3 (thebox design system)
+     "The operating system for modern restaurants."
+     Rule #1: no pure black, no pure white — everything warm.
+     Burgundy is the new black; cream is the page; tan is rare.
+     ════════════════════════════════════════════════════ */
 
-  /* ─── BRAND : EMERALD GREEN (modern Tailwind emerald) ──
-     Plus vif, plus moderne que l'olive précédent */
-  --green-50:  #ecfdf5;
-  --green-100: #d1fae5;
-  --green-200: #a7f3d0;
-  --green-300: #6ee7b7;
-  --green-400: #34d399;
-  --green-500: #10b981;   /* secondary / accents */
-  --green-600: #059669;   /* primary brand */
-  --green-700: #047857;
-  --green-800: #065f46;
-  --green-900: #064e3b;
+  /* ─── NEUTRAL SCALE (warm taupe, replaces cool slate) ─
+     12-step warm scale: bone → cream → mist → ash → wine */
+  --neutral-50:  #faf7ef;   /* lightest warm wash */
+  --neutral-100: #f3ecda;   /* cream-ish subtle fill */
+  --neutral-150: #ece3cc;   /* cream sunk */
+  --neutral-200: #e2d8c2;   /* light hairline */
+  --neutral-300: #d4cfc0;   /* mist — hairline borders */
+  --neutral-400: #b3a994;   /* muted */
+  --neutral-500: #8a7f70;   /* ash — secondary text */
+  --neutral-600: #6e6456;   /* stronger secondary */
+  --neutral-700: #463a34;   /* deep taupe */
+  --neutral-800: #2a1418;   /* charcoal/wine — body ink */
+  --neutral-900: #1f0d11;   /* deep wine — headings on dark */
+  --neutral-950: #160a0d;
 
-  /* ─── ACCENTS modernes (violet + bleu pour gradients) ── */
-  --violet-400: #a78bfa;
-  --violet-500: #8b5cf6;
-  --violet-600: #7c3aed;
-  --blue-400:   #60a5fa;
-  --blue-500:   #3b82f6;
-  --blue-600:   #2563eb;
+  /* ─── BRAND : BURGUNDY (the new "black") ──────────────
+     Replaces emerald. green-600 = primary so semantic
+     aliases below keep working untouched. */
+  --green-50:  #f3e6e7;   /* burgundy wash (primary-soft) */
+  --green-100: #e8d2d4;
+  --green-200: #d6b1b6;
+  --green-300: #bd8990;
+  --green-400: #9e5560;   /* bright burgundy (dark-mode primary) */
+  --green-500: #7a2230;   /* secondary / accent burgundy */
+  --green-600: #5c1a24;   /* PRIMARY brand — burgundy ink */
+  --green-700: #4a1420;   /* primary-dark / pressed */
+  --green-800: #3a1118;
+  --green-900: #2a1418;
+
+  /* ─── TAN + warm accents (replaces violet/blue) ───────
+     Tan is the rare hero accent; sage/clay for charts. */
+  --tan:        #c9a26b;   /* warm gold — used sparingly */
+  --tan-deep:   #a8854e;
+  --tan-soft:   rgba(201, 162, 107, 0.16);
+  --violet-400: #d8b985;   /* → light tan */
+  --violet-500: #c9a26b;   /* → tan */
+  --violet-600: #a8854e;   /* → deep tan */
+  --blue-400:   #8a9a78;   /* → light sage */
+  --blue-500:   #6b7a5c;   /* → sage */
+  --blue-600:   #566348;   /* → deep sage */
 
   /* ─── SEMANTIC TOKENS ────────────────────────────────
      Use ces variables dans le code, pas les scales */
-  --bg:           var(--neutral-50);     /* canvas */
-  --surface:      #ffffff;                /* élément */
-  --surface-2:    var(--neutral-100);    /* fond subtil */
-  --surface-3:    var(--neutral-200);    /* fond marqué */
+  --bg:           #f4ecd8;   /* cream — canvas */
+  --surface:      #fafaf5;   /* bone — elevated element */
+  --surface-2:    #ece3cc;   /* cream sunk — fond subtil */
+  --surface-3:    #e2d8c2;   /* fond marqué */
 
-  --primary:      var(--green-600);    /* emerald-600 — vivant et moderne */
+  --primary:      var(--green-600);    /* burgundy ink */
   --primary-dark: var(--green-700);
   --primary-soft: var(--green-50);
   --accent:       var(--green-500);
   --accent-dark:  var(--green-600);
-  /* Gradients premium (boutons primary, headers, etc.) */
-  --gradient-primary: linear-gradient(135deg, var(--green-500) 0%, var(--green-600) 100%);
-  --gradient-accent:  linear-gradient(135deg, var(--violet-500) 0%, var(--blue-500) 100%);
+  /* Gradients : flat-by-design (warm depth, never showy).
+     Brand rule: no gradients on UI — these read near-solid. */
+  --gradient-primary: linear-gradient(135deg, #6a1f2a 0%, #5c1a24 100%);
+  --gradient-accent:  linear-gradient(135deg, var(--tan) 0%, var(--tan-deep) 100%);
 
-  --text:         var(--neutral-900);    /* body */
-  --text-2:       var(--neutral-600);    /* secondaire */
-  --text-3:       var(--neutral-500);    /* tertiaire / hints */
-  --text-4:       var(--neutral-400);    /* placeholder */
+  --text:         #2a1418;   /* charcoal — body */
+  --text-2:       #6e6456;   /* secondaire */
+  --text-3:       #8a7f70;   /* ash — tertiaire / hints */
+  --text-4:       #b3a994;   /* placeholder */
 
-  --border:       var(--neutral-200);
-  --border-2:     var(--neutral-300);
+  --border:       #d4cfc0;   /* mist */
+  --border-2:     #c4bca8;
 
-  /* States */
-  --danger:       #dc2626;
-  --danger-soft:  #fef2f2;
-  --warn:         #d97706;
-  --warn-soft:    #fffbeb;
-  --info:         #2563eb;
-  --info-soft:    #eff6ff;
-  --success:      #16a34a;
-  --success-soft: #f0fdf4;
+  /* States — warm, same family as the ink */
+  --danger:       #b83a2e;   /* signal */
+  --danger-soft:  #f6e4e1;
+  --warn:         #b5772e;   /* warm amber */
+  --warn-soft:    #f6ebd9;
+  --info:         #7a6e60;   /* warm slate (no blue) */
+  --info-soft:    #efe9e0;
+  --success:      #6b7a5c;   /* sage */
+  --success-soft: #eaeee4;
 
   /* Legacy state aliases — préservés pour compat */
-  --tea:          #f4c2bb;
+  --tea:          #c98b86;
   --tea-bg:       var(--danger-soft);
   --snack:        #c9966c;
   --snack-bg:     var(--warn-soft);
   --danger-bg:    var(--danger-soft);
 
   /* ─── TYPOGRAPHY ─────────────────────────────────────
-     Modular scale 1.125 (major second) ancrée à 14px */
+     Inter everywhere (display optical size for headlines),
+     JetBrains Mono for numerals/receipts. */
   --font-app:  'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --font-logo: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: 'JetBrains Mono', 'SF Mono', ui-monospace, Menlo, monospace;
@@ -127,21 +141,24 @@
   --r-2xl: 20px;
   --r-pill: 999px;
 
-  /* ─── ELEVATION refined (cooler shadow color) ───────── */
+  /* ─── ELEVATION refined (burgundy-tinted, never gray) ─ */
   --shadow-0: none;
-  --shadow-1: 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 1px rgba(15, 23, 42, 0.03);
-  --shadow-2: 0 2px 4px rgba(15, 23, 42, 0.05), 0 4px 16px rgba(15, 23, 42, 0.06);
-  --shadow-3: 0 4px 8px rgba(15, 23, 42, 0.06), 0 12px 32px rgba(15, 23, 42, 0.08);
-  --shadow-4: 0 8px 16px rgba(15, 23, 42, 0.08), 0 24px 56px rgba(15, 23, 42, 0.12);
-  --shadow-5: 0 16px 32px rgba(15, 23, 42, 0.10), 0 32px 80px rgba(15, 23, 42, 0.18);
-  /* Glow effects pour les états actifs */
-  --glow-primary: 0 0 0 4px rgba(16, 185, 129, 0.18);
-  --glow-danger:  0 0 0 4px rgba(239, 68, 68, 0.18);
-  --glow-violet:  0 0 0 4px rgba(139, 92, 246, 0.18);
+  --shadow-1: 0 1px 2px rgba(92, 26, 36, 0.05), 0 1px 1px rgba(92, 26, 36, 0.04);
+  --shadow-2: 0 2px 4px rgba(92, 26, 36, 0.06), 0 4px 16px rgba(92, 26, 36, 0.07);
+  --shadow-3: 0 4px 8px rgba(92, 26, 36, 0.07), 0 12px 32px rgba(92, 26, 36, 0.09);
+  --shadow-4: 0 8px 16px rgba(92, 26, 36, 0.09), 0 24px 56px rgba(42, 20, 24, 0.14);
+  --shadow-5: 0 16px 32px rgba(42, 20, 24, 0.12), 0 32px 80px rgba(42, 20, 24, 0.20);
+  /* Glow effects pour les états actifs — warm burgundy/tan halo */
+  --glow-primary: 0 0 0 4px rgba(92, 26, 36, 0.16);
+  --glow-danger:  0 0 0 4px rgba(184, 58, 46, 0.18);
+  --glow-violet:  0 0 0 4px rgba(201, 162, 107, 0.22);
+  /* The 2026 premium button halo (marketing CTAs) */
+  --glow-burgundy: 0 6px 20px rgba(92, 26, 36, 0.28), 0 2px 6px rgba(92, 26, 36, 0.18);
+  --glow-tan:      0 6px 22px rgba(201, 162, 107, 0.40), 0 2px 8px rgba(201, 162, 107, 0.28);
 
   /* Focus ring (accessibility AA) */
-  --ring: 0 0 0 3px rgba(25, 83, 52, 0.20);
-  --ring-danger: 0 0 0 3px rgba(220, 38, 38, 0.20);
+  --ring: 0 0 0 3px rgba(92, 26, 36, 0.20);
+  --ring-danger: 0 0 0 3px rgba(184, 58, 46, 0.22);
 
   /* ─── MOTION ─────────────────────────────────────────
      Durées tokenisées par rôle */
@@ -192,59 +209,60 @@
 /* ─── DARK MODE ─────────────────────────────────────────
    Neutrals froids, accent vert plus vif pour conserver brand */
 [data-theme="dark"] {
-  --neutral-50:  #1c1917;
-  --neutral-100: #292524;
-  --neutral-150: #2e2a28;
-  --neutral-200: #44403c;
-  --neutral-300: #57534e;
-  --neutral-400: #78716c;
-  --neutral-500: #a8a29e;
-  --neutral-600: #d6d3d1;
-  --neutral-700: #e7e5e4;
-  --neutral-800: #f5f5f4;
-  --neutral-900: #fafaf9;
+  /* Back-of-house dark mode: deep-wine base, tan punches harder. */
+  --neutral-50:  #1f0d11;
+  --neutral-100: #2a1418;
+  --neutral-150: #321a1f;
+  --neutral-200: #422228;
+  --neutral-300: #573038;
+  --neutral-400: #7a5e62;
+  --neutral-500: #a89a8c;
+  --neutral-600: #cabfae;
+  --neutral-700: #e2d8c6;
+  --neutral-800: #f2ecdd;
+  --neutral-900: #faf6ec;
 
-  --bg:           #0e120f;
-  --surface:      #181c1a;
-  --surface-2:    #1f2522;
-  --surface-3:    #2b3330;
+  --bg:           #1a090d;   /* deep wine canvas */
+  --surface:      #271216;   /* elevated panel */
+  --surface-2:    #321a1f;
+  --surface-3:    #422228;
 
-  --primary:      var(--green-400);
+  --primary:      var(--green-400);   /* brighter burgundy */
   --primary-dark: var(--green-300);
-  --primary-soft: rgba(79, 159, 114, 0.16);
-  --accent:       var(--green-400);
-  --accent-dark:  var(--green-300);
+  --primary-soft: rgba(201, 162, 107, 0.14);
+  --accent:       var(--tan);          /* tan leads in the dark */
+  --accent-dark:  var(--tan-deep);
 
-  --text:         #f0ede4;
-  --text-2:       #b8c0b8;
-  --text-3:       #828a82;
-  --text-4:       #555c55;
+  --text:         #f4ecdd;
+  --text-2:       #cabfae;
+  --text-3:       #a89a8c;
+  --text-4:       #7a5e62;
 
-  --border:       #2e3631;
-  --border-2:     #424b45;
+  --border:       #3a2127;
+  --border-2:     #4e2c33;
 
-  --danger:       #f87171;
-  --danger-soft:  rgba(248, 113, 113, 0.14);
-  --warn:         #fbbf24;
-  --warn-soft:    rgba(251, 191, 36, 0.14);
-  --info:         #60a5fa;
-  --info-soft:    rgba(96, 165, 250, 0.14);
-  --success:      #4ade80;
-  --success-soft: rgba(74, 222, 128, 0.14);
+  --danger:       #e06b5d;
+  --danger-soft:  rgba(224, 107, 93, 0.16);
+  --warn:         #d6a25a;
+  --warn-soft:    rgba(214, 162, 90, 0.16);
+  --info:         #b6a892;
+  --info-soft:    rgba(182, 168, 146, 0.14);
+  --success:      #9bac88;
+  --success-soft: rgba(155, 172, 136, 0.16);
 
-  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --shadow-2: 0 4px 12px rgba(0, 0, 0, 0.5);
-  --shadow-3: 0 8px 24px rgba(0, 0, 0, 0.55);
-  --shadow-4: 0 24px 48px rgba(0, 0, 0, 0.6);
-  --shadow-5: 0 32px 64px rgba(0, 0, 0, 0.7);
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.45);
+  --shadow-2: 0 4px 12px rgba(0, 0, 0, 0.55);
+  --shadow-3: 0 8px 24px rgba(0, 0, 0, 0.6);
+  --shadow-4: 0 24px 48px rgba(0, 0, 0, 0.65);
+  --shadow-5: 0 32px 64px rgba(0, 0, 0, 0.72);
 
-  --ring: 0 0 0 3px rgba(79, 159, 114, 0.30);
-  --ring-danger: 0 0 0 3px rgba(248, 113, 113, 0.30);
+  --ring: 0 0 0 3px rgba(201, 162, 107, 0.32);
+  --ring-danger: 0 0 0 3px rgba(224, 107, 93, 0.30);
 
-  --tea-bg:    rgba(244, 194, 187, 0.10);
-  --green-bg:  rgba(74, 222, 128, 0.14);
-  --orange-bg: rgba(251, 191, 36, 0.14);
-  --blue-bg:   rgba(96, 165, 250, 0.14);
+  --tea-bg:    rgba(201, 139, 134, 0.12);
+  --green-bg:  rgba(155, 172, 136, 0.16);
+  --orange-bg: rgba(214, 162, 90, 0.16);
+  --blue-bg:   rgba(182, 168, 146, 0.14);
 }
 
 /* ── RESET & FOUNDATION ────────────────────────────── */
@@ -487,7 +505,7 @@ input:focus-visible, textarea:focus-visible, select:focus-visible {
 .theme-toggle:hover { background: var(--surface-2); border-color: var(--border-2); color: var(--text); }
 .theme-toggle span { display: inline; }
 .status-row { display: flex; align-items: center; gap: var(--space-2); padding: 0 var(--space-1); }
-.status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); display: inline-block; box-shadow: 0 0 0 3px rgba(22,163,74,.15); }
+.status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); display: inline-block; box-shadow: 0 0 0 3px rgba(92, 26, 36,.15); }
 .status-text { font-size: var(--text-xs); color: var(--text-3); font-weight: 500; }
 .clock { font-size: var(--text-xs); color: var(--text-3); padding: 0 var(--space-1); font-variant-numeric: tabular-nums; font-weight: 500; }
 
@@ -755,7 +773,7 @@ input:focus-visible, textarea:focus-visible, select:focus-visible {
   font-family: inherit;
   transition: .15s var(--ease);
 }
-.login-btn:hover { background: var(--primary-dark); transform: translateY(-1px); box-shadow: 0 8px 18px rgba(39,92,62,.22); }
+.login-btn:hover { background: var(--primary-dark); transform: translateY(-1px); box-shadow: 0 8px 18px rgba(92, 26, 36,.22); }
 .login-error { color: var(--danger); font-size: 12px; margin-top: 10px; min-height: 16px; font-weight: 600; }
 .login-hint  { font-size: 11px; color: var(--text-3); margin-top: 14px; }
 

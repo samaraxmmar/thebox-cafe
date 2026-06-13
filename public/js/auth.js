@@ -223,11 +223,11 @@ const Auth = (() => {
     try {
       var url = localStorage.getItem(LOGO_KEY);
       var img = document.getElementById('login-logo-img');
-      var text = document.getElementById('login-logo-text');
-      if (url && img && text) {
+      var cube = document.getElementById('login-logo-cube');
+      if (url && img) {
         img.src = url;
         img.style.display = 'block';
-        text.style.display = 'none';
+        if (cube) cube.style.display = 'none';
       }
     } catch (_) {}
   }

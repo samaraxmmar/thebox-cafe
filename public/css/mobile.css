@@ -109,8 +109,8 @@
     width: 44px; height: 44px;
     border-radius: 50%;
     border: none;
-    background: #fff;
-    color: #16a34a;
+    background: var(--surface);
+    color: #5c1a24;
     box-shadow: 0 4px 14px rgba(0,0,0,.15), 0 0 0 1px rgba(0,0,0,.04);
     display: flex; align-items: center; justify-content: center;
     cursor: pointer;
@@ -119,7 +119,7 @@
   }
   .mobile-center-btn:active {
     transform: scale(.92);
-    background: #f0fdf4;
+    background: #f3e9d2;
   }
 
   /* ── Vue Liste desktop : 1 col sur mobile ── */

@@ -20,7 +20,7 @@ var Tables = (function() {
   function _loadLocal() {
     try {
       var parsed = JSON.parse(localStorage.getItem(STORAGE_PANIERS) || '{}');
-      // ⚡ MUTATE l'objet existant — JAMAIS réassigner !
+      // MUTATE l'objet existant — JAMAIS réassigner !
       // Sinon l'export Tables._paniers devient stale (référence à l'ancien objet)
       Object.keys(_paniers).forEach(function(k) { delete _paniers[k]; });
       Object.keys(parsed).forEach(function(k) { _paniers[k] = parsed[k]; });
@@ -43,12 +43,12 @@ var Tables = (function() {
     if (canAdmin) {
       html += '<button class="btn-floor-add" onclick="Tables.openAddModal()"><span style="font-size:14px;font-weight:700">+</span> Ajouter une nouvelle table</button>';
       if (_editing) {
-        html += '<button class="btn-floor-wall" onclick="Tables.addWall()">🧱 Mur</button>';
+        html += '<button class="btn-floor-wall" onclick="Tables.addWall()">Mur</button>';
         var dirtyCount = Object.keys(_dirty).length;
         html += '<button class="btn-floor-save" onclick="Tables.exitEditMode()"><span style="font-size:13px">💾</span> Sauvegarder' + (dirtyCount ? ' (' + dirtyCount + ')' : '') + '</button>';
         html += '<button class="btn btn-ghost btn-sm" onclick="Tables.cancelEditMode()" title="Annuler">✕</button>';
       } else {
-        html += '<button class="btn btn-secondary btn-sm" onclick="Tables.enterEditMode()">✏ Éditer le plan</button>';
+        html += '<button class="btn btn-secondary btn-sm" onclick="Tables.enterEditMode()">Éditer le plan</button>';
       }
     }
     html += '<button class="btn btn-ghost btn-sm" title="Rafraîchir" onclick="Tables.render()">↺</button>';
@@ -156,7 +156,7 @@ var Tables = (function() {
     if (!el) return;
     el.classList.toggle('edit-mode', _editing);
 
-    // ⚡ Safety net : détecte tables hors zone OU stackées, force grille propre
+    // Safety net : détecte tables hors zone OU stackées, force grille propre
     //    DÉSACTIVÉ en mode édition (sinon le drag est inutilisable)
     _tablesFallbackPos = {};
     if (!_editing) {
@@ -269,7 +269,7 @@ var Tables = (function() {
       }).join('');
     }
 
-    var footer = _editing ? '<div id="floor-info" class="floor-info-bar">✏ Glisse les tables OU clique puis utilise les <strong>flèches clavier ←↑↓→</strong> · Shift = pas plus grand</div>' : '';
+    var footer = _editing ? '<div id="floor-info" class="floor-info-bar">Glisse les tables OU clique puis utilise les <strong>flèches clavier ←↑↓→</strong> · Shift = pas plus grand</div>' : '';
     el.innerHTML = cardsHtml + footer;
 
     el.querySelectorAll('.table-card[data-shape="round"]').forEach(_setRoundChairRadius);
@@ -277,7 +277,7 @@ var Tables = (function() {
 
     if (_editing) _wireDrag(el);
     
-    // 🎯 PLUS DE TRANSFORM SCALE
+    // PLUS DE TRANSFORM SCALE
     _scaleFloor();
   }
 
@@ -328,7 +328,7 @@ var Tables = (function() {
     panel.classList.add('open');
     if (layout) layout.classList.add('with-details');
 
-    var primaryAction = sess ? '<button class="btn btn-primary btn-block" onclick="Tables.actionSelected()">📋 Reprendre la commande →</button>' : '<button class="btn btn-primary btn-block" onclick="Tables.actionSelected()">▶ Ouvrir & commander</button>';
+    var primaryAction = sess ? '<button class="btn btn-primary btn-block" onclick="Tables.actionSelected()">Reprendre la commande →</button>' : '<button class="btn btn-primary btn-block" onclick="Tables.actionSelected()">▶ Ouvrir & commander</button>';
 
     panel.innerHTML = ''
       + '<div class="details-head"><button class="details-close" onclick="Tables.cancelSelection()" title="Fermer">✕</button><div class="details-status details-status-' + status + '">' + statusLabel + '</div><h2 class="details-title">' + (t.nom || ('Table ' + t.id)) + '</h2><div class="details-subtitle">' + (t.zone || 'Salle') + '</div></div>'
@@ -351,14 +351,14 @@ var Tables = (function() {
 
     var actions = '<div class="details-actions">';
     if (canManage) actions += primaryAction;
-    if (canManage && !sess && !resa) actions += '<button class="btn btn-secondary btn-block" onclick="Tables.openReservationModal(' + t.id + ')">📅 Réserver la table</button>';
-    if (canManage && resa && !sess) actions += '<button class="btn btn-danger btn-block" onclick="Tables.cancelReservation(' + t.id + ')">✕ Annuler la réservation</button>';
+    if (canManage && !sess && !resa) actions += '<button class="btn btn-secondary btn-block" onclick="Tables.openReservationModal(' + t.id + ')">Réserver la table</button>';
+    if (canManage && resa && !sess) actions += '<button class="btn btn-danger btn-block" onclick="Tables.cancelReservation(' + t.id + ')">Annuler la réservation</button>';
     if (sess) {
       if (canAdmin) actions += '<button class="btn btn-secondary btn-block" onclick="Tables.promptTransfer(' + t.id + ')">⇄ Transférer la table</button>';
-      if (canAdmin) actions += '<button class="btn btn-secondary btn-block" onclick="Tables.printBill(' + t.id + ')">🖨 Imprimer l\'addition</button>';
-      if (canAdmin) actions += '<button class="btn btn-danger btn-block" onclick="Tables.closeFromPanel(' + t.id + ')">✕ Fermer la table</button>';
+      if (canAdmin) actions += '<button class="btn btn-secondary btn-block" onclick="Tables.printBill(' + t.id + ')">Imprimer l\'addition</button>';
+      if (canAdmin) actions += '<button class="btn btn-danger btn-block" onclick="Tables.closeFromPanel(' + t.id + ')">Fermer la table</button>';
     }
-    if (canAdmin) actions += '<button class="btn btn-ghost btn-block" onclick="Tables.openEditModal(' + t.id + ')">✎ Modifier la table</button>';
+    if (canAdmin) actions += '<button class="btn btn-ghost btn-block" onclick="Tables.openEditModal(' + t.id + ')">Modifier la table</button>';
     actions += '</div></div>';
     panel.innerHTML += actions;
   }
@@ -387,7 +387,7 @@ var Tables = (function() {
     if (!payload.date_time) { Toast.warn('Date et heure requises'); return; }
     var btn = document.querySelector('#modal-reserve-table .btn-primary'); if (btn) { btn.disabled = true; btn.textContent = 'Enregistrement…'; }
     var r = await API.reserveTable(_reservingId, payload);
-    if (btn) { btn.disabled = false; btn.textContent = '📅 Réserver'; }
+    if (btn) { btn.disabled = false; btn.textContent = 'Réserver'; }
     if (r && r.success) { Toast.success('Réservation enregistrée'); Modal.close('modal-reserve-table'); _reservingId = null; await render(); } else Toast.error((r && r.error) || 'Erreur');
   }
   async function cancelReservation(id) { if (!confirm('Annuler la réservation ?')) return; var r = await API.cancelReservation(id); if (r && r.success) { Toast.success('Réservation annulée'); await render(); } else Toast.error((r && r.error) || 'Erreur'); }
@@ -598,7 +598,7 @@ var Tables = (function() {
     if (Array.isArray(data) && data.length) {
       _tables = data;
 
-      // ⚡ MUTATE _sessions au lieu de réassigner (préserver export ref)
+      // MUTATE _sessions au lieu de réassigner (préserver export ref)
       Object.keys(_sessions).forEach(function(k) { delete _sessions[k]; });
 
       // Populer _sessions à partir des sessions_table renvoyées par l'API
@@ -690,7 +690,7 @@ var Tables = (function() {
       var st = _statusOf(t);
       var sess = _sessions[t.id];
       var stLbl = st === 'occupee' ? 'OCCUPÉE' : st === 'reservee' ? 'RÉSERVÉE' : st === 'cleaning' ? 'MÉNAGE' : 'LIBRE';
-      var actionLbl = sess ? '📋 Reprendre la commande →' : '+ Ouvrir & commander';
+      var actionLbl = sess ? 'Reprendre la commande →' : '+ Ouvrir & commander';
       var info = '';
       if (sess) {
         var total = getTableTotal(t.id);
@@ -822,7 +822,7 @@ var Tables = (function() {
       var content2 = document.querySelector('#page-tables .page-content');
       if (content2) {
         content2.innerHTML = '<div style="padding:20px;color:#dc2626;font-size:13px;font-family:monospace;white-space:pre-wrap">' +
-          '⚠ Erreur mobile fallback :\n' + (err.message || err) + '</div>';
+          'Erreur mobile fallback :\n' + (err.message || err) + '</div>';
       }
     }
   }
@@ -886,7 +886,7 @@ var Tables = (function() {
       var st = _statusOf(t);
       var sess = _sessions[t.id];
       var stLbl = st === 'occupee' ? 'OCCUPÉE' : st === 'reservee' ? 'RÉSERVÉE' : st === 'cleaning' ? 'MÉNAGE' : 'LIBRE';
-      var actionLbl = sess ? '📋 Reprendre la commande →' : '+ Ouvrir & commander';
+      var actionLbl = sess ? 'Reprendre la commande →' : '+ Ouvrir & commander';
       var meta = (t.zone || 'Salle') + ' · ' + (t.capacite || 4) + ' places';
       var info = '';
       if (sess) {
@@ -926,7 +926,7 @@ var Tables = (function() {
       var st = _statusOf(t);
       var sess = _sessions[t.id];
       var stLbl = st === 'occupee' ? 'OCCUPÉE' : st === 'reservee' ? 'RÉSERVÉE' : st === 'cleaning' ? 'MÉNAGE' : 'LIBRE';
-      var actionLbl = sess ? '📋 Reprendre la commande →' : '+ Ouvrir & commander';
+      var actionLbl = sess ? 'Reprendre la commande →' : '+ Ouvrir & commander';
       var meta = (t.zone || 'Salle') + ' · ' + (t.capacite || 4) + ' places';
       var info = '';
       if (sess) {
@@ -1103,7 +1103,7 @@ var Tables = (function() {
       positions[key] = true;
     });
     if (realTables.length && (problematic / realTables.length) > 0.3) {
-      Toast.warn(problematic + ' tables empilées/hors zone — clique "✨ Auto-organiser" pour les replacer en grille');
+      Toast.warn(problematic + ' tables empilées/hors zone — clique "Auto-organiser" pour les replacer en grille');
     } else {
       Toast.success('Mode édition activé');
     }
@@ -1278,7 +1278,7 @@ var Tables = (function() {
       _dirty[w.id] = Object.assign(_dirty[w.id] || {}, { x: -999, y: -999 });
     });
 
-    // ⚡ Sauvegarde IMMÉDIATE (pas besoin de cliquer "Sauvegarder")
+    // Sauvegarde IMMÉDIATE (pas besoin de cliquer "Sauvegarder")
     Toast.success('Réorganisation… sauvegarde en cours');
     var updates = Object.keys(_dirty).map(function(id) {
       var d = _dirty[id];

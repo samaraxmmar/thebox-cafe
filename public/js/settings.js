@@ -112,7 +112,7 @@ var Settings = (function() {
         _input('Numéro destinataire (avec indicatif)', 'set-wa-num',   w.number,   '21612345678') +
         _checkbox('Alertes stock critique', 'set-wa-stock', !!w.alertes_stock) +
         _checkbox('Rapport quotidien à 22h', 'set-wa-rap',  !!w.rapport_quotidien) +
-        '<div style="margin-top:12px"><button class="btn btn-ghost btn-sm" onclick="Settings.testWA()">📲 Envoyer un message test</button></div>');
+        '<div style="margin-top:12px"><button class="btn btn-ghost btn-sm" onclick="Settings.testWA()">Envoyer un message test</button></div>');
       return;
     }
 
@@ -139,7 +139,7 @@ var Settings = (function() {
       var current = (typeof Theme !== 'undefined' && Theme.current) ? Theme.current() : 'light';
       el.innerHTML = _section('Apparence', 'Thème de l\'interface',
         '<div style="display:flex;gap:10px">' +
-          '<button class="btn ' + (current === 'light' ? 'btn-primary' : 'btn-secondary') + '" onclick="Theme.toggle()">' + (current === 'light' ? '☀ Mode clair' : '🌙 Mode sombre') + '</button>' +
+          '<button class="btn ' + (current === 'light' ? 'btn-primary' : 'btn-secondary') + '" onclick="Theme.toggle()">' + (current === 'light' ? 'Mode clair' : 'Mode sombre') + '</button>' +
           '<button class="btn btn-ghost" onclick="Theme.toggle()">Basculer</button>' +
         '</div>' +
         '<div class="settings-hint" style="margin-top:14px">Le thème est mémorisé dans le navigateur (localStorage) et appliqué à tous les modules.</div>');
@@ -259,7 +259,7 @@ var Settings = (function() {
   function backup() { window.open(API.backupUrl(), '_blank'); }
 
   async function testWA() {
-    var r = await API.testWA('🧪 Test depuis Paramètres');
+    var r = await API.testWA('Test depuis Paramètres');
     if (r && r.sent) Toast.success('Message envoyé'); else Toast.warn('WhatsApp non connecté');
   }
 

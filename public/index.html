@@ -7,24 +7,23 @@
 
 <!-- ── PWA : manifest + couleurs + icônes ────────────────── -->
 <link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#16a34a">
+<meta name="theme-color" content="#5C1A24">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="The Box">
+<meta name="apple-mobile-web-app-title" content="thebox">
 <meta name="mobile-web-app-capable" content="yes">
-<link rel="apple-touch-icon" href="/icons/icon.svg">
-<link rel="icon" type="image/svg+xml" href="/icons/icon.svg">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<!-- Google Fonts : Poppins (app) + Inter (logo) -->
+<link rel="apple-touch-icon" href="/brand/logo-cube.svg">
+<link rel="icon" type="image/svg+xml" href="/brand/logo-cube.svg">
+<!-- thebox type system : Inter (display+UI optical sizing) + JetBrains Mono (numerals/receipts) -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Inter:wght@700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 
-<link rel="stylesheet" href="/css/base.css?v=20260609c">
-<link rel="stylesheet" href="/css/components.css?v=20260609c">
-<link rel="stylesheet" href="/css/pages.css?v=20260609c">
-<link rel="stylesheet" href="/css/mobile.css?v=20260609c">
+<link rel="stylesheet" href="/css/base.css?v=20260610tb">
+<link rel="stylesheet" href="/css/components.css?v=20260610tb">
+<link rel="stylesheet" href="/css/pages.css?v=20260610tb">
+<link rel="stylesheet" href="/css/mobile.css?v=20260610tb">
+<link rel="stylesheet" href="/css/brand.css?v=20260610tb">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js" defer></script>
 </head>
@@ -37,25 +36,22 @@
       <div class="login-logo-wrap" id="login-logo-wrap">
         <!-- Logo custom (s'affiche si chargé) -->
         <img id="login-logo-img" src="" alt="" style="display:none">
-        <!-- Logo par défaut THE BOX texte empilé -->
-        <div class="login-logo-text" id="login-logo-text">
-          <span>THE</span>
-          <span>BOX</span>
-          <span>CAFÉ</span>
-        </div>
+        <!-- thebox cube mark -->
+        <img class="login-logo-cube" src="/brand/logo-cube.svg" alt="thebox" id="login-logo-cube">
       </div>
-      <div class="login-desc">Système de caisse & gestion</div>
+      <div class="tb-wordmark" style="font-size:30px;margin-bottom:4px">thebox</div>
+      <div class="login-desc">Point of sale</div>
       <!-- Upload logo (visible au hover) -->
       <label class="login-logo-upload" title="Changer le logo">
         <input type="file" accept="image/*" id="login-logo-input" style="display:none" onchange="Auth.uploadLogo(event)">
-        <span>✎ Logo</span>
+        <span>Logo</span>
       </label>
     </div>
     <div class="role-grid" style="grid-template-columns:repeat(2,1fr);gap:8px">
-      <button class="role-btn" id="role-admin"    onclick="Auth.selectRole('admin')"><span class="role-icon">👑</span><div class="role-label">Admin</div><div class="role-desc">Accès complet</div></button>
-      <button class="role-btn" id="role-manager"  onclick="Auth.selectRole('manager')"><span class="role-icon">🛠</span><div class="role-label">Manager</div><div class="role-desc">Gestion</div></button>
-      <button class="role-btn" id="role-caissier" onclick="Auth.selectRole('caissier')"><span class="role-icon">💳</span><div class="role-label">Caissier</div><div class="role-desc">Caisse + tables</div></button>
-      <button class="role-btn" id="role-serveur"  onclick="Auth.selectRole('serveur')"><span class="role-icon">☕</span><div class="role-label">Serveur</div><div class="role-desc">Caisse + tables</div></button>
+      <button class="role-btn" id="role-admin"    onclick="Auth.selectRole('admin')"><span class="role-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7l4 5 5-7 5 7 4-5v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z"/></svg></span><div class="role-label">Admin</div><div class="role-desc">Accès complet</div></button>
+      <button class="role-btn" id="role-manager"  onclick="Auth.selectRole('manager')"><span class="role-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4l-6 6a1.4 1.4 0 0 0 2 2l6-6a4 4 0 0 0 5.4-5.4l-2.3 2.3-2-2z"/></svg></span><div class="role-label">Manager</div><div class="role-desc">Gestion</div></button>
+      <button class="role-btn" id="role-caissier" onclick="Auth.selectRole('caissier')"><span class="role-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg></span><div class="role-label">Caissier</div><div class="role-desc">Caisse + tables</div></button>
+      <button class="role-btn" id="role-serveur"  onclick="Auth.selectRole('serveur')"><span class="role-icon"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a3 3 0 0 1 0 6h-1M4 8h14v3a6 6 0 0 1-12 0z"/><path d="M6 1v2M10 1v2M14 1v2"/></svg></span><div class="role-label">Serveur</div><div class="role-desc">Caisse + tables</div></button>
     </div>
     <label class="pin-label">Identifiant</label>
     <input class="form-input" type="text" id="login-username" placeholder="admin, manager, caisse, serveur..." autocomplete="username" style="margin-bottom:10px">
@@ -69,8 +65,8 @@
 </div>
 
 <!-- ══ OFFLINE BANNER ════════════════════════════════ -->
-<div id="offline-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:#dc2626;color:#fff;text-align:center;padding:8px 16px;font-size:13px;font-weight:600">
-  ⚠️ Connexion perdue — mode hors ligne
+<div id="offline-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:#B83A2E;color:#FAFAF5;text-align:center;padding:8px 16px;font-size:13px;font-weight:600">
+  Connexion perdue — mode hors ligne
 </div>
 
 <!-- ══ TOAST ══════════════════════════════════════════ -->
@@ -83,13 +79,10 @@
   <aside class="sidebar">
     <div class="sidebar-logo">
       <div class="logo-mark">
-        <svg class="logo-leaf" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">
-          <circle cx="12" cy="12" r="10" fill="#275c3e"/>
-        </svg>
+        <img class="logo-cube-img" src="/brand/logo-cube.svg" alt="" aria-hidden="true">
         <div class="logo-text">
-          <span>THE</span>
-          <span>BOX</span>
-          <span>CAFÉ</span>
+          <span>thebox</span>
+          <span>café</span>
         </div>
       </div>
     </div>
@@ -175,10 +168,10 @@
         </div>
         <div class="topbar-right">
           <span class="topbar-stat">Total : <strong id="cmd-count">0 Orders</strong></span>
-          <button class="topbar-btn" onclick="window.print()">📄 Report</button>
-          <div class="topbar-bell" title="Notifications">🔔</div>
+          <button class="topbar-btn" onclick="window.print()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/></svg> Report</button>
+          <div class="topbar-bell" title="Notifications"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></div>
           <div class="topbar-user">
-            <div class="topbar-user-avatar" id="topbar-user-avatar">👤</div>
+            <div class="topbar-user-avatar" id="topbar-user-avatar"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></div>
             <div class="topbar-user-info">
               <div class="topbar-user-name" id="topbar-user-name">User</div>
               <div class="topbar-user-role" id="topbar-user-role">Caissier</div>
@@ -205,7 +198,7 @@
           </div>
           <div class="order-items" id="order-items">
             <div class="order-empty">
-              <div class="order-empty-icon">📋</div>
+              <div class="order-empty-icon"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg></div>
               <div>Sélectionnez une table</div>
             </div>
           </div>
@@ -216,7 +209,7 @@
               <span class="order-total-val" id="order-total">0.000 DT</span>
             </div>
             <button class="validate-btn" id="validate-btn" onclick="Caisse.valider()" disabled>
-              💳 Valider & encaisser
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px;margin-right:6px"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>Valider &amp; encaisser
             </button>
             <button class="clear-btn" onclick="Caisse.clear()">Vider le panier</button>
           </div>
@@ -326,7 +319,7 @@
             <label class="form-label">Rotation (degrés)</label>
             <input class="form-input" type="number" id="te-rotation" min="0" max="359" step="15" value="0">
           </div>
-          <div class="te-size-hint">💡 Astuce : tu peux aussi redimensionner directement en mode "Éditer le plan" en glissant le coin des tables.</div>
+          <div class="te-size-hint">Astuce : tu peux aussi redimensionner directement en mode "Éditer le plan" en glissant le coin des tables.</div>
         </div>
 
         <div class="modal-actions">
@@ -340,7 +333,7 @@
     <div class="modal-overlay" id="modal-reserve-table">
       <div class="modal cover-modal" style="max-width:480px">
         <div class="cover-modal-header">
-          <div class="cover-modal-icon" style="background:linear-gradient(135deg, #dbeafe, rgba(59,130,246,.10));">📅</div>
+          <div class="cover-modal-icon" style="background:linear-gradient(135deg, #f3e6e7, rgba(92,26,36,.06));"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
           <div>
             <h2 class="modal-title" style="margin:0">Réserver <span id="rm-table-name">la table</span></h2>
             <div class="cover-modal-sub">Saisis les informations de la réservation</div>
@@ -374,7 +367,7 @@
 
         <div class="modal-actions">
           <button class="btn btn-secondary" onclick="Tables.cancelReservationModal()">Annuler</button>
-          <button class="btn btn-primary" onclick="Tables.confirmReservation()">📅 Réserver</button>
+          <button class="btn btn-primary" onclick="Tables.confirmReservation()">Réserver</button>
         </div>
       </div>
     </div>
@@ -383,7 +376,7 @@
     <div class="modal-overlay" id="modal-open-table">
       <div class="modal modal-sm cover-modal">
         <div class="cover-modal-header">
-          <div class="cover-modal-icon">👥</div>
+          <div class="cover-modal-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
           <div>
             <h2 class="modal-title" style="margin:0">Ouvrir <span id="cm-table-name">la table</span></h2>
             <div class="cover-modal-sub">Combien de personnes seront à cette table&nbsp;?</div>
@@ -435,7 +428,7 @@
         <div class="dash-kpi-strip">
           <div class="kpi-pro" data-kpi="revenue">
             <div class="kpi-pro-head">
-              <span class="kpi-pro-icon">💰</span>
+              <span class="kpi-pro-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>
               <span class="kpi-pro-lbl">Chiffre d'affaires</span>
             </div>
             <div class="kpi-pro-val" id="dk-revenue">—</div>
@@ -443,7 +436,7 @@
           </div>
           <div class="kpi-pro" data-kpi="orders">
             <div class="kpi-pro-head">
-              <span class="kpi-pro-icon">🧾</span>
+              <span class="kpi-pro-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3v18l2-1 2 1 2-1 2 1 2-1 2 1V3l-2 1-2-1-2 1-2-1-2 1z"/><path d="M9 8h6M9 12h6"/></svg></span>
               <span class="kpi-pro-lbl">Commandes</span>
             </div>
             <div class="kpi-pro-val" id="dk-orders">—</div>
@@ -451,7 +444,7 @@
           </div>
           <div class="kpi-pro" data-kpi="avg">
             <div class="kpi-pro-head">
-              <span class="kpi-pro-icon">📊</span>
+              <span class="kpi-pro-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3v18h18"/><path d="M7 15l4-4 3 3 5-6"/></svg></span>
               <span class="kpi-pro-lbl">Ticket moyen</span>
             </div>
             <div class="kpi-pro-val" id="dk-avg">—</div>
@@ -459,7 +452,7 @@
           </div>
           <div class="kpi-pro" data-kpi="customers">
             <div class="kpi-pro-head">
-              <span class="kpi-pro-icon">👥</span>
+              <span class="kpi-pro-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
               <span class="kpi-pro-lbl">Clients servis</span>
             </div>
             <div class="kpi-pro-val" id="dk-customers">—</div>
@@ -467,7 +460,7 @@
           </div>
           <div class="kpi-pro" data-kpi="occupation">
             <div class="kpi-pro-head">
-              <span class="kpi-pro-icon">🪑</span>
+              <span class="kpi-pro-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V11l3-1V6a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v4l3 1v10"/><path d="M5 14h14"/></svg></span>
               <span class="kpi-pro-lbl">Taux d'occupation</span>
             </div>
             <div class="kpi-pro-val" id="dk-occupation">—</div>
@@ -476,7 +469,7 @@
           </div>
           <div class="kpi-pro" data-kpi="stock">
             <div class="kpi-pro-head">
-              <span class="kpi-pro-icon">📦</span>
+              <span class="kpi-pro-icon"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.27 6.96 12 12l8.73-5.04M12 22V12"/></svg></span>
               <span class="kpi-pro-lbl">Santé du stock</span>
             </div>
             <div class="kpi-pro-val" id="dk-stock">—</div>
@@ -680,7 +673,7 @@
       </div>
       <div class="page-content">
         <div style="margin-bottom:16px;display:flex;gap:10px;align-items:center;flex-wrap:wrap">
-          <input class="form-input" id="produits-search" placeholder="🔍 Rechercher un produit..." style="max-width:320px;flex:1">
+          <input class="form-input" id="produits-search" placeholder="Rechercher un produit..." style="max-width:320px;flex:1">
           <div id="produits-cat-filter" style="display:flex;gap:6px;flex-wrap:wrap"></div>
         </div>
         <div id="produits-sections"></div>
@@ -704,7 +697,7 @@
         <div class="card">
           <div class="card-header">
             <div><div class="card-title">Matrice de permissions</div><div class="card-sub">L'administrateur a toujours toutes les permissions</div></div>
-            <button class="btn btn-ghost btn-sm" onclick="Users.resetPerms()">↺ Réinitialiser</button>
+            <button class="btn btn-ghost btn-sm" onclick="Users.resetPerms()">Réinitialiser</button>
           </div>
           <div class="table-wrap"><table id="perms-table"></table></div>
         </div>
@@ -716,23 +709,23 @@
       <div class="topbar">
         <div class="topbar-left"><div><div class="page-title">Paramètres</div><div class="page-subtitle">Configuration du système</div></div></div>
         <div class="topbar-right">
-          <button class="btn btn-secondary btn-sm" onclick="Settings.backup()">⬇ Sauvegarde</button>
-          <button class="btn btn-primary btn-sm" onclick="Settings.save()">💾 Enregistrer</button>
+          <button class="btn btn-secondary btn-sm" onclick="Settings.backup()">Sauvegarde</button>
+          <button class="btn btn-primary btn-sm" onclick="Settings.save()">Enregistrer</button>
         </div>
       </div>
       <div class="page-content">
         <div class="settings-layout">
           <aside class="settings-tabs" id="settings-tabs">
-            <button class="settings-tab active" data-tab="cafe">☕ Café</button>
-            <button class="settings-tab" data-tab="pos">💳 POS</button>
-            <button class="settings-tab" data-tab="taxes">📊 Taxes & devise</button>
-            <button class="settings-tab" data-tab="printer">🖨 Imprimante</button>
-            <button class="settings-tab" data-tab="whatsapp">💬 WhatsApp</button>
-            <button class="settings-tab" data-tab="supabase">🗄 Supabase</button>
-            <button class="settings-tab" data-tab="security">🔐 Sécurité</button>
-            <button class="settings-tab" data-tab="theme">🎨 Thème & langue</button>
-            <button class="settings-tab" data-tab="backup">💾 Sauvegarde</button>
-            <button class="settings-tab" data-tab="logs">📜 Logs</button>
+            <button class="settings-tab active" data-tab="cafe">Café</button>
+            <button class="settings-tab" data-tab="pos">POS</button>
+            <button class="settings-tab" data-tab="taxes">Taxes & devise</button>
+            <button class="settings-tab" data-tab="printer">Imprimante</button>
+            <button class="settings-tab" data-tab="whatsapp">WhatsApp</button>
+            <button class="settings-tab" data-tab="supabase">Supabase</button>
+            <button class="settings-tab" data-tab="security">Sécurité</button>
+            <button class="settings-tab" data-tab="theme">Thème & langue</button>
+            <button class="settings-tab" data-tab="backup">Sauvegarde</button>
+            <button class="settings-tab" data-tab="logs">Logs</button>
           </aside>
           <div class="settings-panel" id="settings-panel"></div>
         </div>
@@ -767,12 +760,12 @@
       <label class="form-label">Photo du produit (optionnel)</label>
       <div class="img-upload-row">
         <div class="img-upload-preview" id="np-image-preview">
-          <span class="img-upload-placeholder">📷 Aucune photo</span>
+          <span class="img-upload-placeholder">Aucune photo</span>
         </div>
         <div class="img-upload-actions">
           <input type="file" id="np-image-file" accept="image/*" style="display:none" onchange="Admin.handleImageFile(event)">
-          <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('np-image-file').click()">📁 Choisir une photo</button>
-          <button type="button" class="btn btn-ghost btn-sm" onclick="Admin.removeImage()" id="np-image-remove" style="display:none">✕ Retirer</button>
+          <button type="button" class="btn btn-secondary btn-sm" onclick="document.getElementById('np-image-file').click()">Choisir une photo</button>
+          <button type="button" class="btn btn-ghost btn-sm" onclick="Admin.removeImage()" id="np-image-remove" style="display:none">Retirer</button>
         </div>
       </div>
       <input type="hidden" id="np-image" value="">
@@ -782,7 +775,7 @@
       <input type="checkbox" id="np-actif" checked style="width:18px;height:18px;cursor:pointer">
       <label for="np-actif" style="font-weight:600;cursor:pointer;margin:0">Produit actif (visible à la caisse)</label>
     </div>
-    <div class="settings-hint">💡 Stock initial à <strong>0</strong> = produit <strong>non suivi</strong> (idéal pour les cafés/boissons faits sur place).<br>Stock initial &gt; 0 = produit suivi, 1 unité décrémentée à chaque vente.</div>
+    <div class="settings-hint">Stock initial à <strong>0</strong> = produit <strong>non suivi</strong> (idéal pour les cafés/boissons faits sur place).<br>Stock initial &gt; 0 = produit suivi, 1 unité décrémentée à chaque vente.</div>
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="Modal.close('modal-product')">Annuler</button>
       <button class="btn btn-primary" onclick="Admin.saveProduct()">Enregistrer</button>
@@ -793,15 +786,15 @@
 <!-- Modal: Gérer les catégories (rename / delete / list) -->
 <div class="modal-overlay" id="modal-categories">
   <div class="modal" style="max-width:620px">
-    <h2 class="modal-title">📂 Gérer les catégories</h2>
+    <h2 class="modal-title">Gérer les catégories</h2>
     <div class="form-group">
-      <input class="form-input" id="cat-search" placeholder="🔍 Rechercher une catégorie…" oninput="Admin.filterCategoriesList(this.value)">
+      <input class="form-input" id="cat-search" placeholder="Rechercher une catégorie…" oninput="Admin.filterCategoriesList(this.value)">
     </div>
     <div id="cat-list" style="display:flex;flex-direction:column;gap:6px;max-height:420px;overflow:auto;padding:4px 2px"></div>
     <div class="settings-hint" style="margin-top:14px">
-      💡 <strong>Famille</strong> = grand groupe (Boisson Chaude, Boisson Froide, Cake…).<br>
-      💡 <strong>Catégorie</strong> = sous-groupe (COFFEE, SMOOTHIES, CREPE…). Le sélecteur à droite de chaque catégorie permet de l'affecter à une famille.<br>
-      💡 <strong>Renommer</strong> applique à TOUS les produits. <strong>Supprimer</strong> déplace vers "Divers" par défaut.
+      <strong>Famille</strong> = grand groupe (Boisson Chaude, Boisson Froide, Cake…).<br>
+      <strong>Catégorie</strong> = sous-groupe (COFFEE, SMOOTHIES, CREPE…). Le sélecteur à droite de chaque catégorie permet de l'affecter à une famille.<br>
+      <strong>Renommer</strong> applique à TOUS les produits. <strong>Supprimer</strong> déplace vers "Divers" par défaut.
     </div>
     <div class="modal-actions">
       <button class="btn btn-ghost" onclick="Admin.promptCreateFamily()">+ Nouvelle famille</button>
@@ -814,7 +807,7 @@
 <!-- Modal: Nouvelle catégorie avec produits en lot -->
 <div class="modal-overlay" id="modal-category">
   <div class="modal" style="max-width:680px">
-    <h2 class="modal-title">📂 Nouvelle catégorie</h2>
+    <h2 class="modal-title">Nouvelle catégorie</h2>
     <div class="form-group">
       <label class="form-label">Nom de la catégorie</label>
       <input class="form-input" id="nc-nom" placeholder="Ex: COCKTAILS, GLACES, SANDWICHS…" maxlength="40">
@@ -825,7 +818,7 @@
     <div style="margin-top:10px">
       <button type="button" class="btn btn-secondary btn-sm" onclick="Admin.addCategoryRow()">+ Ajouter une ligne</button>
     </div>
-    <div class="settings-hint" style="margin-top:12px">💡 Renseigne au moins un produit. Les lignes vides seront ignorées. Tous les produits seront créés comme actifs.</div>
+    <div class="settings-hint" style="margin-top:12px">Renseigne au moins un produit. Les lignes vides seront ignorées. Tous les produits seront créés comme actifs.</div>
     <div class="modal-actions">
       <button class="btn btn-secondary" onclick="Modal.close('modal-category')">Annuler</button>
       <button class="btn btn-primary" onclick="Admin.saveCategory()">Créer la catégorie + produits</button>
@@ -856,7 +849,7 @@
 <div class="modal-overlay" id="modal-receipt">
   <div class="receipt-modal">
     <div class="receipt-header">
-      <div class="receipt-logo">The Box ☕</div>
+      <div class="receipt-logo">thebox</div>
       <div class="receipt-cafe">Café & Gestion</div>
       <div class="receipt-date" id="receipt-date"></div>
     </div>
@@ -865,7 +858,7 @@
     <div class="receipt-footer">Merci pour votre visite !<br>The Box Café</div>
     <div class="receipt-btns">
       <button class="btn btn-secondary" onclick="Modal.close('modal-receipt')">Fermer</button>
-      <button class="btn btn-primary" onclick="Modal.close('modal-receipt')">OK ✓</button>
+      <button class="btn btn-primary" onclick="Modal.close('modal-receipt')">OK</button>
     </div>
   </div>
 </div>
@@ -961,9 +954,9 @@
     if (!hasMobileShell && text.length < 5) {
       content.innerHTML =
         '<div style="padding:24px;background:#fef3c7;border:1px solid #fbbf24;border-radius:12px;margin:16px;color:#92400e;font-size:13px;line-height:1.5">' +
-          '<strong style="font-size:14px">⚠ Rendu mobile manqué</strong><br><br>' +
+          '<strong style="font-size:14px">Rendu mobile manqué</strong><br><br>' +
           'La page tables n\'a pas pu se rendre. Cliquez le bouton ci-dessous pour recharger forcément :<br><br>' +
-          '<button onclick="location.reload(true)" style="width:100%;padding:14px;background:#16a34a;color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:700">🔄 Recharger</button><br><br>' +
+          '<button onclick="location.reload(true)" style="width:100%;padding:14px;background:#5C1A24;color:#FAFAF5;border:none;border-radius:10px;font-size:14px;font-weight:700">Recharger</button><br><br>' +
           '<small>Si le problème persiste, désinstalle l\'app du home screen puis réinstalle.</small>' +
         '</div>';
     }

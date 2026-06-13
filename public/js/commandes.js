@@ -36,7 +36,7 @@ const Commandes = {
       btn.id = 'commandes-delete-btn';
       btn.className = 'btn btn-danger btn-sm';
       btn.style.cssText = 'display:none;margin-left:8px';
-      btn.innerHTML = '🗑 Supprimer cette journée';
+      btn.innerHTML = 'Supprimer cette journée';
       btn.onclick = () => this.openDeleteByDate();
       wrap.appendChild(btn);
     }
@@ -88,8 +88,8 @@ const Commandes = {
    *  (même index dans la palette → même couleur partout) */
   _serveurBadge(name) {
     const palette = (typeof THEBOX_PALETTE !== 'undefined') ? THEBOX_PALETTE : [
-      ['#34d399', '#059669'], ['#22d3ee', '#0891b2'], ['#818cf8', '#4338ca'],
-      ['#a78bfa', '#6d28d9'], ['#f472b6', '#be185d'], ['#fbbf24', '#b45309'],
+      ['#9e5560', '#5c1a24'], ['#d8b985', '#a8854e'], ['#8a9a78', '#566348'],
+      ['#d99873', '#b5683c'], ['#a06b72', '#7a2230'], ['#e0b066', '#b5772e'],
     ];
     const map = window._SERVER_COLOR_MAP || {};
     let idx = map[name];
@@ -142,7 +142,7 @@ const Commandes = {
     const html = `
       <div class="modal-overlay open" id="modal-delete-date" onclick="if(event.target.id==='modal-delete-date') document.getElementById('modal-delete-date').remove()">
         <div class="modal modal-sm" onclick="event.stopPropagation()">
-          <h2 class="modal-title" style="color:var(--danger)">⚠ Supprimer les commandes</h2>
+          <h2 class="modal-title" style="color:var(--danger)">Supprimer les commandes</h2>
           <div style="font-size:14px;color:var(--text);margin-bottom:14px">
             Tu es sur le point de supprimer <strong>définitivement</strong> :
           </div>
@@ -165,7 +165,7 @@ const Commandes = {
           </div>
           <div style="display:flex;gap:8px;justify-content:flex-end">
             <button class="btn btn-secondary" onclick="document.getElementById('modal-delete-date').remove()">Annuler</button>
-            <button class="btn btn-danger" id="confirm-delete-date">🗑 Confirmer la suppression</button>
+            <button class="btn btn-danger" id="confirm-delete-date">Confirmer la suppression</button>
           </div>
         </div>
       </div>`;

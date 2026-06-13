@@ -51,7 +51,7 @@ const Admin = {
       const rupture = stock <= 0;
       const bas = !rupture && stock < seuil;
       const stockCls = rupture ? 'badge-red' : bas ? 'badge-orange' : 'badge-green';
-      const stockLbl = rupture ? '⚠ Rupture' : stock + ' en stock';
+      const stockLbl = rupture ? 'Rupture' : stock + ' en stock';
 
       return `
         <div class="product-list-item">
@@ -164,7 +164,7 @@ const Admin = {
         preview.innerHTML = '<img src="' + produit.image_url + '" alt="" />';
         var rm = document.getElementById('np-image-remove'); if (rm) rm.style.display = '';
       } else {
-        preview.innerHTML = '<span class="img-upload-placeholder">📷 Aucune photo</span>';
+        preview.innerHTML = '<span class="img-upload-placeholder">Aucune photo</span>';
         var rm2 = document.getElementById('np-image-remove'); if (rm2) rm2.style.display = 'none';
       }
     }
@@ -224,14 +224,14 @@ const Admin = {
       document.getElementById('np-image-remove').style.display = '';
       Toast.success('Photo prête');
     } catch (e) {
-      preview.innerHTML = '<span class="img-upload-placeholder">📷 Erreur</span>';
+      preview.innerHTML = '<span class="img-upload-placeholder">Erreur</span>';
       Toast.error(e.message || 'Erreur upload');
     }
   },
 
   removeImage() {
     const preview = document.getElementById('np-image-preview');
-    if (preview) preview.innerHTML = '<span class="img-upload-placeholder">📷 Aucune photo</span>';
+    if (preview) preview.innerHTML = '<span class="img-upload-placeholder">Aucune photo</span>';
     const hidden = document.getElementById('np-image'); if (hidden) hidden.value = '';
     const file   = document.getElementById('np-image-file'); if (file) file.value = '';
     const rm     = document.getElementById('np-image-remove'); if (rm) rm.style.display = 'none';
@@ -330,7 +330,7 @@ const Admin = {
     // Orphelins (sans famille)
     if (orphans.length) {
       html += '<div class="fam-block fam-orphan">'
-           + '  <div class="fam-header"><span class="fam-name">⚠ Sans famille</span>'
+           + '  <div class="fam-header"><span class="fam-name">Sans famille</span>'
            + '  <span class="fam-count">' + orphans.length + ' à classer</span></div>'
            + '  <div class="fam-cats">';
       orphans.forEach(function(c) { html += _renderCatChip(c, families); });
@@ -424,7 +424,7 @@ const Admin = {
     // Choix : déplacer ou supprimer définitivement
     var choice = prompt(
       'Supprimer la catégorie "' + name + '" ?\n\n' +
-      '⚠ Les produits seront DÉPLACÉS vers une autre catégorie.\n\n' +
+      'Les produits seront DÉPLACÉS vers une autre catégorie.\n\n' +
       'Tape le NOM d\'une catégorie cible (ou "Divers" par défaut)\n' +
       'OU tape "SUPPRIMER" pour supprimer DÉFINITIVEMENT les produits.\n\n' +
       'Catégories disponibles : ' + moveOptions.slice(0, 8).join(', ') + (moveOptions.length > 8 ? '…' : ''),

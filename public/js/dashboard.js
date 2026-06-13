@@ -8,13 +8,15 @@
 // ── Palette globale dashboard (assortie au thème emerald) ────
 //   Paires [clair, foncé] pour les dégradés. Ordre fixe pour cohérence
 //   entre pie chart, server bars, top products, server chips, etc.
+// Warm categorical palette derived from the thebox brand system
+// (burgundy / tan / sage / clay / plum / gold) — [light, deep]
 const THEBOX_PALETTE = [
-  ['#34d399', '#059669'],  // emerald — primary
-  ['#22d3ee', '#0891b2'],  // cyan
-  ['#818cf8', '#4338ca'],  // indigo
-  ['#a78bfa', '#6d28d9'],  // violet
-  ['#f472b6', '#be185d'],  // pink (accent)
-  ['#fbbf24', '#b45309'],  // amber (accent)
+  ['#9e5560', '#5c1a24'],  // burgundy — primary
+  ['#d8b985', '#a8854e'],  // tan
+  ['#8a9a78', '#566348'],  // sage
+  ['#d99873', '#b5683c'],  // clay / terracotta
+  ['#a06b72', '#7a2230'],  // plum
+  ['#e0b066', '#b5772e'],  // warm gold
 ];
 
 // Map { nom_serveur → index palette } — peuplé par _renderServers, lu par les chips
@@ -25,7 +27,7 @@ const Dashboard = (() => {
   let _evoDays = 7;
   const charts = {};
 
-  const COLORS = ['#008060','#2c6ecb','#b98900','#d72c0d','#9b59b6','#19a974','#e0935c','#5c9fe0','#a564d4'];
+  const COLORS = ['#5c1a24','#a8854e','#6b7a5c','#b5683c','#7a2230','#8a9a78','#c9a26b','#9c5b3f','#566348'];
   const _isDark = () => document.documentElement.getAttribute('data-theme') === 'dark';
   const _txt    = () => _isDark() ? '#e8e8e8' : '#202223';
   const _grid   = () => _isDark() ? 'rgba(255,255,255,.06)' : 'rgba(0,0,0,.06)';
@@ -117,7 +119,7 @@ const Dashboard = (() => {
 
     // Courbe unique — total (style Sales Overview moderne)
     if (evo && !evo.error) _renderEvolutionLine(evo);
-    // ⚡ Charger les serveurs AVANT les dernières commandes →
+    // Charger les serveurs AVANT les dernières commandes →
     //    construit _SERVER_COLOR_MAP qui synchronise les chips avec le bar chart
     _wireServersPeriod();
     await _renderServers(_srvPeriod);
@@ -155,7 +157,7 @@ const Dashboard = (() => {
     const servers = (payload && payload.serveurs) || [];
     const nbNonAttr = (payload && payload.nb_non_attribuees) || 0;
 
-    // ⚡ Mémorise l'ordre (rang par CA desc) → utilisé pour colorer les chips serveur
+    // Mémorise l'ordre (rang par CA desc) → utilisé pour colorer les chips serveur
     //    partout (dashboard widget, page Commandes) de manière cohérente avec le bar chart.
     window._SERVER_COLOR_MAP = {};
     servers.forEach((s, i) => { window._SERVER_COLOR_MAP[s.serveur] = i; });
@@ -412,9 +414,9 @@ const Dashboard = (() => {
                onchange="Dashboard.setDate(this.value)">
         <button class="btn btn-ghost btn-sm" onclick="Dashboard.nextDay()">›</button>
         <button class="btn btn-ghost btn-sm" onclick="Dashboard.setDate('${today}')">Auj.</button>
-        ${canZ      ? `<button class="btn btn-secondary btn-sm" onclick="Dashboard.openZ()">📋 Z caisse</button>` : ''}
+        ${canZ      ? `<button class="btn btn-secondary btn-sm" onclick="Dashboard.openZ()">Z caisse</button>` : ''}
         ${canExport ? `<a class="btn btn-ghost btn-sm" href="${API.exportUrl('produits', _date, _date)}" target="_blank">⬇ CSV</a>` : ''}
-        <a class="btn btn-primary btn-sm" href="/api/rapport?date=${_date}" target="_blank">📄 PDF</a>
+        <a class="btn btn-primary btn-sm" href="/api/rapport?date=${_date}" target="_blank">PDF</a>
       </div>`;
   }
 
@@ -913,7 +915,7 @@ const Dashboard = (() => {
         datasets: [{
           label: 'CA',
           data: data.map(h => parseFloat(h.ca || 0)),
-          backgroundColor: '#2c6ecb',
+          backgroundColor: '#6b7a5c',
           borderRadius: 5,
           maxBarThickness: 26,
         }],
@@ -937,14 +939,14 @@ const Dashboard = (() => {
     // Palette par famille (couleurs modernes assorties au reste)
     // Définit { borderColor, gradientTopAlpha, gradientBottomAlpha }
     const famColors = {
-      'Boisson Chaude': '#c83a6e',
-      'Boisson Froide': '#5d4796',
-      'Cake':           '#e8a746',
-      'Coffee':         '#c83a6e',
-      'Tea / Cold':     '#5d4796',
-      'Snack':          '#e8a746',
+      'Boisson Chaude': '#5c1a24',
+      'Boisson Froide': '#6b7a5c',
+      'Cake':           '#a8854e',
+      'Coffee':         '#5c1a24',
+      'Tea / Cold':     '#6b7a5c',
+      'Snack':          '#a8854e',
     };
-    const fallback = ['#c83a6e', '#5d4796', '#e8a746', '#1f7a68', '#1e5fa8', '#c2540c', '#7f1e54'];
+    const fallback = ['#5c1a24', '#6b7a5c', '#a8854e', '#b5683c', '#7a2230', '#c2540c', '#8a9a78'];
 
     const c2d = canvas.getContext('2d');
     const h = canvas.parentElement ? canvas.parentElement.offsetHeight : 240;
@@ -1069,17 +1071,17 @@ const Dashboard = (() => {
     const c2d = canvas.getContext('2d');
     const h = canvas.parentElement ? canvas.parentElement.offsetHeight : 260;
 
-    // Gradient vert sous la courbe (assorti au thème primary)
+    // Gradient burgundy sous la courbe (assorti au thème primary)
     const grad = c2d.createLinearGradient(0, 0, 0, h);
-    grad.addColorStop(0,    'rgba(16, 185, 129, .32)');
-    grad.addColorStop(0.55, 'rgba(16, 185, 129, .10)');
-    grad.addColorStop(1,    'rgba(16, 185, 129, 0)');
+    grad.addColorStop(0,    'rgba(92, 26, 36, .26)');
+    grad.addColorStop(0.55, 'rgba(92, 26, 36, .08)');
+    grad.addColorStop(1,    'rgba(92, 26, 36, 0)');
 
-    // Gradient sur le trait (emerald clair → emerald profond)
+    // Gradient sur le trait (burgundy clair → burgundy profond)
     const lineGrad = c2d.createLinearGradient(0, 0, canvas.width, 0);
-    lineGrad.addColorStop(0,   '#34d399');
-    lineGrad.addColorStop(0.5, '#10b981');
-    lineGrad.addColorStop(1,   '#059669');
+    lineGrad.addColorStop(0,   '#9e5560');
+    lineGrad.addColorStop(0.5, '#7a2230');
+    lineGrad.addColorStop(1,   '#5c1a24');
 
     charts.evolution = new Chart(canvas, {
       type: 'line',
@@ -1092,12 +1094,12 @@ const Dashboard = (() => {
           backgroundColor: grad,
           fill: true,
           tension: 0.4,
-          pointBackgroundColor: '#10b981',
+          pointBackgroundColor: '#5c1a24',
           pointBorderColor: '#fff',
           pointBorderWidth: 2,
           pointRadius: n <= 8 ? 4 : 0,
           pointHoverRadius: 6,
-          pointHoverBackgroundColor: '#10b981',
+          pointHoverBackgroundColor: '#5c1a24',
           pointHoverBorderColor: '#fff',
           pointHoverBorderWidth: 3,
           borderWidth: 2.8,
@@ -1314,7 +1316,7 @@ const Dashboard = (() => {
     if (!el) return;
     // Filtre : uniquement les produits avec tracking actif (pas tous les produits)
     const all = (typeof Store !== 'undefined' && Store.produits) || [];
-    // ⚡ Store pas encore chargé ? On force le chargement et on re-render après
+    // Store pas encore chargé ? On force le chargement et on re-render après
     if (typeof Store !== 'undefined' && !all.length && !Store._loaded.produits) {
       // Loading state pendant le fetch
       el.innerHTML = '<div class="empty-state" style="padding:20px;text-align:center"><div class="spinner" style="margin:0 auto"></div></div>';
